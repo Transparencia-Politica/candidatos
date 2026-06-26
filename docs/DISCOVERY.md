@@ -10,3 +10,9 @@ modeled on):
 The full research corpus now lives at the repo root and in [`../research/`](../research/).
 **Start at the [README](../README.md)** for the document map, key design decisions, data-source
 attribution, and the non-partisan disclaimer.
+- https://github.com/Mcp-Brasil/mcp-brasil
+    - TSE (documentação: https://github.com/augusto-herrmann/divulgacandcontas-doc):
+        - Candidatos: https://github.com/Mcp-Brasil/mcp-brasil/blob/main/src/mcp_brasil/data/tse/client.py
+        - Emendas parlamentares (aceita por autor): https://github.com/Mcp-Brasil/mcp-brasil/blob/main/src/mcp_brasil/data/transferegov/client.py
+        - Diario oficial https://github.com/Mcp-Brasil/mcp-brasil/blob/main/src/mcp_brasil/data/diario_oficial/client.py
+        - Bens declarados por candidatos: https://github.com/Mcp-Brasil/mcp-brasil/blob/main/src/mcp_brasil/datasets/tse_bens/tools.py
