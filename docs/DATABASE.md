@@ -22,9 +22,20 @@ topics -> laws -> keywords -> scores <- politics
 ## Runtime flow
 
 1. `app/db.py` connects to MySQL, creates the schema, and seeds the initial topic/law/keyword reference data.
-2. `app/score_candidate.py` fetches one politician from Câmara and TSE, calculates scores for every seeded keyword, and upserts into `scores`.
-3. `app/server.py` exposes the stored data via `/api/scorecards`, `/api/politics`, and `/api/topics`.
-4. `app/index.html` renders the scorecard from `/api/scorecards`; it no longer calls Câmara/TSE directly.
+2. `app/score_candidate.py` fetches one politician from Câmara and TSE, resolves the TSE candidate when possible, calculates scores for every seeded keyword, and upserts into `scores`.
+3. `app/server.py` exposes candidate search, on-demand scoring, and stored scorecards.
+4. `app/index.html` searches candidates and renders scorecards through the local API; it no longer calls Câmara/TSE directly.
+
+## API surface
+
+| Endpoint | Method | Role |
+|---|---|---|
+| `/api/candidates/search?q=nome` | `GET` | Searches Câmara deputies by name and returns candidate choices. |
+| `/api/scorecards` | `GET` | Lists stored scorecards from MySQL. |
+| `/api/scorecards` | `POST` | Accepts `{"camara_id": 123}`. Returns cached MySQL data when present, or calculates and stores the scorecard. |
+| `/api/scorecards/{camara_id}` | `GET` | Reads one stored scorecard. |
+| `/api/politics` | `GET` | Lists stored politicians. |
+| `/api/topics` | `GET` | Lists the topic/law/keyword reference tree. |
 
 ## Local environment
 

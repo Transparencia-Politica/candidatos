@@ -20,6 +20,14 @@
   .badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;
     padding:4px 10px;background:var(--surface);color:var(--muted);font-size:.78rem;font-weight:650;white-space:nowrap}
   .panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;margin:14px 0}
+  .search-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .search-input{min-width:260px;flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);background:#fff}
+  .primary{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:9px 15px;font-weight:700;cursor:pointer}
+  .primary:disabled{opacity:.55;cursor:default}
+  .results{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .candidate{border:1px solid var(--line);border-radius:8px;background:#fbfcfe;color:var(--ink);padding:8px 10px;cursor:pointer;text-align:left}
+  .candidate b{display:block}
+  .candidate span{color:var(--muted);font-size:.8rem}
   .identity{display:flex;gap:16px;align-items:center}
   .avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
     background:#e7f5f1;color:var(--teal);font-weight:800;font-size:1.35rem;border:1px solid #b9dfd7}
@@ -53,6 +61,8 @@
   footer{color:var(--muted);font-size:.8rem;margin-top:16px}
   @media (max-width:760px){
     header{align-items:flex-start;flex-direction:column}
+    .search-form{align-items:stretch;flex-direction:column}
+    .search-input,.primary{width:100%}
     .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
     .wealth-grid{grid-template-columns:1fr}
     th:nth-child(2),td:nth-child(2){display:none}
@@ -64,10 +74,18 @@
   <header>
     <div>
       <h1>Candidato · Scorecard</h1>
-      <div class="sub">Patrimônio declarado × votos em teses tributárias, lido do banco local.</div>
+      <div class="sub">Busque um(a) deputado(a), calcule o score no backend e leia o resultado armazenado em MySQL.</div>
     </div>
-    <div class="badge">SQLite API</div>
+    <div class="badge">MySQL API</div>
   </header>
+
+  <section class="panel">
+    <form id="search-form" class="search-form">
+      <input id="candidate-query" class="search-input" placeholder="Digite um nome, ex.: Luciano Bivar" autocomplete="off">
+      <button id="search-button" class="primary" type="submit">Buscar</button>
+    </form>
+    <div id="search-results" class="results"></div>
+  </section>
 
   <section id="state" class="panel">Carregando scorecards...</section>
   <main id="content" style="display:none">
@@ -95,6 +113,10 @@ const BRL = n => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', {
 const COLORS = ['#0f766e', '#b45309', '#2563eb', '#7c3aed', '#be123c'];
 const el = id => document.getElementById(id);
 const pct = value => value === null || value === undefined ? '—' : `${value}%`;
+const form = el('search-form');
+const queryInput = el('candidate-query');
+const searchButton = el('search-button');
+const resultsEl = el('search-results');
 
 function chipClass(score){
   const status = score?.vote_status || '';
@@ -165,6 +187,75 @@ function renderVotes(card){
     <tbody>${rows.join('')}</tbody></table>`;
 }
 
+function renderCard(card, source){
+  renderIdentity(card);
+  renderMetrics(card);
+  renderWealth(card);
+  renderVotes(card);
+  el('state').style.display = 'none';
+  el('content').style.display = 'block';
+  const sourceLabel = source ? ` · ${source}` : '';
+  el('sources').textContent = `Dados servidos por /api/scorecards${sourceLabel} · renderizado em ${new Date().toLocaleString('pt-BR')}`;
+}
+
+function setLoading(message){
+  el('content').style.display = 'none';
+  el('state').style.display = 'block';
+  el('state').innerHTML = message;
+}
+
+function renderCandidateResults(candidates){
+  if(!candidates.length){
+    resultsEl.innerHTML = '<span class="muted">Nenhum deputado encontrado.</span>';
+    return;
+  }
+  resultsEl.innerHTML = candidates.map(c => `<button class="candidate" type="button" data-camara-id="${c.camara_id}">
+    <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · Câmara ${c.camara_id}</span>
+  </button>`).join('');
+  for(const button of resultsEl.querySelectorAll('.candidate')){
+    button.addEventListener('click', () => analyzeCandidate(Number(button.dataset.camaraId), button.querySelector('b').textContent));
+  }
+}
+
+async function searchCandidates(event){
+  event.preventDefault();
+  const q = queryInput.value.trim();
+  if(q.length < 2){
+    resultsEl.innerHTML = '<span class="error">Digite pelo menos 2 caracteres.</span>';
+    return;
+  }
+  searchButton.disabled = true;
+  resultsEl.innerHTML = '<span class="muted">Buscando na Câmara...</span>';
+  try{
+    const res = await fetch(`/api/candidates/search?q=${encodeURIComponent(q)}`);
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    renderCandidateResults(payload.candidates || []);
+  }catch(err){
+    resultsEl.innerHTML = `<span class="error">Erro na busca: ${err}</span>`;
+  }finally{
+    searchButton.disabled = false;
+  }
+}
+
+async function analyzeCandidate(camaraId, name){
+  setLoading(`Calculando score de ${name} e salvando no MySQL...`);
+  try{
+    const res = await fetch('/api/scorecards', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({camara_id: camaraId})
+    });
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('scorecard não retornado');
+    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+  }catch(err){
+    el('state').innerHTML = `<span class="error">Erro ao analisar ${name}: ${err}</span>`;
+  }
+}
+
 async function run(){
   try{
     const res = await fetch('/api/scorecards');
@@ -175,17 +266,12 @@ async function run(){
       el('state').innerHTML = '<span class="muted">Nenhum score calculado no banco ainda.</span>';
       return;
     }
-    renderIdentity(card);
-    renderMetrics(card);
-    renderWealth(card);
-    renderVotes(card);
-    el('state').style.display = 'none';
-    el('content').style.display = 'block';
-    el('sources').textContent = `Dados servidos por /api/scorecards · renderizado em ${new Date().toLocaleString('pt-BR')}`;
+    renderCard(card);
   }catch(err){
     el('state').innerHTML = `<span class="error">Erro ao carregar a API: ${err}</span>`;
   }
 }
+form.addEventListener('submit', searchCandidates);
 run();
 </script>
 </body>

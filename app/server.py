@@ -8,8 +8,10 @@ import http.server, urllib.request, urllib.parse, json, os
 
 try:
     import db
+    import score_candidate
 except ModuleNotFoundError:
     from app import db
+    from app import score_candidate
 
 ALLOWED = ("dadosabertos.camara.leg.br", "divulgacandcontas.tse.jus.br")
 CACHE = {}
@@ -23,6 +25,14 @@ def with_db(callback):
         return callback(conn)
     finally:
         conn.close()
+
+
+def parse_json_body(handler):
+    length = int(handler.headers.get("Content-Length", "0") or 0)
+    if length <= 0:
+        return {}
+    raw = handler.rfile.read(length).decode("utf-8")
+    return json.loads(raw or "{}")
 
 class H(http.server.BaseHTTPRequestHandler):
     def _send(self, code, body, ctype="application/json"):
@@ -40,6 +50,16 @@ class H(http.server.BaseHTTPRequestHandler):
         if p.path in ("/", "/index.html"):
             with open(os.path.join(HERE, "index.html"), "rb") as f:
                 return self._send(200, f.read(), "text/html; charset=utf-8")
+        if p.path == "/api/candidates/search":
+            query = urllib.parse.parse_qs(p.query)
+            name = (query.get("q", [""])[0] or "").strip()
+            if len(name) < 2:
+                return self._send(400, json.dumps({"error": "query must have at least 2 characters"}))
+            try:
+                candidates = score_candidate.search_deputies(name)
+                return self._send(200, json.dumps({"candidates": candidates}, ensure_ascii=False))
+            except Exception as e:
+                return self._send(502, json.dumps({"error": str(e)}, ensure_ascii=False))
         if p.path == "/api/topics":
             payload = with_db(lambda conn: {"topics": db.list_topics(conn)})
             return self._send(200, json.dumps(payload, ensure_ascii=False))
@@ -77,6 +97,36 @@ class H(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 return self._send(502, json.dumps({"error": str(e), "url": url}))
         return self._send(404, json.dumps({"error": "not found"}))
+
+    def do_POST(self):
+        p = urllib.parse.urlparse(self.path)
+        if p.path != "/api/scorecards":
+            return self._send(404, json.dumps({"error": "not found"}))
+        try:
+            body = parse_json_body(self)
+            camara_id = int(body.get("camara_id") or 0)
+            if not camara_id:
+                return self._send(400, json.dumps({"error": "camara_id is required"}))
+            refresh = bool(body.get("refresh"))
+            if not refresh:
+                existing = with_db(lambda conn: db.get_scorecards(conn, camara_id))
+                if existing["scorecards"]:
+                    existing["source"] = "cache"
+                    return self._send(200, json.dumps(existing, ensure_ascii=False))
+            score_candidate.score_camara_candidate(
+                camara_id=camara_id,
+                tse_year=int(body.get("tse_year") or score_candidate.DEFAULT_ELECTION["tse_year"]),
+                tse_uf=body.get("tse_uf"),
+                tse_election_id=body.get("tse_election_id") or score_candidate.DEFAULT_ELECTION["tse_election_id"],
+                tse_cargo=int(body.get("tse_cargo") or score_candidate.DEFAULT_ELECTION["tse_cargo"]),
+                tse_sq=body.get("tse_sq"),
+                database_url=db.DATABASE_URL,
+            )
+            payload = with_db(lambda conn: db.get_scorecards(conn, camara_id))
+            payload["source"] = "calculated"
+            return self._send(200, json.dumps(payload, ensure_ascii=False))
+        except Exception as e:
+            return self._send(502, json.dumps({"error": str(e)}, ensure_ascii=False))
 
     def log_message(self, *a):  # quiet
         pass

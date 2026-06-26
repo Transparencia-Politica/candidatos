@@ -7,6 +7,7 @@ import json
 import re
 import sys
 import time
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -20,13 +21,12 @@ except ModuleNotFoundError:
 
 CAMARA = "https://dadosabertos.camara.leg.br/api/v2"
 TSE = "https://divulgacandcontas.tse.jus.br/divulga/rest/v1"
-DEFAULT_CANDIDATE = {
-    "camara_id": 74478,
+DEFAULT_ELECTION = {
     "tse_year": 2022,
-    "tse_uf": "PE",
     "tse_election_id": "2040602022",
-    "tse_sq": "170001609112",
+    "tse_cargo": 6,
 }
+DEFAULT_CANDIDATE = {"camara_id": 74478}
 
 
 def fetch_json(url: str, attempts: int = 3, pause: float = 1.0) -> dict[str, Any]:
@@ -56,6 +56,75 @@ def fetch_json(url: str, attempts: int = 3, pause: float = 1.0) -> dict[str, Any
                 raise
         time.sleep(pause * attempt)
     raise RuntimeError(f"failed to fetch {url}: {last_error}")
+
+
+def normalize_name(value: str | None) -> str:
+    text = unicodedata.normalize("NFD", value or "")
+    text = "".join(ch for ch in text if unicodedata.category(ch) != "Mn")
+    return " ".join(text.upper().split())
+
+
+def search_deputies(name: str, limit: int = 10) -> list[dict[str, Any]]:
+    data = fetch_json(f"{CAMARA}/deputados?nome={urllib.parse.quote(name)}&ordem=ASC&ordenarPor=nome").get("dados", [])
+    return [
+        {
+            "camara_id": item.get("id"),
+            "name": item.get("nome"),
+            "party": item.get("siglaPartido"),
+            "uf": item.get("siglaUf"),
+            "photo_url": item.get("urlFoto"),
+            "source_url": item.get("uri"),
+        }
+        for item in data[:limit]
+    ]
+
+
+def tse_candidates_from_response(payload: dict[str, Any] | list[Any]) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return payload
+    return payload.get("candidatos") or payload.get("dados") or []
+
+
+def resolve_tse_candidate(
+    profile: dict[str, Any],
+    *,
+    tse_year: int,
+    tse_uf: str,
+    tse_election_id: str,
+    tse_cargo: int,
+) -> tuple[dict[str, Any], str]:
+    status = profile.get("ultimoStatus") or {}
+    names = [
+        normalize_name(status.get("nome")),
+        normalize_name(profile.get("nomeCivil")),
+        normalize_name(profile.get("nome")),
+    ]
+    names = [name for name in names if name]
+    list_url = f"{TSE}/candidatura/listar/{tse_year}/{tse_uf}/{tse_election_id}/{tse_cargo}/candidatos"
+    candidates = tse_candidates_from_response(fetch_json(list_url))
+
+    def candidate_names(candidate: dict[str, Any]) -> list[str]:
+        return [
+            normalize_name(candidate.get("nomeUrna")),
+            normalize_name(candidate.get("nomeCompleto")),
+            normalize_name(candidate.get("nome")),
+        ]
+
+    for candidate in candidates:
+        indexed_names = candidate_names(candidate)
+        if any(name and name in indexed_names for name in names):
+            return fetch_tse_detail(tse_year, tse_uf, tse_election_id, str(candidate["id"])), str(candidate["id"])
+
+    for candidate in candidates:
+        indexed_names = [name for name in candidate_names(candidate) if name]
+        if any(name in indexed or indexed in name for name in names for indexed in indexed_names):
+            return fetch_tse_detail(tse_year, tse_uf, tse_election_id, str(candidate["id"])), str(candidate["id"])
+
+    raise ValueError(f"TSE candidate not found for {status.get('nome') or profile.get('nome')} in {tse_uf}/{tse_year}")
+
+
+def fetch_tse_detail(tse_year: int, tse_uf: str, tse_election_id: str, tse_sq: str) -> dict[str, Any]:
+    return fetch_json(f"{TSE}/candidatura/buscar/{tse_year}/{tse_uf}/{tse_election_id}/candidato/{tse_sq}")
 
 
 def br_float(value: Any) -> float:
@@ -193,76 +262,121 @@ def score_keyword(keyword: dict[str, Any], law_vote: dict[str, Any], wealth_capi
     return score_value, self_interest_value
 
 
+def score_camara_candidate(
+    *,
+    camara_id: int,
+    database_url: str | None = None,
+    tse_year: int = DEFAULT_ELECTION["tse_year"],
+    tse_uf: str | None = None,
+    tse_election_id: str = DEFAULT_ELECTION["tse_election_id"],
+    tse_cargo: int = DEFAULT_ELECTION["tse_cargo"],
+    tse_sq: str | None = None,
+    limit_votes: int = 25,
+    pause: float = 0.35,
+    log=None,
+) -> dict[str, Any]:
+    conn = db.init_db(database_url)
+    try:
+        profile = fetch_json(f"{CAMARA}/deputados/{camara_id}").get("dados", {})
+        status = profile.get("ultimoStatus") or {}
+        tse_uf = tse_uf or status.get("siglaUf")
+        if not tse_uf:
+            raise ValueError(f"Cannot infer TSE UF for Câmara id {camara_id}")
+        time.sleep(pause)
+        if tse_sq:
+            candidate = fetch_tse_detail(tse_year, tse_uf, tse_election_id, tse_sq)
+        else:
+            candidate, tse_sq = resolve_tse_candidate(
+                profile,
+                tse_year=tse_year,
+                tse_uf=tse_uf,
+                tse_election_id=tse_election_id,
+                tse_cargo=tse_cargo,
+            )
+        tse_url = f"{TSE}/candidatura/buscar/{tse_year}/{tse_uf}/{tse_election_id}/candidato/{tse_sq}"
+        assets = candidate.get("bens") or []
+        buckets = bucketize_assets(assets)
+        wealth_total = br_float(candidate.get("totalDeBens")) or sum(buckets.values())
+        wealth_capital = buckets["Ações / participações"] + buckets["Depósito no exterior"]
+        name = status.get("nome") or candidate.get("nomeUrna") or candidate.get("nomeCompleto") or f"Câmara {camara_id}"
+
+        politic_id = db.upsert_politic(
+            conn,
+            camara_id=camara_id,
+            tse_sq=tse_sq,
+            tse_year=tse_year,
+            tse_uf=tse_uf,
+            tse_election_id=tse_election_id,
+            name=name,
+            party=status.get("siglaPartido") or candidate.get("partido") or "",
+            uf=status.get("siglaUf") or tse_uf,
+            birth_date=profile.get("dataNascimento"),
+            occupation=candidate.get("ocupacao") or "",
+            profile={"camara": profile, "tse": candidate},
+            wealth_total=wealth_total,
+            wealth_capital=wealth_capital,
+            wealth_buckets=buckets,
+        )
+
+        for law in db.list_laws_with_keywords(conn):
+            if log:
+                log(f"Scoring {name}: {law['label']}...")
+            law_vote = infer_law_vote(camara_id, law, limit_votes, pause)
+            for keyword in law["keywords"]:
+                score_value, self_interest_value = score_keyword(keyword, law_vote, wealth_capital)
+                evidence = {
+                    "camara_votes_url": law_vote["source_url"],
+                    "camara_law_url": law["source_url"],
+                    "nominal_vote_ids": law_vote["nominal_vote_ids"],
+                    "recorded_votes": law_vote["recorded"],
+                    "all_recorded_vote_types": law_vote["votes"],
+                    "passage_vote": law_vote["passage"],
+                    "tse_candidate_url": tse_url,
+                    "fetch_error": law_vote["fetch_error"],
+                }
+                db.upsert_score(
+                    conn,
+                    politic_id=politic_id,
+                    keyword_id=keyword["id"],
+                    score_value=score_value,
+                    self_interest_value=self_interest_value,
+                    vote_status=law_vote["vote_status"],
+                    vote_label=law_vote["vote_label"],
+                    stance=law_vote["stance"],
+                    present_count=law_vote["present"],
+                    nominal_count=law_vote["nominal"],
+                    coverage_value=1.0 if law_vote["present"] > 0 else 0.0,
+                    evidence=evidence,
+                )
+            conn.commit()
+            if log:
+                log(f"  -> {law_vote['vote_label']} ({law_vote['present']}/{law_vote['nominal']} votações nominais)")
+
+        return {"politic_id": politic_id, "camara_id": camara_id, "name": name, "tse_sq": tse_sq}
+    finally:
+        conn.close()
+
+
 def run(args: argparse.Namespace) -> int:
-    conn = db.init_db(args.db)
     if args.seed_only:
+        conn = db.init_db(args.db)
+        conn.close()
         print(f"Seeded DB schema/reference data at {args.db or db.DB_PATH}")
         return 0
 
-    profile = fetch_json(f"{CAMARA}/deputados/{args.camara_id}").get("dados", {})
-    time.sleep(args.pause)
-    tse_url = (
-        f"{TSE}/candidatura/buscar/{args.tse_year}/{args.tse_uf}/"
-        f"{args.tse_election_id}/candidato/{args.tse_sq}"
-    )
-    candidate = fetch_json(tse_url)
-    status = profile.get("ultimoStatus") or {}
-    assets = candidate.get("bens") or []
-    buckets = bucketize_assets(assets)
-    wealth_total = br_float(candidate.get("totalDeBens")) or sum(buckets.values())
-    wealth_capital = buckets["Ações / participações"] + buckets["Depósito no exterior"]
-    name = status.get("nome") or candidate.get("nomeUrna") or candidate.get("nomeCompleto") or f"Câmara {args.camara_id}"
-
-    politic_id = db.upsert_politic(
-        conn,
+    result = score_camara_candidate(
         camara_id=args.camara_id,
-        tse_sq=args.tse_sq,
+        database_url=args.db,
         tse_year=args.tse_year,
         tse_uf=args.tse_uf,
         tse_election_id=args.tse_election_id,
-        name=name,
-        party=status.get("siglaPartido") or candidate.get("partido") or "",
-        uf=status.get("siglaUf") or args.tse_uf,
-        birth_date=profile.get("dataNascimento"),
-        occupation=candidate.get("ocupacao") or "",
-        profile={"camara": profile, "tse": candidate},
-        wealth_total=wealth_total,
-        wealth_capital=wealth_capital,
-        wealth_buckets=buckets,
+        tse_cargo=args.tse_cargo,
+        tse_sq=args.tse_sq,
+        limit_votes=args.limit_votes,
+        pause=args.pause,
+        log=lambda message: print(message, flush=True),
     )
-
-    for law in db.list_laws_with_keywords(conn):
-        print(f"Scoring {name}: {law['label']}...", flush=True)
-        law_vote = infer_law_vote(args.camara_id, law, args.limit_votes, args.pause)
-        for keyword in law["keywords"]:
-            score_value, self_interest_value = score_keyword(keyword, law_vote, wealth_capital)
-            evidence = {
-                "camara_votes_url": law_vote["source_url"],
-                "camara_law_url": law["source_url"],
-                "nominal_vote_ids": law_vote["nominal_vote_ids"],
-                "recorded_votes": law_vote["recorded"],
-                "all_recorded_vote_types": law_vote["votes"],
-                "passage_vote": law_vote["passage"],
-                "tse_candidate_url": tse_url,
-                "fetch_error": law_vote["fetch_error"],
-            }
-            db.upsert_score(
-                conn,
-                politic_id=politic_id,
-                keyword_id=keyword["id"],
-                score_value=score_value,
-                self_interest_value=self_interest_value,
-                vote_status=law_vote["vote_status"],
-                vote_label=law_vote["vote_label"],
-                stance=law_vote["stance"],
-                present_count=law_vote["present"],
-                nominal_count=law_vote["nominal"],
-                coverage_value=1.0 if law_vote["present"] > 0 else 0.0,
-                evidence=evidence,
-            )
-        conn.commit()
-        print(f"  -> {law_vote['vote_label']} ({law_vote['present']}/{law_vote['nominal']} votações nominais)", flush=True)
-
+    name = result["name"]
     print(f"Stored scores for {name} in {args.db or db.DB_PATH}", flush=True)
     return 0
 
@@ -271,10 +385,11 @@ def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--db", default=db.DATABASE_URL, help="Database URL; defaults to DATABASE_URL")
     p.add_argument("--camara-id", type=int, default=DEFAULT_CANDIDATE["camara_id"])
-    p.add_argument("--tse-year", type=int, default=DEFAULT_CANDIDATE["tse_year"])
-    p.add_argument("--tse-uf", default=DEFAULT_CANDIDATE["tse_uf"])
-    p.add_argument("--tse-election-id", default=DEFAULT_CANDIDATE["tse_election_id"])
-    p.add_argument("--tse-sq", default=DEFAULT_CANDIDATE["tse_sq"])
+    p.add_argument("--tse-year", type=int, default=DEFAULT_ELECTION["tse_year"])
+    p.add_argument("--tse-uf")
+    p.add_argument("--tse-election-id", default=DEFAULT_ELECTION["tse_election_id"])
+    p.add_argument("--tse-cargo", type=int, default=DEFAULT_ELECTION["tse_cargo"])
+    p.add_argument("--tse-sq")
     p.add_argument("--limit-votes", type=int, default=25, help="Recent proposition votes to inspect per law")
     p.add_argument("--pause", type=float, default=0.35, help="Seconds to wait between public API calls")
     p.add_argument("--seed-only", action="store_true", help="Create schema and seed topics/laws/keywords only")
