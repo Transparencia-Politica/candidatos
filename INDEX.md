@@ -43,6 +43,16 @@ the **Transparência-Política** project. There is no app code yet — the docum
 | File | What it is |
 |---|---|
 | [`docs/DISCOVERY.md`](docs/DISCOVERY.md) | Seed reference + pointer into the research corpus. |
+| [`docs/DATABASE.md`](docs/DATABASE.md) | Local MySQL schema, Docker Compose setup, and scorecard runtime flow. |
+
+### `app/`
+
+| File | What it is |
+|---|---|
+| [`app/db.py`](app/db.py) | MySQL schema, seed data, and scorecard read model. |
+| [`app/score_candidate.py`](app/score_candidate.py) | One-candidate ingestion/scoring script for Câmara + TSE data. |
+| [`app/server.py`](app/server.py) | Local HTTP server exposing scorecard APIs and serving the frontend. |
+| [`app/index.html`](app/index.html) | Frontend that consumes `/api/scorecards`. |
 
 ## Reading order by task
 
@@ -51,6 +61,8 @@ the **Transparência-Política** project. There is no app code yet — the docum
 - **Design the matching engine** → `wahl-o-mat-methodology.md` → `04` → `06`.
 - **Write the thesis bank** → `05` → `06` → `wahl-o-mat-methodology.md`.
 - **Scale the scoring POC** → `07` → `01` / `02`.
+- **Work on the local scorecard DB/API** → `docs/DATABASE.md` → `app/db.py` →
+  `app/score_candidate.py` → `app/server.py`.
 
 ## Documenting findings (research mode)
 
