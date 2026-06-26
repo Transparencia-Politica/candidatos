@@ -1,6 +1,6 @@
 # Candidate-Evaluation & Preference-Matching Pipeline — Design & Prior Art
 
-Research brief for **voto-o-mat-br2026**, a Brazilian Wahl-O-Mat analog for the 2026 general election.
+Research brief for **Candidato** (Transparência-Política), a Brazilian Wahl-O-Mat analog for the 2026 general election.
 Focus: **methodology** and **existing products**. Raw Câmara/Senado/TSE API endpoints are covered by other agents and are deliberately omitted here.
 
 Date: 2026-06-26.

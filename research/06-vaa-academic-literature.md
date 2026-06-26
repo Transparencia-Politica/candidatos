@@ -1,4 +1,4 @@
-# VAA Academic Literature — Synthesis for voto-o-mat-br2026
+# VAA Academic Literature — Synthesis for Candidato (Transparência-Política)
 
 Distilled from four peer-reviewed papers (cited in full below; consult them via their DOIs —
 three are paywalled, Fossen & Anderson 2014 is open access). This is the methodological backbone
@@ -161,7 +161,7 @@ statements, 11 parties) and compared the advice.
 
 ---
 
-## Cross-cutting synthesis → design directives for voto-o-mat-br2026
+## Cross-cutting synthesis → design directives for Candidato
 
 1. **Algorithm = product.** Default to a **high-dimensional agreement / city-block** match over
    raw theses. Treat any ideological-map view as a *secondary, separately-validated* visualization.
