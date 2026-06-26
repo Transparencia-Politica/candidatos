@@ -1,4 +1,4 @@
-# Voto-O-Mat BR 2026 — Data Sources & References
+# Candidato (Transparência-Política) — Data Sources & References
 
 A Brazilian analog to Germany's [Wahl-O-Mat](https://www.wahl-o-mat.de/bw2026/app/main_app.html),
 targeting the **2026 Brazilian general election** (President, Congress, governors,
