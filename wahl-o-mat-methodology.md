@@ -1,6 +1,6 @@
 # Wahl-O-Mat — Methodology, Matching Math & Glossary (Canonical)
 
-*Reference document for designing the Brazilian voting-advice app (voto-o-mat-br2026).
+*Reference document for designing Candidato (Transparência-Política), the Brazilian voting-advice app.
 Compiled June 2026 from authoritative German sources (bpb.de, Landeszentralen, the bpb
 Rechenmodell PDF, Wikipedia, university explainers). Every factual claim was verified against
 a primary source; URLs are linked inline. This file merges the methodology overview, the exact
