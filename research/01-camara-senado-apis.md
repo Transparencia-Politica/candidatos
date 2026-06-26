@@ -1,6 +1,6 @@
 # Legislative Behavior Data — Câmara dos Deputados & Senado Federal Open-Data APIs
 
-Research report for the 2026 Brazilian Wahl-O-Mat (voto-o-mat-br2026). Scope: **legislative behavior only** (deputies, senators, roll-call votes, bills, attendance, expenses, topic taxonomies). TSE/election-candidate data is out of scope (handled separately).
+Research report for Candidato (Transparência-Política), a 2026 Brazilian Wahl-O-Mat-style voting-advice app. Scope: **legislative behavior only** (deputies, senators, roll-call votes, bills, attendance, expenses, topic taxonomies). TSE/election-candidate data is out of scope (handled separately).
 
 All endpoints below were **verified live** against the production APIs on 2026-06-26. Status of each is noted. Both APIs are **open, require no API key, and impose no documented hard rate limit** (be polite: throttle to a few req/s and cache aggressively).
 

@@ -1,4 +1,4 @@
-# candidatos — Voto-O-Mat BR 2026 (research & data layer)
+# candidatos — Candidato (Transparência-Política) (research & data layer)
 
 A Brazilian analog of Germany's [Wahl-O-Mat](https://www.wahl-o-mat.de/), targeting the
 **2026 Brazilian general election** (1st round **4 Oct 2026**). The distinguishing idea: instead

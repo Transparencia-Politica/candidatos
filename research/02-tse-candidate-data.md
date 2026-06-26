@@ -1,4 +1,4 @@
-# TSE / Candidate Data for Voto-o-mat BR 2026
+# TSE / Candidate Data for Candidato (Transparência-Política)
 
 Research date: 2026-06-26. Scope: candidate & electoral data acquisition and screening for the 2026 Brazilian general election (1st round **4 Oct 2026**, 2nd round **25 Oct 2026**). Legislative voting APIs (Câmara/Senado) are covered by a separate report.
 
