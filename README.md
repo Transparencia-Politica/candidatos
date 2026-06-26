@@ -28,6 +28,22 @@ This repo currently holds the **research and data-access groundwork** (no app co
 | [`08-api-field-notes.md`](research/08-api-field-notes.md) | Hard-won API gotchas (DivulgaCand route shape, Câmara `/votos`, zsh, rate limits). Read before coding ingestion. |
 | [`09-topic-to-law-discovery.md`](research/09-topic-to-law-discovery.md) | Topic → bills: the `codTema` theme list + TECAD thesaurus + query-expansion pipeline (and the "0/0" discovery-bug fix). |
 
+### `app/` and `docs/`
+| File | What it is |
+|---|---|
+| [`app/db.py`](app/db.py) | Local MySQL schema and read model for `topics -> laws -> keywords -> scores <- politics`. |
+| [`app/score_candidate.py`](app/score_candidate.py) | One-candidate scoring script/API helper that fetches official APIs, resolves TSE candidates, and stores calculated scores. |
+| [`app/server.py`](app/server.py) | Local HTTP server with candidate search, on-demand scoring, `/api/scorecards`, `/api/politics`, and `/api/topics`. |
+| [`app/index.html`](app/index.html) | Static frontend for candidate search and MySQL-backed scorecards. |
+| [`docs/DATABASE.md`](docs/DATABASE.md) | Implementation note for the database model and runtime flow. |
+
+Local app/database environment:
+
+```bash
+docker compose up --build
+docker compose run --rm app python app/score_candidate.py
+```
+
 The two reference MCP repos analyzed in `REPO-ANALYSIS.md` are **not bundled** here — clone them
 from their GitHub URLs (listed in that doc) if you want to read their source.
 

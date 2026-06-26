@@ -3,282 +3,276 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Candidato — Scorecard (genérico, ao vivo)</title>
+<title>Candidato — Scorecard</title>
 <style>
-  :root{--bg:#0d1117;--card:#161b22;--line:#272e3a;--fg:#e6edf3;--muted:#8b949e;
-    --green:#2ea043;--red:#da3633;--amber:#d29922;--gray:#484f58;--accent:#388bfd;}
+  :root{
+    --bg:#f7f8fb;--surface:#ffffff;--ink:#20242c;--muted:#667085;--line:#d9dee7;
+    --teal:#0f766e;--rose:#be123c;--amber:#b45309;--blue:#2563eb;--violet:#7c3aed;
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);
-    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
-  .wrap{max-width:920px;margin:0 auto;padding:28px 20px 100px;}
-  h1{font-size:1.5em;margin:0 0 2px;}
-  .sub{color:var(--muted);margin-bottom:18px;font-size:.9em;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0;}
-  .card h2{font-size:1em;margin:0 0 12px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);}
-  .row{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);}
-  .row:last-child{border-bottom:0}
-  .big{font-size:2em;font-weight:700;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 18px 72px;}
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+  h1{font-size:1.45rem;line-height:1.15;margin:0}
+  h2{font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+  .sub{color:var(--muted);font-size:.92rem;margin-top:4px}
+  .badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;
+    padding:4px 10px;background:var(--surface);color:var(--muted);font-size:.78rem;font-weight:650;white-space:nowrap}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;margin:14px 0}
+  .search-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .search-input{min-width:260px;flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);background:#fff}
+  .primary{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:9px 15px;font-weight:700;cursor:pointer}
+  .primary:disabled{opacity:.55;cursor:default}
+  .results{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .candidate{border:1px solid var(--line);border-radius:8px;background:#fbfcfe;color:var(--ink);padding:8px 10px;cursor:pointer;text-align:left}
+  .candidate b{display:block}
+  .candidate span{color:var(--muted);font-size:.8rem}
+  .identity{display:flex;gap:16px;align-items:center}
+  .avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+    background:#e7f5f1;color:var(--teal);font-weight:800;font-size:1.35rem;border:1px solid #b9dfd7}
+  .name{font-size:1.28rem;font-weight:760}
   .muted{color:var(--muted)}
-  .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78em;font-weight:600;}
-  .c-sim{background:rgba(46,160,67,.18);color:#3fb950;border:1px solid #2ea04355;}
-  .c-nao{background:rgba(218,54,51,.18);color:#f85149;border:1px solid #da363355;}
-  .c-aus{background:rgba(72,79,88,.25);color:#8b949e;border:1px solid #484f58;}
-  .c-mix{background:rgba(210,153,34,.18);color:#e3b341;border:1px solid #d2992255;}
-  .bar{height:9px;border-radius:6px;background:#21262d;overflow:hidden;margin-top:4px;}
-  .bar > i{display:block;height:100%;}
-  .hdr{display:flex;gap:16px;align-items:center;}
-  .avatar{width:60px;height:60px;border-radius:50%;background:#21262d;display:flex;align-items:center;
-    justify-content:center;font-size:1.3em;font-weight:700;color:var(--accent);border:1px solid var(--line);flex:0 0 auto;}
-  table{width:100%;border-collapse:collapse;}
-  th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.9em;}
-  th{color:var(--muted);font-weight:600;font-size:.78em;text-transform:uppercase;}
-  .gauge{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-  .pill{background:#21262d;border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:120px;}
-  .pill .n{font-size:1.4em;font-weight:700;}
-  .pill .l{color:var(--muted);font-size:.74em;text-transform:uppercase;}
-  .note{background:#1c2128;border-left:3px solid var(--accent);padding:10px 14px;border-radius:6px;
-    color:#c9d1d9;font-size:.88em;margin-top:12px;}
-  .warn{border-left-color:var(--amber);}
-  code{background:#21262d;padding:1px 6px;border-radius:5px;font-size:.85em;}
-  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
-  .src{color:var(--muted);font-size:.8em;}
-  .step{font-size:.84em;color:var(--muted);margin:2px 0;}
-  .ok{color:#3fb950}.err{color:#f85149}
-  input,button{font:inherit}
-  #q{background:#0d1117;border:1px solid var(--line);color:var(--fg);border-radius:8px;padding:9px 12px;width:min(420px,70%);}
-  button{background:var(--accent);border:0;color:#fff;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:600;}
-  .picks button{background:#21262d;border:1px solid var(--line);color:var(--fg);margin:4px 6px 0 0;font-weight:500;}
+  .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:92px}
+  .metric .n{font-size:1.65rem;font-weight:780;line-height:1.05}
+  .metric .l{color:var(--muted);font-size:.78rem;text-transform:uppercase;margin-top:6px}
+  .wealth-grid{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:start}
+  .big{font-size:2rem;font-weight:800}
+  .row{display:grid;grid-template-columns:1fr auto;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .bar{height:8px;background:#edf0f5;border-radius:999px;overflow:hidden;margin-top:5px}
+  .bar i{display:block;height:100%;border-radius:999px}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:.75rem;text-transform:uppercase}
+  .chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 9px;font-size:.77rem;font-weight:700;
+    border:1px solid transparent;white-space:nowrap}
+  .c-sim{background:#e7f5f1;color:var(--teal);border-color:#b9dfd7}
+  .c-nao{background:#fff1f2;color:var(--rose);border-color:#fecdd3}
+  .c-aus{background:#eef1f5;color:#5b6472;border-color:#d8dee8}
+  .c-mix{background:#fff7ed;color:var(--amber);border-color:#fed7aa}
+  .keywords{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .keyword{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:.76rem;color:#384152;background:#fbfcfe}
+  .note{border-left:3px solid var(--blue);background:#f0f5ff;padding:10px 12px;border-radius:6px;color:#344054}
+  .warn{border-left-color:var(--amber);background:#fff7ed}
+  code{background:#edf0f5;padding:1px 5px;border-radius:5px}
+  .error{color:var(--rose)}
+  footer{color:var(--muted);font-size:.8rem;margin-top:16px}
+  @media (max-width:760px){
+    header{align-items:flex-start;flex-direction:column}
+    .search-form{align-items:stretch;flex-direction:column}
+    .search-input,.primary{width:100%}
+    .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .wealth-grid{grid-template-columns:1fr}
+    th:nth-child(2),td:nth-child(2){display:none}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Candidato · Scorecard <span class="muted" style="font-size:.6em">genérico · ao vivo</span></h1>
-  <div class="sub">Digite um(a) deputado(a). Tudo é descoberto pelas APIs abertas — sem candidato,
-  projetos ou rótulos escritos à mão. Patrimônio (TSE) × votos em finanças/tributação (Câmara),
-  com a direção tirada da <b>orientação do Governo</b> em cada votação.</div>
+  <header>
+    <div>
+      <h1>Candidato · Scorecard</h1>
+      <div class="sub">Busque um(a) deputado(a), calcule o score no backend e leia o resultado armazenado em MySQL.</div>
+    </div>
+    <div class="badge">MySQL API</div>
+  </header>
 
-  <div class="card">
-    <form id="form" onsubmit="return false">
-      <input id="q" placeholder="ex.: Tabata Amaral, Kim Kataguiri, Nikolas…" autofocus>
-      <button id="go">Analisar</button>
+  <section class="panel">
+    <form id="search-form" class="search-form">
+      <input id="candidate-query" class="search-input" placeholder="Digite um nome, ex.: Luciano Bivar" autocomplete="off">
+      <button id="search-button" class="primary" type="submit">Buscar</button>
     </form>
-    <div id="picks" class="picks"></div>
-  </div>
+    <div id="search-results" class="results"></div>
+  </section>
 
-  <div id="loadlog" class="card" style="display:none"><h2>Carregando ao vivo…</h2><div id="steps"></div></div>
-  <div id="header" class="card" style="display:none"></div>
-  <div id="wealth" class="card" style="display:none"></div>
-  <div id="score"  class="card" style="display:none"></div>
-  <div id="votes"  class="card" style="display:none"></div>
-
-  <div class="card">
-    <h2>Como funciona (sem nada escrito à mão)</h2>
-    <ol style="margin:.3em 0;padding-left:1.2em">
-      <li><b>Deputado(a):</b> resolvido por <code>/deputados?nome=</code>.</li>
-      <li><b>Patrimônio:</b> casa o nome na lista do TSE da eleição (<code>/candidatura/listar</code>)
-      e busca os bens (<code>/candidatura/buscar</code>).</li>
-      <li><b>Pauta tributária:</b> descoberta pela taxonomia da própria Câmara
-      (<code>codTema</code> 70 Finanças Públicas / 40 Economia) → proposições → votações.</li>
-      <li><b>Direção:</b> tirada da <code>/orientacoes</code> de cada votação (linha do <b>Governo</b>),
-      não de um rótulo meu.</li>
-      <li><b>Score:</b> presença, alinhamento com o Governo/Oposição e patrimônio — tudo calculado.</li>
-    </ol>
-    <div class="note">Limitação honesta: "tributar os ricos" é um rótulo semântico que a API não traz.
-    O único eixo ideológico que a API fornece sem rotulagem humana é a <b>orientação Governo/Oposição</b>.
-    Por isso o score mede alinhamento com o Governo na pauta de finanças — derivado 100% de dados.</div>
-  </div>
-  <div class="card src" id="sources"></div>
+  <section id="state" class="panel">Carregando scorecards...</section>
+  <main id="content" style="display:none">
+    <section id="identity" class="panel"></section>
+    <section id="metrics" class="metrics"></section>
+    <section id="wealth" class="panel"></section>
+    <section id="votes" class="panel"></section>
+    <section class="panel">
+      <h2>Como o score é calculado</h2>
+      <p>Para cada palavra-chave associada a uma lei, a direção indica o que um voto <code>Sim</code>
+      representa. <code>+1</code> significa avançar a tese, <code>-1</code> significa bloquear a tese,
+      e <code>0</code> é contexto sem direção de riqueza.</p>
+      <div class="note warn">Ausência continua sendo ausência: o banco guarda presença, cobertura e
+      evidência separadamente para evitar transformar dado faltante em intenção.</div>
+    </section>
+  </main>
+  <footer id="sources"></footer>
 </div>
 
 <script>
-const C='https://dadosabertos.camara.leg.br/api/v2';
-const T='https://divulgacandcontas.tse.jus.br/divulga/rest/v1';
-// ---- the only config: which election to read TSE wealth from, and which theme codes = "tax/finance" ----
-const ELECTION={ ano:2022, idEleicao:'2040602022', cargo:6 };   // cargo 6 = Deputado Federal
-const THEMES=[70,40];          // 70 Finanças Públicas e Orçamento, 40 Economia (Câmara taxonomy)
-const CONC=6;
-// Topic = "tributação de riqueza/renda" as TECAD controlled-vocabulary descriptors
-// (harvested from the indexação of seed bills; see research/09-topic-to-law-discovery.md).
-const DESCRIPTORS=["Imposto sobre Grandes Fortunas (IGF)","dividendos","ganho de capital",
-  "Juros sobre capital próprio","Imposto sobre a Renda da Pessoa Física (IRPF)",
-  "Contribuição Social sobre o Lucro Líquido (CSLL)",
-  "Imposto sobre a Renda e Proventos de Qualquer Natureza (IR)"];
-const YEARS=[2023,2024,2025];  // current legislature only → fair presence comparison across deputies
-const TIPOS=new Set(["PL","PEC","PLP","MPV"]);
-const CAP_VOTACOES=90;
-let UNIVERSE=null;  // built once, reused across deputies
+const BRL = n => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+const COLORS = ['#0f766e', '#b45309', '#2563eb', '#7c3aed', '#be123c'];
+const el = id => document.getElementById(id);
+const pct = value => value === null || value === undefined ? '—' : `${value}%`;
+const form = el('search-form');
+const queryInput = el('candidate-query');
+const searchButton = el('search-button');
+const resultsEl = el('search-results');
 
-const BRL=n=>'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-// via local proxy: same-origin (no CORS) + server cache/retries → robust under parallel load
-const px =url=>fetch('/proxy?url='+encodeURIComponent(url)).then(r=>r.json());
-const el =id=>document.getElementById(id);
-const norm=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().trim();
-function step(t,cls){const d=document.createElement('div');d.className='step';
-  d.innerHTML=(cls==='ok'?'<span class="ok">✓</span> ':cls==='err'?'<span class="err">✗</span> ':'• ')+t;el('steps').appendChild(d);}
-async function pool(items,fn,conc=CONC){const out=[];let i=0;
-  await Promise.all(Array.from({length:Math.min(conc,items.length)},async()=>{
-    while(i<items.length){const k=i++;try{out[k]=await fn(items[k],k)}catch(e){out[k]=null}}}));
-  return out;}
-
-function bucketize(bens){
-  const g={'Ações / participações':0,'Depósito no exterior':0,'Dinheiro em espécie':0,'Poupança / renda fixa / contas':0,'Imóveis':0,'Outros':0};
-  for(const b of (bens||[])){const v=parseFloat(b.valor||0)||0;const d=norm(b.descricaoDeTipoDeBem).toLowerCase();
-    if(d.includes('acoes')||d.includes('quota')||d.includes('participa'))g['Ações / participações']+=v;
-    else if(d.includes('exterior'))g['Depósito no exterior']+=v;
-    else if(d.includes('especie'))g['Dinheiro em espécie']+=v;
-    else if(d.includes('poupanca')||d.includes('renda fixa')||d.includes('deposito')||d.includes('cdb')||d.includes('fundo'))g['Poupança / renda fixa / contas']+=v;
-    else if(d.includes('imovel')||d.includes('apartament')||d.includes('casa')||d.includes('terreno')||d.includes('predio')||d.includes('sala'))g['Imóveis']+=v;
-    else g['Outros']+=v;}
-  return g;}
-const COLORS=['#388bfd','#d29922','#2ea043','#a371f7','#db61a2','#8b949e'];
-
-async function searchDep(name){
-  return (await px(`${C}/deputados?nome=${encodeURIComponent(name)}&ordem=ASC&ordenarPor=nome`)).dados||[];}
-
-async function resolveWealth(dep){
-  const uf=dep.siglaUf;
-  const list=await px(`${T}/candidatura/listar/${ELECTION.ano}/${uf}/${ELECTION.idEleicao}/${ELECTION.cargo}/candidatos`);
-  const cands=list.candidatos||list||[];
-  const want=norm(dep.nome);
-  let hit=cands.find(c=>norm(c.nomeUrna)===want)||cands.find(c=>norm(c.nomeCompleto)===want)
-    ||cands.find(c=>norm(c.nomeCompleto).includes(want)||want.includes(norm(c.nomeUrna)));
-  if(!hit) return null;
-  return px(`${T}/candidatura/buscar/${ELECTION.ano}/${uf}/${ELECTION.idEleicao}/candidato/${hit.id}`);}
-
-// Build the (deputy-independent) universe of tributação votações ONCE, via the
-// keyword-descriptor pipeline (research/09): descriptors → bills → voted votações →
-// votos + government orientation. Cached so switching deputies is instant.
-async function buildUniverse(){
-  if(UNIVERSE) return UNIVERSE;
-  step('Descobrindo a pauta de tributação (descritores → proposições)…');
-  const queries=[];
-  for(const d of DESCRIPTORS) for(const y of YEARS) queries.push({d,y});
-  const props={};
-  await pool(queries, async({d,y})=>{
-    const r=(await px(`${C}/proposicoes?keywords=${encodeURIComponent(d)}&ano=${y}&itens=30&ordem=DESC&ordenarPor=id`)).dados||[];
-    for(const p of r){ if(TIPOS.has(p.siglaTipo)) props[p.id]=p; }
-  });
-  const bills=Object.values(props);
-  step(`${bills.length} proposições candidatas; identificando as votadas…`);
-  const vls=await pool(bills, p=>px(`${C}/proposicoes/${p.id}/votacoes`).then(r=>({p,v:r.dados||[]})));
-  let votacoes=[];
-  for(const x of vls){ if(!x) continue; for(const v of x.v){ if(/Sim:/.test(v.descricao||'')) votacoes.push({prop:x.p,votacao:v}); } }
-  votacoes=votacoes.slice(0,CAP_VOTACOES);
-  step(`${votacoes.length} votações nominais; carregando votos + linha do Governo…`);
-  const enriched=await pool(votacoes, async({prop,votacao})=>{
-    const [votos,ori]=await Promise.all([
-      px(`${C}/votacoes/${votacao.id}/votos`).then(r=>r.dados||[]).catch(()=>[]),
-      px(`${C}/votacoes/${votacao.id}/orientacoes`).then(r=>r.dados||[]).catch(()=>[])]);
-    const gov=(ori.find(o=>/governo/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
-    const opp=(ori.find(o=>/oposi/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
-    return {prop,votacao,votos,gov,opp};
-  });
-  UNIVERSE=enriched.filter(x=>x&&x.votos.length);
-  step(`Universo: ${UNIVERSE.length} votações de tributação (reutilizado entre deputados)`,'ok');
-  return UNIVERSE;
+function chipClass(score){
+  const status = score?.vote_status || '';
+  if(status.includes('sim')) return 'c-sim';
+  if(status.includes('nao') || status.includes('não')) return 'c-nao';
+  if(status.includes('misto')) return 'c-mix';
+  return 'c-aus';
 }
 
-async function run(dep){
-  el('picks').innerHTML='';['header','wealth','votes','score'].forEach(i=>el(i).style.display='none');
-  el('loadlog').style.display='block';el('steps').innerHTML='';
-  step('Deputado(a): '+dep.nome+' ('+dep.siglaPartido+'-'+dep.siglaUf+')','ok');
+function renderIdentity(card){
+  const p = card.politic;
+  el('identity').innerHTML = `<div class="identity">
+    <div class="avatar">${(p.name || '?').slice(0,1)}</div>
+    <div>
+      <div class="name">${p.name}</div>
+      <div class="muted">${p.party || '—'} · ${p.uf || '—'} · ${p.occupation || 'ocupação não informada'}</div>
+      <div class="muted">Câmara ${p.camara_id} · TSE ${p.tse_year}/${p.tse_uf} · SQ ${p.tse_sq}</div>
+    </div>
+  </div>`;
+}
 
-  const prof=(await px(`${C}/deputados/${dep.id}`)).dados; const us=prof.ultimoStatus||{};
-  const idade=prof.dataNascimento?Math.floor((Date.now()-new Date(prof.dataNascimento))/3.15576e10):'';
-  el('header').style.display='block';
-  el('header').innerHTML=`<div class="hdr"><div class="avatar">${(us.nome||'?')[0]}</div>
-    <div><div style="font-size:1.25em;font-weight:700">${us.nome}</div>
-    <div class="muted">${us.siglaPartido||''} · ${us.siglaUf||''} — ${prof.escolaridade||''} ${idade?'· '+idade+' anos':''}</div>
-    <div class="muted">Câmara id ${dep.id} · ${us.condicaoEleitoral||''}</div></div></div>`;
+function renderMetrics(card){
+  const s = card.summary;
+  const metrics = [
+    [pct(s.wealth_capital_pct), 'patrimônio em capital'],
+    [pct(s.coverage_pct), 'cobertura de leis relevantes'],
+    [pct(s.key_attendance_pct), 'presença no projeto-chave'],
+    [s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio']
+  ];
+  el('metrics').innerHTML = metrics.map(([n,l]) => `<div class="metric"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+}
 
-  step('Casando nome na lista do TSE e buscando patrimônio…');
-  let total=0,buckets={},capPct=0,nbens=0,ocup='',wealthOK=false;
+function renderWealth(card){
+  const p = card.politic;
+  const rows = Object.entries(p.wealth_buckets || {})
+    .filter(([,v]) => Number(v) > 0)
+    .sort((a,b) => b[1] - a[1])
+    .map(([label,value], i) => {
+      const share = p.wealth_total ? (100 * value / p.wealth_total) : 0;
+      return `<div class="row">
+        <div>${label}<div class="bar"><i style="width:${share.toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></i></div></div>
+        <div style="text-align:right;white-space:nowrap">${BRL(value)}<br><span class="muted">${share.toFixed(1)}%</span></div>
+      </div>`;
+    }).join('');
+  el('wealth').innerHTML = `<h2>Patrimônio declarado</h2>
+    <div class="wealth-grid">
+      <div><div class="big">${BRL(p.wealth_total)}</div><div class="muted">${p.wealth_capital_pct}% em ações/participações ou exterior</div></div>
+      <div>${rows || '<span class="muted">Sem bens armazenados.</span>'}</div>
+    </div>`;
+}
+
+function renderVotes(card){
+  const rows = [];
+  for(const topic of card.topics){
+    for(const law of topic.laws){
+      const score = law.score;
+      rows.push(`<tr>
+        <td><b>${law.label}</b><br><span class="muted">${law.description}</span>
+          <div class="keywords">${law.keywords.map(k => `<span class="keyword">${k.label}</span>`).join('')}</div></td>
+        <td>${topic.title}${law.is_key ? '<br><span class="chip c-mix">chave</span>' : ''}</td>
+        <td><span class="chip ${chipClass(score)}">${score?.vote_label || 'sem score'}</span></td>
+        <td>${score ? `${score.present_count}/${score.nominal_count}` : '—'}</td>
+      </tr>`);
+    }
+  }
+  el('votes').innerHTML = `<h2>Leis, palavras-chave e votos armazenados</h2>
+    <table><thead><tr><th>Lei</th><th>Tópico</th><th>Voto</th><th>Presença</th></tr></thead>
+    <tbody>${rows.join('')}</tbody></table>`;
+}
+
+function renderCard(card, source){
+  renderIdentity(card);
+  renderMetrics(card);
+  renderWealth(card);
+  renderVotes(card);
+  el('state').style.display = 'none';
+  el('content').style.display = 'block';
+  const sourceLabel = source ? ` · ${source}` : '';
+  el('sources').textContent = `Dados servidos por /api/scorecards${sourceLabel} · renderizado em ${new Date().toLocaleString('pt-BR')}`;
+}
+
+function setLoading(message){
+  el('content').style.display = 'none';
+  el('state').style.display = 'block';
+  el('state').innerHTML = message;
+}
+
+function renderCandidateResults(candidates){
+  if(!candidates.length){
+    resultsEl.innerHTML = '<span class="muted">Nenhum deputado encontrado.</span>';
+    return;
+  }
+  resultsEl.innerHTML = candidates.map(c => `<button class="candidate" type="button" data-camara-id="${c.camara_id}">
+    <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · Câmara ${c.camara_id}</span>
+  </button>`).join('');
+  for(const button of resultsEl.querySelectorAll('.candidate')){
+    button.addEventListener('click', () => analyzeCandidate(Number(button.dataset.camaraId), button.querySelector('b').textContent));
+  }
+}
+
+async function searchCandidates(event){
+  event.preventDefault();
+  const q = queryInput.value.trim();
+  if(q.length < 2){
+    resultsEl.innerHTML = '<span class="error">Digite pelo menos 2 caracteres.</span>';
+    return;
+  }
+  searchButton.disabled = true;
+  resultsEl.innerHTML = '<span class="muted">Buscando na Câmara...</span>';
   try{
-    const cand=await resolveWealth(dep);
-    if(cand){wealthOK=true;total=parseFloat(cand.totalDeBens||0)||0;buckets=bucketize(cand.bens);
-      nbens=(cand.bens||[]).length;ocup=cand.ocupacao||'';
-      const cap=(buckets['Ações / participações']+buckets['Depósito no exterior']);
-      capPct=total?Math.round(100*cap/total):0;
-      step(`Patrimônio: ${BRL(total)} (${nbens} bens)`,'ok');
-    } else step('Patrimônio não encontrado no TSE '+ELECTION.ano+' para este nome','err');
-  }catch(e){step('TSE indisponível: '+e,'err');}
-  el('wealth').style.display='block';
-  if(wealthOK){
-    const rows=Object.entries(buckets).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>{
-      const p=total?100*v/total:0;return `<div class="row"><div>${k}<div class="bar"><i style="width:${p.toFixed(1)}%;background:${COLORS[i%COLORS.length]}"></i></div></div>
-      <div style="text-align:right;white-space:nowrap">${BRL(v)}<br><span class="muted">${p.toFixed(1)}%</span></div></div>`;}).join('');
-    el('wealth').innerHTML=`<h2>Patrimônio declarado (TSE ${ELECTION.ano})</h2><div class="big">${BRL(total)}</div>
-      <div class="muted" style="margin-bottom:10px">Ocupação: <b>${ocup||'—'}</b> · ${nbens} bens</div>${rows}
-      <div class="note">≈ <b>${capPct}% em capital</b> (ações + exterior).</div>`;
-  } else el('wealth').innerHTML=`<h2>Patrimônio (TSE ${ELECTION.ano})</h2><div class="muted">Não foi possível casar este nome na eleição de ${ELECTION.ano} (pode não ter concorrido nesse ano/cargo).</div>`;
-
-  const universe=await buildUniverse();
-  step(`Cruzando ${universe.length} votações de tributação com ${us.nome}…`);
-  const rows=universe.map(u=>{
-    const mine=u.votos.find(x=>x.deputado_&&x.deputado_.id===dep.id);
-    return {prop:u.prop,votacao:u.votacao,vote:mine?mine.tipoVoto:null,gov:u.gov,opp:u.opp};
-  });
-  const withVote=rows.filter(r=>r.vote);
-  const present=withVote.length, nominal=rows.length;
-  const govComparable=withVote.filter(r=>r.gov&&(r.vote==='Sim'||r.vote==='Não'));
-  const govAlign=govComparable.length?Math.round(100*govComparable.filter(r=>r.vote===r.gov).length/govComparable.length):null;
-  const oppComparable=withVote.filter(r=>r.opp&&(r.vote==='Sim'||r.vote==='Não'));
-  const oppAlign=oppComparable.length?Math.round(100*oppComparable.filter(r=>r.vote===r.opp).length/oppComparable.length):null;
-  const attend=nominal?Math.round(100*present/nominal):0;
-  step(`Pronto: ${present}/${nominal} votos registrados, alinhamento Governo ${govAlign===null?'—':govAlign+'%'}`,'ok');
-
-  el('score').style.display='block';
-  el('score').innerHTML=`<h2>Score (calculado dos dados)</h2><div class="gauge">
-    <div class="pill"><div class="n">${wealthOK?capPct+'%':'—'}</div><div class="l">patrimônio em capital</div></div>
-    <div class="pill"><div class="n">${attend}%</div><div class="l">presença (pauta fiscal)</div></div>
-    <div class="pill"><div class="n">${govAlign===null?'—':govAlign+'%'}</div><div class="l">alinhado ao Governo</div></div>
-    <div class="pill"><div class="n">${oppAlign===null?'—':oppAlign+'%'}</div><div class="l">alinhado à Oposição</div></div>
-    <div class="pill"><div class="n">${present}</div><div class="l">votos analisados</div></div></div>
-    <div class="note ${present<3?'warn':''}">${us.nome} esteve presente em <b>${present}/${nominal}</b> votações
-    nominais de finanças/economia descobertas pela taxonomia da Câmara; em ${govComparable.length} delas
-    com linha do Governo definida, votou igual ao Governo <b>${govAlign===null?'—':govAlign+'%'}</b> das vezes.
-    ${wealthOK?`Patrimônio ${capPct}% capital.`:''} ${present<3?'Amostra pequena — leia com cautela.':''}</div>`;
-
-  // group by LAW so each bill shows once, with its ementa (readable name)
-  const byProp={};
-  for(const r of rows){const k=r.prop.id;(byProp[k]=byProp[k]||{prop:r.prop,items:[]}).items.push(r);}
-  const laws=Object.values(byProp).sort((a,b)=>{
-    const pa=a.items.filter(x=>x.vote).length, pb=b.items.filter(x=>x.vote).length;
-    return pb-pa || b.prop.ano-a.prop.ano;});
-  el('votes').style.display='block';
-  el('votes').innerHTML=`<h2>Leis de tributação analisadas (${laws.length})</h2>
-    <table><thead><tr><th>Lei</th><th>Votações / presença</th><th>Como votou</th></tr></thead><tbody>
-    ${laws.map(g=>{
-      const p=g.prop, nv=g.items.length, pres=g.items.filter(x=>x.vote).length;
-      const votes=g.items.filter(x=>x.vote).map(x=>x.vote);
-      const set=[...new Set(votes)];
-      let chip,cls;
-      if(pres===0){chip='AUSENTE (faltou a todas)';cls='c-aus';}
-      else if(set.length===1){chip=set[0].toUpperCase();cls=set[0]==='Sim'?'c-sim':set[0]==='Não'?'c-nao':'c-mix';}
-      else {const s=votes.filter(v=>v==='Sim').length,n=votes.filter(v=>v==='Não').length;chip=`misto (${s} Sim / ${n} Não)`;cls='c-mix';}
-      return `<tr>
-        <td><a href="https://www.camara.leg.br/propostas-legislativas/${p.id}" target="_blank"><b>${p.siglaTipo} ${p.numero}/${p.ano}</b></a>
-          <div class="muted" style="font-size:.94em;margin-top:2px">${(p.ementa||'').slice(0,160)}</div></td>
-        <td>${pres}/${nv}</td>
-        <td><span class="chip ${cls}">${chip}</span></td></tr>`;}).join('')}
-    </tbody></table>`;
-  el('loadlog').style.display='none';
-  el('sources').innerHTML=`Fontes ao vivo: Câmara <code>${C}</code> · TSE <code>${T}</code>.
-    Descritores de tributação ${DESCRIPTORS.length} · anos ${YEARS.join('/')} · eleição ${ELECTION.ano}. Carregado em ${new Date().toLocaleString('pt-BR')}.`;
+    const res = await fetch(`/api/candidates/search?q=${encodeURIComponent(q)}`);
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    renderCandidateResults(payload.candidates || []);
+  }catch(err){
+    resultsEl.innerHTML = `<span class="error">Erro na busca: ${err}</span>`;
+  }finally{
+    searchButton.disabled = false;
+  }
 }
 
-async function onSearch(){
-  const q=el('q').value.trim(); if(!q) return;
-  el('picks').innerHTML='<span class="muted">buscando…</span>';
-  const ds=await searchDep(q);
-  if(!ds.length){el('picks').innerHTML='<span class="err">nenhum deputado encontrado</span>';return;}
-  if(ds.length===1){el('picks').innerHTML='';return run(ds[0]);}
-  el('picks').innerHTML='<span class="muted">vários resultados — escolha:</span><br>'+
-    ds.slice(0,8).map((d,i)=>`<button data-i="${i}">${d.nome} (${d.siglaPartido}-${d.siglaUf})</button>`).join('');
-  [...el('picks').querySelectorAll('button')].forEach(b=>b.onclick=()=>run(ds[+b.dataset.i]));
+async function analyzeCandidate(camaraId, name){
+  setLoading(`Calculando score de ${name} e salvando no MySQL...`);
+  try{
+    const res = await fetch('/api/scorecards', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({camara_id: camaraId})
+    });
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('scorecard não retornado');
+    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+  }catch(err){
+    el('state').innerHTML = `<span class="error">Erro ao analisar ${name}: ${err}</span>`;
+  }
 }
-el('go').onclick=onSearch;
-el('q').addEventListener('keydown',e=>{if(e.key==='Enter')onSearch();});
+
+async function run(){
+  try{
+    const res = await fetch('/api/scorecards');
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const payload = await res.json();
+    const card = payload.scorecards?.[0];
+    if(!card){
+      el('state').innerHTML = '<span class="muted">Nenhum score calculado no banco ainda.</span>';
+      return;
+    }
+    renderCard(card);
+  }catch(err){
+    el('state').innerHTML = `<span class="error">Erro ao carregar a API: ${err}</span>`;
+  }
+}
+form.addEventListener('submit', searchCandidates);
+run();
 </script>
 </body>
 </html>

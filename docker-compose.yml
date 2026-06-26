@@ -1,0 +1,34 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: candidato
+      MYSQL_USER: candidato
+      MYSQL_PASSWORD: candidato
+      MYSQL_ROOT_PASSWORD: candidato-root
+    ports:
+      - "3306:3306"
+    volumes:
+      - candidato_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -ucandidato -pcandidato --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: mysql://candidato:candidato@mysql:3306/candidato
+      CANDIDATO_HOST: 0.0.0.0
+      CANDIDATO_PORT: 8765
+    ports:
+      - "8765:8765"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+volumes:
+  candidato_mysql_data:
