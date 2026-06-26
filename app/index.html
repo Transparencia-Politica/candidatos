@@ -96,10 +96,21 @@ const T='https://divulgacandcontas.tse.jus.br/divulga/rest/v1';
 // ---- the only config: which election to read TSE wealth from, and which theme codes = "tax/finance" ----
 const ELECTION={ ano:2022, idEleicao:'2040602022', cargo:6 };   // cargo 6 = Deputado Federal
 const THEMES=[70,40];          // 70 Finanças Públicas e Orçamento, 40 Economia (Câmara taxonomy)
-const CAP_PROPS=40, CAP_VOTACOES=36, CONC=6;
+const CONC=6;
+// Topic = "tributação de riqueza/renda" as TECAD controlled-vocabulary descriptors
+// (harvested from the indexação of seed bills; see research/09-topic-to-law-discovery.md).
+const DESCRIPTORS=["Imposto sobre Grandes Fortunas (IGF)","dividendos","ganho de capital",
+  "Juros sobre capital próprio","Imposto sobre a Renda da Pessoa Física (IRPF)",
+  "Contribuição Social sobre o Lucro Líquido (CSLL)",
+  "Imposto sobre a Renda e Proventos de Qualquer Natureza (IR)"];
+const YEARS=[2023,2024,2025];  // current legislature only → fair presence comparison across deputies
+const TIPOS=new Set(["PL","PEC","PLP","MPV"]);
+const CAP_VOTACOES=90;
+let UNIVERSE=null;  // built once, reused across deputies
 
 const BRL=n=>'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const px =url=>fetch(url,{headers:{'Accept':'application/json'}}).then(r=>r.json());
+// via local proxy: same-origin (no CORS) + server cache/retries → robust under parallel load
+const px =url=>fetch('/proxy?url='+encodeURIComponent(url)).then(r=>r.json());
 const el =id=>document.getElementById(id);
 const norm=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().trim();
 function step(t,cls){const d=document.createElement('div');d.className='step';
@@ -134,19 +145,37 @@ async function resolveWealth(dep){
   if(!hit) return null;
   return px(`${T}/candidatura/buscar/${ELECTION.ano}/${uf}/${ELECTION.idEleicao}/candidato/${hit.id}`);}
 
-async function discoverTaxVotacoes(){
-  let props=[];
-  for(const tema of THEMES){
-    const p=(await px(`${C}/proposicoes?codTema=${tema}&ordem=DESC&ordenarPor=id&itens=${CAP_PROPS}`)).dados||[];
-    props=props.concat(p);
-  }
-  const seen=new Set(),uniq=[];
-  for(const p of props){if(!seen.has(p.id)){seen.add(p.id);uniq.push(p);}}
-  step(`Descobertas ${uniq.length} proposições de finanças/economia`,'ok');
-  const vlists=await pool(uniq.slice(0,CAP_PROPS), p=>px(`${C}/proposicoes/${p.id}/votacoes?ordem=DESC&ordenarPor=dataHoraRegistro`).then(r=>({p,v:r.dados||[]})));
-  const votacoes=[];
-  for(const x of vlists){if(!x)continue;for(const v of x.v){votacoes.push({prop:x.p,votacao:v});}}
-  return votacoes.slice(0,CAP_VOTACOES);
+// Build the (deputy-independent) universe of tributação votações ONCE, via the
+// keyword-descriptor pipeline (research/09): descriptors → bills → voted votações →
+// votos + government orientation. Cached so switching deputies is instant.
+async function buildUniverse(){
+  if(UNIVERSE) return UNIVERSE;
+  step('Descobrindo a pauta de tributação (descritores → proposições)…');
+  const queries=[];
+  for(const d of DESCRIPTORS) for(const y of YEARS) queries.push({d,y});
+  const props={};
+  await pool(queries, async({d,y})=>{
+    const r=(await px(`${C}/proposicoes?keywords=${encodeURIComponent(d)}&ano=${y}&itens=30&ordem=DESC&ordenarPor=id`)).dados||[];
+    for(const p of r){ if(TIPOS.has(p.siglaTipo)) props[p.id]=p; }
+  });
+  const bills=Object.values(props);
+  step(`${bills.length} proposições candidatas; identificando as votadas…`);
+  const vls=await pool(bills, p=>px(`${C}/proposicoes/${p.id}/votacoes`).then(r=>({p,v:r.dados||[]})));
+  let votacoes=[];
+  for(const x of vls){ if(!x) continue; for(const v of x.v){ if(/Sim:/.test(v.descricao||'')) votacoes.push({prop:x.p,votacao:v}); } }
+  votacoes=votacoes.slice(0,CAP_VOTACOES);
+  step(`${votacoes.length} votações nominais; carregando votos + linha do Governo…`);
+  const enriched=await pool(votacoes, async({prop,votacao})=>{
+    const [votos,ori]=await Promise.all([
+      px(`${C}/votacoes/${votacao.id}/votos`).then(r=>r.dados||[]).catch(()=>[]),
+      px(`${C}/votacoes/${votacao.id}/orientacoes`).then(r=>r.dados||[]).catch(()=>[])]);
+    const gov=(ori.find(o=>/governo/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
+    const opp=(ori.find(o=>/oposi/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
+    return {prop,votacao,votos,gov,opp};
+  });
+  UNIVERSE=enriched.filter(x=>x&&x.votos.length);
+  step(`Universo: ${UNIVERSE.length} votações de tributação (reutilizado entre deputados)`,'ok');
+  return UNIVERSE;
 }
 
 async function run(dep){
@@ -183,20 +212,12 @@ async function run(dep){
       <div class="note">≈ <b>${capPct}% em capital</b> (ações + exterior).</div>`;
   } else el('wealth').innerHTML=`<h2>Patrimônio (TSE ${ELECTION.ano})</h2><div class="muted">Não foi possível casar este nome na eleição de ${ELECTION.ano} (pode não ter concorrido nesse ano/cargo).</div>`;
 
-  step('Descobrindo votações de finanças/tributação pela taxonomia da Câmara…');
-  const found=await discoverTaxVotacoes();
-  step(`Analisando ${found.length} votações (voto do deputado + linha do Governo)…`);
-  const analyzed=await pool(found, async ({prop,votacao})=>{
-    const [votosR,oriR]=await Promise.all([
-      px(`${C}/votacoes/${votacao.id}/votos`).then(r=>r.dados||[]).catch(()=>[]),
-      px(`${C}/votacoes/${votacao.id}/orientacoes`).then(r=>r.dados||[]).catch(()=>[])]);
-    if(!votosR.length) return null;
-    const mine=votosR.find(x=>x.deputado_&&x.deputado_.id===dep.id);
-    const gov=(oriR.find(o=>/governo/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
-    const opp=(oriR.find(o=>/oposi/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
-    return {prop,votacao,vote:mine?mine.tipoVoto:null,gov,opp};
+  const universe=await buildUniverse();
+  step(`Cruzando ${universe.length} votações de tributação com ${us.nome}…`);
+  const rows=universe.map(u=>{
+    const mine=u.votos.find(x=>x.deputado_&&x.deputado_.id===dep.id);
+    return {prop:u.prop,votacao:u.votacao,vote:mine?mine.tipoVoto:null,gov:u.gov,opp:u.opp};
   });
-  const rows=analyzed.filter(Boolean);
   const withVote=rows.filter(r=>r.vote);
   const present=withVote.length, nominal=rows.length;
   const govComparable=withVote.filter(r=>r.gov&&(r.vote==='Sim'||r.vote==='Não'));
@@ -218,18 +239,32 @@ async function run(dep){
     com linha do Governo definida, votou igual ao Governo <b>${govAlign===null?'—':govAlign+'%'}</b> das vezes.
     ${wealthOK?`Patrimônio ${capPct}% capital.`:''} ${present<3?'Amostra pequena — leia com cautela.':''}</div>`;
 
+  // group by LAW so each bill shows once, with its ementa (readable name)
+  const byProp={};
+  for(const r of rows){const k=r.prop.id;(byProp[k]=byProp[k]||{prop:r.prop,items:[]}).items.push(r);}
+  const laws=Object.values(byProp).sort((a,b)=>{
+    const pa=a.items.filter(x=>x.vote).length, pb=b.items.filter(x=>x.vote).length;
+    return pb-pa || b.prop.ano-a.prop.ano;});
   el('votes').style.display='block';
-  el('votes').innerHTML=`<h2>Votações analisadas (${rows.length})</h2>
-    <table><thead><tr><th>Proposição</th><th>Votação</th><th>Voto</th><th>Governo</th></tr></thead><tbody>
-    ${rows.map(r=>{const cl=r.vote==='Sim'?'c-sim':r.vote==='Não'?'c-nao':r.vote?'c-mix':'c-aus';
-      return `<tr><td><b>${r.prop.siglaTipo} ${r.prop.numero}/${r.prop.ano}</b></td>
-      <td class="muted">${(r.votacao.descricao||'').slice(0,70)}</td>
-      <td><span class="chip ${cl}">${r.vote||'AUSENTE'}</span></td>
-      <td class="muted">${r.gov||'—'}</td></tr>`;}).join('')}
+  el('votes').innerHTML=`<h2>Leis de tributação analisadas (${laws.length})</h2>
+    <table><thead><tr><th>Lei</th><th>Votações / presença</th><th>Como votou</th></tr></thead><tbody>
+    ${laws.map(g=>{
+      const p=g.prop, nv=g.items.length, pres=g.items.filter(x=>x.vote).length;
+      const votes=g.items.filter(x=>x.vote).map(x=>x.vote);
+      const set=[...new Set(votes)];
+      let chip,cls;
+      if(pres===0){chip='AUSENTE (faltou a todas)';cls='c-aus';}
+      else if(set.length===1){chip=set[0].toUpperCase();cls=set[0]==='Sim'?'c-sim':set[0]==='Não'?'c-nao':'c-mix';}
+      else {const s=votes.filter(v=>v==='Sim').length,n=votes.filter(v=>v==='Não').length;chip=`misto (${s} Sim / ${n} Não)`;cls='c-mix';}
+      return `<tr>
+        <td><a href="https://www.camara.leg.br/propostas-legislativas/${p.id}" target="_blank"><b>${p.siglaTipo} ${p.numero}/${p.ano}</b></a>
+          <div class="muted" style="font-size:.94em;margin-top:2px">${(p.ementa||'').slice(0,160)}</div></td>
+        <td>${pres}/${nv}</td>
+        <td><span class="chip ${cls}">${chip}</span></td></tr>`;}).join('')}
     </tbody></table>`;
   el('loadlog').style.display='none';
   el('sources').innerHTML=`Fontes ao vivo: Câmara <code>${C}</code> · TSE <code>${T}</code>.
-    Temas ${THEMES.join(', ')} · eleição ${ELECTION.ano}. Carregado em ${new Date().toLocaleString('pt-BR')}.`;
+    Descritores de tributação ${DESCRIPTORS.length} · anos ${YEARS.join('/')} · eleição ${ELECTION.ano}. Carregado em ${new Date().toLocaleString('pt-BR')}.`;
 }
 
 async function onSearch(){
