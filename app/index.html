@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Candidato — Scorecard (live)</title>
+<title>Candidato — Scorecard (genérico, ao vivo)</title>
 <style>
   :root{--bg:#0d1117;--card:#161b22;--line:#272e3a;--fg:#e6edf3;--muted:#8b949e;
     --green:#2ea043;--red:#da3633;--amber:#d29922;--gray:#484f58;--accent:#388bfd;}
@@ -11,217 +11,239 @@
   body{margin:0;background:var(--bg);color:var(--fg);
     font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
   .wrap{max-width:920px;margin:0 auto;padding:28px 20px 100px;}
-  h1{font-size:1.6em;margin:0 0 2px;}
-  .sub{color:var(--muted);margin-bottom:22px;font-size:.92em;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:16px 0;}
-  .card h2{font-size:1.05em;margin:0 0 14px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);}
+  h1{font-size:1.5em;margin:0 0 2px;}
+  .sub{color:var(--muted);margin-bottom:18px;font-size:.9em;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0;}
+  .card h2{font-size:1em;margin:0 0 12px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);}
   .row{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);}
   .row:last-child{border-bottom:0}
-  .big{font-size:2.2em;font-weight:700;}
+  .big{font-size:2em;font-weight:700;}
   .muted{color:var(--muted)}
-  .chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8em;font-weight:600;}
+  .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78em;font-weight:600;}
   .c-sim{background:rgba(46,160,67,.18);color:#3fb950;border:1px solid #2ea04355;}
   .c-nao{background:rgba(218,54,51,.18);color:#f85149;border:1px solid #da363355;}
   .c-aus{background:rgba(72,79,88,.25);color:#8b949e;border:1px solid #484f58;}
   .c-mix{background:rgba(210,153,34,.18);color:#e3b341;border:1px solid #d2992255;}
-  .bar{height:10px;border-radius:6px;background:#21262d;overflow:hidden;margin-top:4px;}
+  .bar{height:9px;border-radius:6px;background:#21262d;overflow:hidden;margin-top:4px;}
   .bar > i{display:block;height:100%;}
-  .hdr{display:flex;gap:18px;align-items:center;}
-  .avatar{width:64px;height:64px;border-radius:50%;background:#21262d;display:flex;align-items:center;
-    justify-content:center;font-size:1.4em;font-weight:700;color:var(--accent);border:1px solid var(--line);flex:0 0 auto;}
+  .hdr{display:flex;gap:16px;align-items:center;}
+  .avatar{width:60px;height:60px;border-radius:50%;background:#21262d;display:flex;align-items:center;
+    justify-content:center;font-size:1.3em;font-weight:700;color:var(--accent);border:1px solid var(--line);flex:0 0 auto;}
   table{width:100%;border-collapse:collapse;}
-  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.92em;}
-  th{color:var(--muted);font-weight:600;font-size:.8em;text-transform:uppercase;}
-  .gauge{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.9em;}
+  th{color:var(--muted);font-weight:600;font-size:.78em;text-transform:uppercase;}
+  .gauge{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
   .pill{background:#21262d;border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:120px;}
-  .pill .n{font-size:1.5em;font-weight:700;}
-  .pill .l{color:var(--muted);font-size:.78em;text-transform:uppercase;}
-  .loading{color:var(--muted);font-style:italic;}
+  .pill .n{font-size:1.4em;font-weight:700;}
+  .pill .l{color:var(--muted);font-size:.74em;text-transform:uppercase;}
   .note{background:#1c2128;border-left:3px solid var(--accent);padding:10px 14px;border-radius:6px;
-    color:#c9d1d9;font-size:.9em;margin-top:12px;}
+    color:#c9d1d9;font-size:.88em;margin-top:12px;}
   .warn{border-left-color:var(--amber);}
   code{background:#21262d;padding:1px 6px;border-radius:5px;font-size:.85em;}
   a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
-  .src{color:var(--muted);font-size:.82em;margin-top:8px}
-  .step{font-size:.85em;color:var(--muted);margin:2px 0;}
-  .ok{color:#3fb950}
+  .src{color:var(--muted);font-size:.8em;}
+  .step{font-size:.84em;color:var(--muted);margin:2px 0;}
+  .ok{color:#3fb950}.err{color:#f85149}
+  input,button{font:inherit}
+  #q{background:#0d1117;border:1px solid var(--line);color:var(--fg);border-radius:8px;padding:9px 12px;width:min(420px,70%);}
+  button{background:var(--accent);border:0;color:#fff;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:600;}
+  .picks button{background:#21262d;border:1px solid var(--line);color:var(--fg);margin:4px 6px 0 0;font-weight:500;}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Candidato · Scorecard <span class="muted" style="font-size:.6em">POC ao vivo</span></h1>
-  <div class="sub">Patrimônio (TSE) × votos em tributação de riqueza (Câmara) — <b>dados carregados ao vivo das APIs abertas ao abrir esta página.</b></div>
-
-  <div id="loadlog" class="card"><h2>Carregando dados ao vivo…</h2><div id="steps"></div></div>
-
-  <div id="header" class="card" style="display:none"></div>
-  <div id="wealth" class="card" style="display:none"></div>
-  <div id="votes"  class="card" style="display:none"></div>
-  <div id="score"  class="card" style="display:none"></div>
+  <h1>Candidato · Scorecard <span class="muted" style="font-size:.6em">genérico · ao vivo</span></h1>
+  <div class="sub">Digite um(a) deputado(a). Tudo é descoberto pelas APIs abertas — sem candidato,
+  projetos ou rótulos escritos à mão. Patrimônio (TSE) × votos em finanças/tributação (Câmara),
+  com a direção tirada da <b>orientação do Governo</b> em cada votação.</div>
 
   <div class="card">
-    <h2>Como o score é calculado</h2>
-    <p style="margin:.2em 0">Para cada projeto <b>relevante para riqueza</b> definimos a direção da tese
-    (<code>+1</code> = "tributar mais a riqueza"). O voto do parlamentar é codificado
-    <code>Sim→+1</code>, <code>Não→−1</code>, <code>Ausente→sem registro</code>.</p>
-    <ul style="margin:.4em 0">
-      <li><b>Alinhamento com o interesse próprio</b> = vota para <i>proteger</i> o próprio patrimônio?
-      <code>Não</code> num projeto pró-tributação ⇒ protege; <code>Sim</code> ⇒ contraria.</li>
-      <li><b>Cobertura</b> = projetos relevantes com voto registrado ÷ total de projetos relevantes.</li>
-      <li><b>Presença</b> = votações nominais em que esteve presente ÷ total (no projeto-chave).</li>
-    </ul>
-    <div class="note warn">n=1 é uma ilustração, não correlação. Ausência ≠ intenção: reportamos
-    "sem voto registrado". Tudo vem de registros públicos oficiais.</div>
+    <form id="form" onsubmit="return false">
+      <input id="q" placeholder="ex.: Tabata Amaral, Kim Kataguiri, Nikolas…" autofocus>
+      <button id="go">Analisar</button>
+    </form>
+    <div id="picks" class="picks"></div>
   </div>
 
+  <div id="loadlog" class="card" style="display:none"><h2>Carregando ao vivo…</h2><div id="steps"></div></div>
+  <div id="header" class="card" style="display:none"></div>
+  <div id="wealth" class="card" style="display:none"></div>
+  <div id="score"  class="card" style="display:none"></div>
+  <div id="votes"  class="card" style="display:none"></div>
+
+  <div class="card">
+    <h2>Como funciona (sem nada escrito à mão)</h2>
+    <ol style="margin:.3em 0;padding-left:1.2em">
+      <li><b>Deputado(a):</b> resolvido por <code>/deputados?nome=</code>.</li>
+      <li><b>Patrimônio:</b> casa o nome na lista do TSE da eleição (<code>/candidatura/listar</code>)
+      e busca os bens (<code>/candidatura/buscar</code>).</li>
+      <li><b>Pauta tributária:</b> descoberta pela taxonomia da própria Câmara
+      (<code>codTema</code> 70 Finanças Públicas / 40 Economia) → proposições → votações.</li>
+      <li><b>Direção:</b> tirada da <code>/orientacoes</code> de cada votação (linha do <b>Governo</b>),
+      não de um rótulo meu.</li>
+      <li><b>Score:</b> presença, alinhamento com o Governo/Oposição e patrimônio — tudo calculado.</li>
+    </ol>
+    <div class="note">Limitação honesta: "tributar os ricos" é um rótulo semântico que a API não traz.
+    O único eixo ideológico que a API fornece sem rotulagem humana é a <b>orientação Governo/Oposição</b>.
+    Por isso o score mede alinhamento com o Governo na pauta de finanças — derivado 100% de dados.</div>
+  </div>
   <div class="card src" id="sources"></div>
 </div>
 
 <script>
-const C = 'https://dadosabertos.camara.leg.br/api/v2';
-const T = 'https://divulgacandcontas.tse.jus.br/divulga/rest/v1';
+const C='https://dadosabertos.camara.leg.br/api/v2';
+const T='https://divulgacandcontas.tse.jus.br/divulga/rest/v1';
+// ---- the only config: which election to read TSE wealth from, and which theme codes = "tax/finance" ----
+const ELECTION={ ano:2022, idEleicao:'2040602022', cargo:6 };   // cargo 6 = Deputado Federal
+const THEMES=[70,40];          // 70 Finanças Públicas e Orçamento, 40 Economia (Câmara taxonomy)
+const CAP_PROPS=40, CAP_VOTACOES=36, CONC=6;
 
-// ---- CONFIG: which candidate + which bills (this is app config, not data) ----
-const CAND = { camaraId: 74478, tse:{ ano:2022, uf:'PE', idEleicao:'2040602022', sq:'170001609112' } };
-const BILLS = [
-  { id:2383287, label:'PL 4173/2023', desc:'Tributa lucros no exterior + fundos exclusivos', dir:+1, wealth:true, key:true },
-  { id:2288389, label:'PL 2337/2021', desc:'Reforma do IR / tributação de dividendos',        dir:+1, wealth:true },
-  { id:2196833, label:'PEC 45/2019',  desc:'Reforma tributária (consumo)',                     dir:0,  wealth:false },
-];
-const BRL = n => 'R$ ' + Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-// Direct browser → API call (no backend). Both Câmara & TSE send CORS headers,
-// so this works on GitHub Pages / any static host. Each visitor calls from their own IP.
-const px  = url => fetch(url, {headers:{'Accept':'application/json'}}).then(r=>r.json());
-const el  = id => document.getElementById(id);
-function step(t, ok){ const d=document.createElement('div'); d.className='step';
-  d.innerHTML=(ok?'<span class="ok">✓</span> ':'• ')+t; el('steps').appendChild(d); }
+const BRL=n=>'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const px =url=>fetch(url,{headers:{'Accept':'application/json'}}).then(r=>r.json());
+const el =id=>document.getElementById(id);
+const norm=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().trim();
+function step(t,cls){const d=document.createElement('div');d.className='step';
+  d.innerHTML=(cls==='ok'?'<span class="ok">✓</span> ':cls==='err'?'<span class="err">✗</span> ':'• ')+t;el('steps').appendChild(d);}
+async function pool(items,fn,conc=CONC){const out=[];let i=0;
+  await Promise.all(Array.from({length:Math.min(conc,items.length)},async()=>{
+    while(i<items.length){const k=i++;try{out[k]=await fn(items[k],k)}catch(e){out[k]=null}}}));
+  return out;}
 
-// group declared assets into buckets
 function bucketize(bens){
-  const g={'Ações / participações':0,'Depósito no exterior':0,'Dinheiro em espécie':0,'Poupança / renda fixa / contas':0,'Outros':0};
-  for(const b of (bens||[])){
-    const v=parseFloat(b.valor||0)||0; const d=(b.descricaoDeTipoDeBem||'').toLowerCase();
-    if(d.includes('ações')||d.includes('acoes')||d.includes('quota')||d.includes('participa')) g['Ações / participações']+=v;
-    else if(d.includes('exterior')) g['Depósito no exterior']+=v;
-    else if(d.includes('espécie')||d.includes('especie')) g['Dinheiro em espécie']+=v;
-    else if(d.includes('poupança')||d.includes('poupanca')||d.includes('renda fixa')||d.includes('depósito')||d.includes('deposito')||d.includes('cdb')) g['Poupança / renda fixa / contas']+=v;
-    else g['Outros']+=v;
-  }
-  return g;
-}
-const COLORS=['#388bfd','#d29922','#2ea043','#a371f7','#8b949e'];
+  const g={'Ações / participações':0,'Depósito no exterior':0,'Dinheiro em espécie':0,'Poupança / renda fixa / contas':0,'Imóveis':0,'Outros':0};
+  for(const b of (bens||[])){const v=parseFloat(b.valor||0)||0;const d=norm(b.descricaoDeTipoDeBem).toLowerCase();
+    if(d.includes('acoes')||d.includes('quota')||d.includes('participa'))g['Ações / participações']+=v;
+    else if(d.includes('exterior'))g['Depósito no exterior']+=v;
+    else if(d.includes('especie'))g['Dinheiro em espécie']+=v;
+    else if(d.includes('poupanca')||d.includes('renda fixa')||d.includes('deposito')||d.includes('cdb')||d.includes('fundo'))g['Poupança / renda fixa / contas']+=v;
+    else if(d.includes('imovel')||d.includes('apartament')||d.includes('casa')||d.includes('terreno')||d.includes('predio')||d.includes('sala'))g['Imóveis']+=v;
+    else g['Outros']+=v;}
+  return g;}
+const COLORS=['#388bfd','#d29922','#2ea043','#a371f7','#db61a2','#8b949e'];
 
-async function run(){
-  // 1) PROFILE (Câmara)
-  step('Buscando perfil na Câmara…');
-  const prof=(await px(`${C}/deputados/${CAND.camaraId}`)).dados;
-  const us=prof.ultimoStatus||{};
-  step('Perfil carregado: '+us.nome, true);
-  const idade = prof.dataNascimento ? Math.floor((Date.now()-new Date(prof.dataNascimento))/3.15576e10) : '';
+async function searchDep(name){
+  return (await px(`${C}/deputados?nome=${encodeURIComponent(name)}&ordem=ASC&ordenarPor=nome`)).dados||[];}
+
+async function resolveWealth(dep){
+  const uf=dep.siglaUf;
+  const list=await px(`${T}/candidatura/listar/${ELECTION.ano}/${uf}/${ELECTION.idEleicao}/${ELECTION.cargo}/candidatos`);
+  const cands=list.candidatos||list||[];
+  const want=norm(dep.nome);
+  let hit=cands.find(c=>norm(c.nomeUrna)===want)||cands.find(c=>norm(c.nomeCompleto)===want)
+    ||cands.find(c=>norm(c.nomeCompleto).includes(want)||want.includes(norm(c.nomeUrna)));
+  if(!hit) return null;
+  return px(`${T}/candidatura/buscar/${ELECTION.ano}/${uf}/${ELECTION.idEleicao}/candidato/${hit.id}`);}
+
+async function discoverTaxVotacoes(){
+  let props=[];
+  for(const tema of THEMES){
+    const p=(await px(`${C}/proposicoes?codTema=${tema}&ordem=DESC&ordenarPor=id&itens=${CAP_PROPS}`)).dados||[];
+    props=props.concat(p);
+  }
+  const seen=new Set(),uniq=[];
+  for(const p of props){if(!seen.has(p.id)){seen.add(p.id);uniq.push(p);}}
+  step(`Descobertas ${uniq.length} proposições de finanças/economia`,'ok');
+  const vlists=await pool(uniq.slice(0,CAP_PROPS), p=>px(`${C}/proposicoes/${p.id}/votacoes?ordem=DESC&ordenarPor=dataHoraRegistro`).then(r=>({p,v:r.dados||[]})));
+  const votacoes=[];
+  for(const x of vlists){if(!x)continue;for(const v of x.v){votacoes.push({prop:x.p,votacao:v});}}
+  return votacoes.slice(0,CAP_VOTACOES);
+}
+
+async function run(dep){
+  el('picks').innerHTML='';['header','wealth','votes','score'].forEach(i=>el(i).style.display='none');
+  el('loadlog').style.display='block';el('steps').innerHTML='';
+  step('Deputado(a): '+dep.nome+' ('+dep.siglaPartido+'-'+dep.siglaUf+')','ok');
+
+  const prof=(await px(`${C}/deputados/${dep.id}`)).dados; const us=prof.ultimoStatus||{};
+  const idade=prof.dataNascimento?Math.floor((Date.now()-new Date(prof.dataNascimento))/3.15576e10):'';
   el('header').style.display='block';
-  el('header').innerHTML=`<div class="hdr">
-     <div class="avatar">${(us.nome||'?').slice(0,1)}</div>
-     <div><div style="font-size:1.3em;font-weight:700">${us.nome||''}</div>
-     <div class="muted">${us.siglaPartido||''} · ${us.siglaUf||''} — ${prof.escolaridade||''} · ${idade?idade+' anos':''}</div>
-     <div class="muted">Câmara id ${CAND.camaraId} · ${us.condicaoEleitoral||''} · ${us.situacao||''}</div></div></div>`;
+  el('header').innerHTML=`<div class="hdr"><div class="avatar">${(us.nome||'?')[0]}</div>
+    <div><div style="font-size:1.25em;font-weight:700">${us.nome}</div>
+    <div class="muted">${us.siglaPartido||''} · ${us.siglaUf||''} — ${prof.escolaridade||''} ${idade?'· '+idade+' anos':''}</div>
+    <div class="muted">Câmara id ${dep.id} · ${us.condicaoEleitoral||''}</div></div></div>`;
 
-  // 2) WEALTH (TSE)
-  step('Buscando patrimônio no TSE (DivulgaCandContas)…');
-  const t=CAND.tse;
-  const cand=await px(`${T}/candidatura/buscar/${t.ano}/${t.uf}/${t.idEleicao}/candidato/${t.sq}`);
-  const total=parseFloat(cand.totalDeBens||0)||0;
-  const buckets=bucketize(cand.bens);
-  step('Patrimônio carregado: '+BRL(total)+' em '+(cand.bens||[]).length+' bens', true);
-  const capital=(buckets['Ações / participações']+buckets['Depósito no exterior']);
-  const capPct=total?Math.round(100*capital/total):0;
-  let wrows=Object.entries(buckets).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>{
-    const p=total?(100*v/total):0;
-    return `<div class="row"><div>${k}<div class="bar"><i style="width:${p.toFixed(1)}%;background:${COLORS[i%COLORS.length]}"></i></div></div>
-      <div style="text-align:right;white-space:nowrap">${BRL(v)}<br><span class="muted">${p.toFixed(1)}%</span></div></div>`;
-  }).join('');
+  step('Casando nome na lista do TSE e buscando patrimônio…');
+  let total=0,buckets={},capPct=0,nbens=0,ocup='',wealthOK=false;
+  try{
+    const cand=await resolveWealth(dep);
+    if(cand){wealthOK=true;total=parseFloat(cand.totalDeBens||0)||0;buckets=bucketize(cand.bens);
+      nbens=(cand.bens||[]).length;ocup=cand.ocupacao||'';
+      const cap=(buckets['Ações / participações']+buckets['Depósito no exterior']);
+      capPct=total?Math.round(100*cap/total):0;
+      step(`Patrimônio: ${BRL(total)} (${nbens} bens)`,'ok');
+    } else step('Patrimônio não encontrado no TSE '+ELECTION.ano+' para este nome','err');
+  }catch(e){step('TSE indisponível: '+e,'err');}
   el('wealth').style.display='block';
-  el('wealth').innerHTML=`<h2>Patrimônio declarado (TSE ${t.ano})</h2>
-    <div class="big">${BRL(total)}</div>
-    <div class="muted" style="margin-bottom:10px">Ocupação declarada: <b>${cand.ocupacao||'—'}</b> · ${(cand.bens||[]).length} bens</div>
-    ${wrows}
-    <div class="note">≈ <b>${capPct}% do patrimônio é capital</b> (ações + depósito no exterior) → diretamente
-    afetado por tributos sobre <b>dividendos, fundos, offshore e grandes fortunas</b>.</div>`;
+  if(wealthOK){
+    const rows=Object.entries(buckets).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>{
+      const p=total?100*v/total:0;return `<div class="row"><div>${k}<div class="bar"><i style="width:${p.toFixed(1)}%;background:${COLORS[i%COLORS.length]}"></i></div></div>
+      <div style="text-align:right;white-space:nowrap">${BRL(v)}<br><span class="muted">${p.toFixed(1)}%</span></div></div>`;}).join('');
+    el('wealth').innerHTML=`<h2>Patrimônio declarado (TSE ${ELECTION.ano})</h2><div class="big">${BRL(total)}</div>
+      <div class="muted" style="margin-bottom:10px">Ocupação: <b>${ocup||'—'}</b> · ${nbens} bens</div>${rows}
+      <div class="note">≈ <b>${capPct}% em capital</b> (ações + exterior).</div>`;
+  } else el('wealth').innerHTML=`<h2>Patrimônio (TSE ${ELECTION.ano})</h2><div class="muted">Não foi possível casar este nome na eleição de ${ELECTION.ano} (pode não ter concorrido nesse ano/cargo).</div>`;
 
-  // 3) VOTES (Câmara) — per bill, fetch votações then votos, find this deputy
-  el('votes').style.display='block';
-  el('votes').innerHTML='<h2>Votos em tributação</h2><div class="loading">Carregando votações nominais…</div>';
-  const results=[];
-  for(const bill of BILLS){
-    step(`Buscando votações de ${bill.label}…`);
-    let vts=[];
-    try{ vts=(await px(`${C}/proposicoes/${bill.id}/votacoes?ordem=DESC&ordenarPor=dataHoraRegistro`)).dados||[]; }catch(e){}
-    let present=0, nominal=0, votes=[], passage=null;
-    const slice=vts.slice(0,25);
-    const all=await Promise.all(slice.map(v=>px(`${C}/votacoes/${v.id}/votos`).then(r=>({v,d:r.dados||[]})).catch(()=>({v,d:[]}))));
-    for(const {v,d} of all){
-      if(!d.length) continue;
-      nominal++;
-      const mine=d.find(x=>x.deputado_&&x.deputado_.id===CAND.camaraId);
-      if(mine){ present++; votes.push(mine.tipoVoto);
-        if(/aprovad/i.test(v.descricao||'') && !passage) passage=mine.tipoVoto; }
-    }
-    // decide displayed vote
-    const set=[...new Set(votes)];
-    let status, cls;
-    if(nominal===0){ status='sem votação nominal'; cls='c-aus'; }
-    else if(present===0){ status='AUSENTE'; cls='c-aus'; }
-    else if(passage){ status=passage.toUpperCase(); cls=passage==='Sim'?'c-sim':passage==='Não'?'c-nao':'c-mix'; }
-    else if(set.length===1){ status=set[0].toUpperCase(); cls=set[0]==='Sim'?'c-sim':set[0]==='Não'?'c-nao':'c-mix'; }
-    else { status='MISTO ('+votes.length+' votos)'; cls='c-mix'; }
-    results.push({bill,present,nominal,status,cls,passage,votes});
-    step(`${bill.label}: ${status} (presente em ${present}/${nominal} votações)`, true);
-  }
-  el('votes').innerHTML=`<h2>Votos em tributação</h2>
-    <table><thead><tr><th>Projeto</th><th>O que é "tributar a riqueza"</th><th>Voto</th><th>Presença</th></tr></thead><tbody>
-    ${results.map(r=>`<tr>
-      <td><b>${r.bill.label}</b><br><span class="muted">${r.bill.desc}</span>${r.bill.key?' <span class="chip c-mix">chave</span>':''}</td>
-      <td>${r.bill.wealth?'voto <b>SIM</b> = tributar':'<span class="muted">não é específico de riqueza</span>'}</td>
-      <td><span class="chip ${r.cls}">${r.status}</span></td>
-      <td>${r.nominal?`${r.present}/${r.nominal}`:'—'}</td></tr>`).join('')}
-    </tbody></table>`;
+  step('Descobrindo votações de finanças/tributação pela taxonomia da Câmara…');
+  const found=await discoverTaxVotacoes();
+  step(`Analisando ${found.length} votações (voto do deputado + linha do Governo)…`);
+  const analyzed=await pool(found, async ({prop,votacao})=>{
+    const [votosR,oriR]=await Promise.all([
+      px(`${C}/votacoes/${votacao.id}/votos`).then(r=>r.dados||[]).catch(()=>[]),
+      px(`${C}/votacoes/${votacao.id}/orientacoes`).then(r=>r.dados||[]).catch(()=>[])]);
+    if(!votosR.length) return null;
+    const mine=votosR.find(x=>x.deputado_&&x.deputado_.id===dep.id);
+    const gov=(oriR.find(o=>/governo/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
+    const opp=(oriR.find(o=>/oposi/i.test(o.siglaPartidoBloco||''))||{}).orientacaoVoto||null;
+    return {prop,votacao,vote:mine?mine.tipoVoto:null,gov,opp};
+  });
+  const rows=analyzed.filter(Boolean);
+  const withVote=rows.filter(r=>r.vote);
+  const present=withVote.length, nominal=rows.length;
+  const govComparable=withVote.filter(r=>r.gov&&(r.vote==='Sim'||r.vote==='Não'));
+  const govAlign=govComparable.length?Math.round(100*govComparable.filter(r=>r.vote===r.gov).length/govComparable.length):null;
+  const oppComparable=withVote.filter(r=>r.opp&&(r.vote==='Sim'||r.vote==='Não'));
+  const oppAlign=oppComparable.length?Math.round(100*oppComparable.filter(r=>r.vote===r.opp).length/oppComparable.length):null;
+  const attend=nominal?Math.round(100*present/nominal):0;
+  step(`Pronto: ${present}/${nominal} votos registrados, alinhamento Governo ${govAlign===null?'—':govAlign+'%'}`,'ok');
 
-  // 4) SCORE — combine wealth exposure × votes
-  const wbills=results.filter(r=>r.bill.wealth);
-  const recorded=wbills.filter(r=>r.present>0);
-  const coverage=wbills.length?Math.round(100*recorded.length/wbills.length):0;
-  const keyBill=results.find(r=>r.bill.key);
-  const attend=keyBill&&keyBill.nominal?Math.round(100*keyBill.present/keyBill.nominal):0;
-  // self-interest alignment over recorded wealth votes with a passage stance
-  let selfHits=0, selfN=0;
-  for(const r of recorded){
-    const stance=r.passage||(new Set(r.votes).size===1?r.votes[0]:null);
-    if(!stance) continue; selfN++;
-    // protects wealth = voted Não on a pro-tax (dir +1) bill
-    if((stance==='Não'&&r.bill.dir>0)||(stance==='Sim'&&r.bill.dir<0)) selfHits++;
-  }
-  const align = selfN? Math.round(100*selfHits/selfN) : null;
   el('score').style.display='block';
-  el('score').innerHTML=`<h2>Combinação: interesse × voto</h2>
-    <div class="gauge">
-      <div class="pill"><div class="n">${capPct}%</div><div class="l">patrimônio em capital</div></div>
-      <div class="pill"><div class="n">${coverage}%</div><div class="l">cobertura (votos/projetos)</div></div>
-      <div class="pill"><div class="n">${attend}%</div><div class="l">presença no projeto-chave</div></div>
-      <div class="pill"><div class="n">${align===null?'—':align+'%'}</div><div class="l">protege o próprio patrimônio</div></div>
-    </div>
-    <div class="note ${recorded.length===0?'warn':''}">
-      <b>Leitura:</b> patrimônio ${capPct}% capital (inclui depósito no exterior).
-      ${keyBill&&keyBill.present===0?`No projeto que tributaria exatamente esse tipo de patrimônio
-      (<b>${keyBill.bill.label}</b> — exterior + fundos), <b>não há voto registrado</b>: ausente em
-      ${keyBill.nominal}/${keyBill.nominal} votações nominais.`:''}
-      ${align===null?' Sem votos de mérito suficientes para calcular alinhamento de interesse — <b>dado insuficiente</b> (o ponto central do POC).':` Alinhamento de proteção patrimonial: <b>${align}%</b> (${selfN} voto(s) de mérito).`}
-    </div>`;
+  el('score').innerHTML=`<h2>Score (calculado dos dados)</h2><div class="gauge">
+    <div class="pill"><div class="n">${wealthOK?capPct+'%':'—'}</div><div class="l">patrimônio em capital</div></div>
+    <div class="pill"><div class="n">${attend}%</div><div class="l">presença (pauta fiscal)</div></div>
+    <div class="pill"><div class="n">${govAlign===null?'—':govAlign+'%'}</div><div class="l">alinhado ao Governo</div></div>
+    <div class="pill"><div class="n">${oppAlign===null?'—':oppAlign+'%'}</div><div class="l">alinhado à Oposição</div></div>
+    <div class="pill"><div class="n">${present}</div><div class="l">votos analisados</div></div></div>
+    <div class="note ${present<3?'warn':''}">${us.nome} esteve presente em <b>${present}/${nominal}</b> votações
+    nominais de finanças/economia descobertas pela taxonomia da Câmara; em ${govComparable.length} delas
+    com linha do Governo definida, votou igual ao Governo <b>${govAlign===null?'—':govAlign+'%'}</b> das vezes.
+    ${wealthOK?`Patrimônio ${capPct}% capital.`:''} ${present<3?'Amostra pequena — leia com cautela.':''}</div>`;
 
+  el('votes').style.display='block';
+  el('votes').innerHTML=`<h2>Votações analisadas (${rows.length})</h2>
+    <table><thead><tr><th>Proposição</th><th>Votação</th><th>Voto</th><th>Governo</th></tr></thead><tbody>
+    ${rows.map(r=>{const cl=r.vote==='Sim'?'c-sim':r.vote==='Não'?'c-nao':r.vote?'c-mix':'c-aus';
+      return `<tr><td><b>${r.prop.siglaTipo} ${r.prop.numero}/${r.prop.ano}</b></td>
+      <td class="muted">${(r.votacao.descricao||'').slice(0,70)}</td>
+      <td><span class="chip ${cl}">${r.vote||'AUSENTE'}</span></td>
+      <td class="muted">${r.gov||'—'}</td></tr>`;}).join('')}
+    </tbody></table>`;
   el('loadlog').style.display='none';
-  el('sources').innerHTML=`Fontes (ao vivo): Câmara dos Deputados — Dados Abertos
-    <code>${C}</code> · TSE DivulgaCandContas <code>${T}</code>.
-    Carregado em ${new Date().toLocaleString('pt-BR')}.`;
+  el('sources').innerHTML=`Fontes ao vivo: Câmara <code>${C}</code> · TSE <code>${T}</code>.
+    Temas ${THEMES.join(', ')} · eleição ${ELECTION.ano}. Carregado em ${new Date().toLocaleString('pt-BR')}.`;
 }
-run().catch(e=>{ el('steps').innerHTML+='<div class="step" style="color:#f85149">Erro: '+e+'</div>'; });
+
+async function onSearch(){
+  const q=el('q').value.trim(); if(!q) return;
+  el('picks').innerHTML='<span class="muted">buscando…</span>';
+  const ds=await searchDep(q);
+  if(!ds.length){el('picks').innerHTML='<span class="err">nenhum deputado encontrado</span>';return;}
+  if(ds.length===1){el('picks').innerHTML='';return run(ds[0]);}
+  el('picks').innerHTML='<span class="muted">vários resultados — escolha:</span><br>'+
+    ds.slice(0,8).map((d,i)=>`<button data-i="${i}">${d.nome} (${d.siglaPartido}-${d.siglaUf})</button>`).join('');
+  [...el('picks').querySelectorAll('button')].forEach(b=>b.onclick=()=>run(ds[+b.dataset.i]));
+}
+el('go').onclick=onSearch;
+el('q').addEventListener('keydown',e=>{if(e.key==='Enter')onSearch();});
 </script>
 </body>
 </html>

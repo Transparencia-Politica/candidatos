@@ -37,6 +37,7 @@ the **Transparência-Política** project. There is no app code yet — the docum
 | [`06-vaa-academic-literature.md`](research/06-vaa-academic-literature.md) | Synthesis of 4 peer-reviewed VAA papers → concrete design directives. | Justifying a methodology choice. |
 | [`07-poc-candidate-scoring-bivar.md`](research/07-poc-candidate-scoring-bivar.md) | Live POC: TSE wealth ⨯ Câmara tax votes for one deputy. Verdict + reproducible calls. | Scaling the scoring approach. |
 | [`08-api-field-notes.md`](research/08-api-field-notes.md) | Hard-won API gotchas (DivulgaCand route shape, Câmara `/votos`, rate limits). | **Before coding any ingestion.** |
+| [`09-topic-to-law-discovery.md`](research/09-topic-to-law-discovery.md) | Turning a topic into the relevant bills: `codTema` themes + TECAD thesaurus + query expansion. Full theme list + the "0/0" bug fix. | Designing topic/theme search; the matching engine's bill discovery. |
 
 ### `docs/`
 
@@ -49,6 +50,7 @@ the **Transparência-Política** project. There is no app code yet — the docum
 - **Understand the project** → `README.md` → this index → `wahl-o-mat-methodology.md`.
 - **Build data ingestion** → `DATA-SOURCES.md` → `01` / `02` → `08-api-field-notes.md` (read last, it's the gotchas).
 - **Design the matching engine** → `wahl-o-mat-methodology.md` → `04` → `06`.
+- **Find bills about a topic** → `09-topic-to-law-discovery.md` → `01`.
 - **Write the thesis bank** → `05` → `06` → `wahl-o-mat-methodology.md`.
 - **Scale the scoring POC** → `07` → `01` / `02`.
 

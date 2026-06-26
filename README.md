@@ -26,6 +26,7 @@ This repo currently holds the **research and data-access groundwork** (no app co
 | [`06-vaa-academic-literature.md`](research/06-vaa-academic-literature.md) | Synthesis of 4 peer-reviewed VAA papers → concrete design directives. |
 | [`07-poc-candidate-scoring-bivar.md`](research/07-poc-candidate-scoring-bivar.md) | Live POC: joined TSE wealth ⨯ Câmara tax votes for one deputy. Verdict + reproducible calls. |
 | [`08-api-field-notes.md`](research/08-api-field-notes.md) | Hard-won API gotchas (DivulgaCand route shape, Câmara `/votos`, zsh, rate limits). Read before coding ingestion. |
+| [`09-topic-to-law-discovery.md`](research/09-topic-to-law-discovery.md) | Topic → bills: the `codTema` theme list + TECAD thesaurus + query-expansion pipeline (and the "0/0" discovery-bug fix). |
 
 The two reference MCP repos analyzed in `REPO-ANALYSIS.md` are **not bundled** here — clone them
 from their GitHub URLs (listed in that doc) if you want to read their source.
