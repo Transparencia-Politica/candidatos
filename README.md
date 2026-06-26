@@ -21,7 +21,6 @@ This repo currently holds the **research and data-access groundwork** (no app co
 |---|---|
 | [`01-camara-senado-apis.md`](research/01-camara-senado-apis.md) | Verified Câmara & Senado open-data endpoints: votes, attendance, authorship, expenses, tema taxonomy. |
 | [`02-tse-candidate-data.md`](research/02-tse-candidate-data.md) | TSE bulk + DivulgaCandContas API: candidates, assets, finance, ficha-limpa; Base dos Dados; 2026 timeline. |
-| [`03-wahl-o-mat-methodology.md`](research/03-wahl-o-mat-methodology.md) | Cited Wahl-O-Mat research incl. the official *Rechenmodell* worked example. |
 | [`04-matching-pipeline-design.md`](research/04-matching-pipeline-design.md) | Brazilian prior art (brasil.vota.com, Radar Parlamentar, Basômetro, Ranking dos Políticos, Serenata) + scoring design + VAA pitfalls. |
 | [`05-questao-publica-2010-first-brazilian-VAA.md`](research/05-questao-publica-2010-first-brazilian-VAA.md) | The first Latin-American VAA (2010 Senate). Includes the full **35-statement Portuguese thesis bank** + lessons. |
 | [`06-vaa-academic-literature.md`](research/06-vaa-academic-literature.md) | Synthesis of 4 peer-reviewed VAA papers → concrete design directives. |
@@ -46,7 +45,7 @@ from their GitHub URLs (listed in that doc) if you want to read their source.
    questions-per-area; secondary issues barely discriminate with few items (doc 06).
 5. **Behavioral *Trennschärfe* as the thesis filter** — keep theses whose underlying votes
    actually split the houses (the empirical version of Wahl-O-Mat's "only divisive statements
-   survive" rule; docs 03/06).
+   survive" rule; `wahl-o-mat-methodology.md` + doc 06).
 6. **Transparent math, no neutrality claims; every thesis links to its evidence** (the bill/vote).
    *Why:* VAA design is never neutral (Fossen & Anderson; doc 06).
 
