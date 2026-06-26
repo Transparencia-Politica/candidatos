@@ -471,7 +471,7 @@ Good architecture, incomplete edge-case handling.
 |---|---|---|
 | Language | Python (FastMCP) | TypeScript (MCP SDK) |
 | Maturity | Production, 25 tools, deployed | Prototype, 1 tool |
-| Useful data for Voto-O-Mat | None (CNPJ/CEP/PIX/agri) | None (CEP only) |
+| Useful data for Candidato | None (CNPJ/CEP/PIX/agri) | None (CEP only) |
 | Value as reference | **High** — auth, scope tiers, caching, tests | Medium — clean minimal TS template |
 
 **Bottom line:** neither ships electoral, voting, attendance, or candidate data — they are
