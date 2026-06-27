@@ -96,6 +96,26 @@ Re-run `export` and commit `data/` whenever you add laws or score new candidates
 (`roll_calls`/`votes`, ~37k rows) is **not** snapshotted — it is rebuildable from the Câmara API via
 `ingest`, and the baked scores don't need it.
 
+## Public site (GitHub Pages)
+
+[`docs/`](docs/) is a self-contained static site that shows the scorecards for **every candidate
+already in the database** — no Python, no MySQL, no backend. It reads a single baked JSON file and
+is served by GitHub Pages.
+
+```bash
+python app/snapshot.py site                    # DB -> docs/data/scorecards.json (commit the result)
+python -m http.server -d docs 8899             # preview locally at http://localhost:8899
+```
+
+`snapshot.py site` writes the exact assembled scorecard shape (`politic` + `summary` + `topics`)
+the page renders. To publish: commit `docs/` and, in the repo's **Settings → Pages**, set
+*Deploy from a branch* → `main` → `/docs`. The live URL is
+`https://transparencia-politica.github.io/candidatos/`.
+
+The site is a frozen snapshot: to add or refresh candidates, re-run the scoring pipeline, then
+`python app/snapshot.py site`, and commit `docs/data/scorecards.json`. Live search for arbitrary
+deputies stays a local-only feature (it needs the backend proxy + DB).
+
 ## Document map
 
 ### Root

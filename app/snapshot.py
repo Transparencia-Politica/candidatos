@@ -31,7 +31,9 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - import shim
     from app import db
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(ROOT_DIR, "data")
+SITE_DATA_DIR = os.path.join(ROOT_DIR, "docs", "data")
 
 
 def _topics(conn) -> list[dict[str, Any]]:
@@ -196,6 +198,20 @@ def write_files(snapshot: dict[str, Any], data_dir: str = DATA_DIR) -> list[str]
     return [laws_file, cands_file, snap_file]
 
 
+def export_site(conn, site_data_dir: str = SITE_DATA_DIR) -> str:
+    """Bake the assembled scorecards for every candidate to a static JSON file.
+
+    Writes the exact `{generated_at, scorecards: [...]}` shape the frontend renders,
+    so the GitHub Pages page can read it with no backend. Source of truth is the live
+    DB (same as `export`) via db.get_scorecards.
+    """
+    payload = db.get_scorecards(conn, None)
+    os.makedirs(site_data_dir, exist_ok=True)
+    out_file = os.path.join(site_data_dir, "scorecards.json")
+    _write(out_file, payload)
+    return out_file
+
+
 def load_config(conn, data: dict[str, Any]) -> None:
     """Restore topics + laws + keywords (the law set) — no results."""
     for t in data["topics"]:
@@ -300,11 +316,22 @@ def load_results(conn, data: dict[str, Any]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["export", "load"])
+    parser.add_argument("command", choices=["export", "load", "site"])
     parser.add_argument("--db", default=None, help="Database URL; defaults to DATABASE_URL")
     parser.add_argument("--data-dir", default=DATA_DIR)
+    parser.add_argument("--site-data-dir", default=SITE_DATA_DIR, help="site: where to write scorecards.json")
     parser.add_argument("--config-only", action="store_true", help="load: laws + candidates only, skip baked results")
     args = parser.parse_args(argv)
+
+    if args.command == "site":
+        conn = db.connect(args.db)
+        try:
+            payload = db.get_scorecards(conn, None)
+            out_file = export_site(conn, args.site_data_dir)
+        finally:
+            conn.close()
+        print(f"Baked {len(payload['scorecards'])} scorecard(s) -> {out_file}")
+        return 0
 
     if args.command == "export":
         conn = db.connect(args.db)

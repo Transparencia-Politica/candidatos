@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Candidato — Scorecards</title>
+<style>
+  :root{
+    --bg:#f7f8fb;--surface:#ffffff;--ink:#20242c;--muted:#667085;--line:#d9dee7;
+    --teal:#0f766e;--rose:#be123c;--amber:#b45309;--blue:#2563eb;--violet:#7c3aed;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 18px 72px;}
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+  h1{font-size:1.45rem;line-height:1.15;margin:0}
+  h2{font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+  h3{font-size:1.05rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.92rem;margin-top:4px}
+  .badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;
+    padding:4px 10px;background:var(--surface);color:var(--muted);font-size:.78rem;font-weight:650;white-space:nowrap}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;margin:14px 0}
+  .nav{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+  .nav .navlabel{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.02em;margin-right:4px}
+  .nav a{text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--surface);
+    color:var(--ink);font-size:.85rem;font-weight:650}
+  .nav a:hover{border-color:var(--blue);color:var(--blue)}
+  .card-block{scroll-margin-top:64px;padding-top:6px}
+  .card-block + .card-block{margin-top:34px;border-top:2px solid var(--line);padding-top:20px}
+  .identity{display:flex;gap:16px;align-items:center}
+  .avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+    background:#e7f5f1;color:var(--teal);font-weight:800;font-size:1.35rem;border:1px solid #b9dfd7}
+  .name{font-size:1.28rem;font-weight:760}
+  .muted{color:var(--muted)}
+  .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:92px}
+  .metric .n{font-size:1.65rem;font-weight:780;line-height:1.05}
+  .metric .l{color:var(--muted);font-size:.78rem;text-transform:uppercase;margin-top:6px}
+  .wealth-grid{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:start}
+  .big{font-size:2rem;font-weight:800}
+  .row{display:grid;grid-template-columns:1fr auto;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .bar{height:8px;background:#edf0f5;border-radius:999px;overflow:hidden;margin-top:5px}
+  .bar i{display:block;height:100%;border-radius:999px}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:.75rem;text-transform:uppercase}
+  .chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 9px;font-size:.77rem;font-weight:700;
+    border:1px solid transparent;white-space:nowrap}
+  .c-sim{background:#e7f5f1;color:var(--teal);border-color:#b9dfd7}
+  .c-nao{background:#fff1f2;color:var(--rose);border-color:#fecdd3}
+  .c-aus{background:#eef1f5;color:#5b6472;border-color:#d8dee8}
+  .c-mix{background:#fff7ed;color:var(--amber);border-color:#fed7aa}
+  .keywords{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .keyword{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:.76rem;color:#384152;background:#fbfcfe}
+  .note{border-left:3px solid var(--blue);background:#f0f5ff;padding:10px 12px;border-radius:6px;color:#344054}
+  .warn{border-left-color:var(--amber);background:#fff7ed}
+  code{background:#edf0f5;padding:1px 5px;border-radius:5px}
+  .error{color:var(--rose)}
+  footer{color:var(--muted);font-size:.8rem;margin-top:16px}
+  @media (max-width:760px){
+    header{align-items:flex-start;flex-direction:column}
+    .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .wealth-grid{grid-template-columns:1fr}
+    th:nth-child(2),td:nth-child(2){display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Candidato · Scorecards</h1>
+      <div class="sub">Como deputados(as) votaram nas leis que mexem com o próprio patrimônio. Snapshot público, sem servidor.</div>
+    </div>
+    <div id="snapshot-badge" class="badge">snapshot</div>
+  </header>
+
+  <nav id="nav" class="nav" style="display:none"></nav>
+
+  <section id="state" class="panel">Carregando scorecards…</section>
+  <main id="cards"></main>
+
+  <footer id="sources"></footer>
+</div>
+
+<script>
+const BRL = n => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+const COLORS = ['#0f766e', '#b45309', '#2563eb', '#7c3aed', '#be123c'];
+const el = id => document.getElementById(id);
+const pct = value => value === null || value === undefined ? '—' : `${value}%`;
+const slugify = (name, id) => 'c-' + id + '-' + String(name || '').toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+function chipClass(score){
+  const status = score?.vote_status || '';
+  if(status.includes('sim')) return 'c-sim';
+  if(status.includes('nao') || status.includes('não')) return 'c-nao';
+  if(status.includes('misto')) return 'c-mix';
+  return 'c-aus';
+}
+
+function identityHtml(card){
+  const p = card.politic;
+  return `<div class="identity">
+    <div class="avatar">${(p.name || '?').slice(0,1)}</div>
+    <div>
+      <div class="name">${p.name}</div>
+      <div class="muted">${p.party || '—'} · ${p.uf || '—'} · ${p.occupation || 'ocupação não informada'}</div>
+      <div class="muted">Câmara ${p.camara_id} · TSE ${p.tse_year}/${p.tse_uf} · SQ ${p.tse_sq}</div>
+    </div>
+  </div>`;
+}
+
+function metricsHtml(card){
+  const s = card.summary;
+  const metrics = [
+    [pct(s.wealth_capital_pct), 'patrimônio em capital'],
+    [pct(s.coverage_pct), 'cobertura de leis relevantes'],
+    [pct(s.key_attendance_pct), 'presença no projeto-chave'],
+    [s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio'],
+    [s.gov_alignment_pct === null || s.gov_alignment_pct === undefined ? '—' : pct(s.gov_alignment_pct), 'alinhado ao Governo'],
+    [s.opp_alignment_pct === null || s.opp_alignment_pct === undefined ? '—' : pct(s.opp_alignment_pct), 'alinhado à Oposição']
+  ];
+  return `<section class="metrics">${
+    metrics.map(([n,l]) => `<div class="metric"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('')
+  }</section>`;
+}
+
+function wealthHtml(card){
+  const p = card.politic;
+  const rows = Object.entries(p.wealth_buckets || {})
+    .filter(([,v]) => Number(v) > 0)
+    .sort((a,b) => b[1] - a[1])
+    .map(([label,value], i) => {
+      const share = p.wealth_total ? (100 * value / p.wealth_total) : 0;
+      return `<div class="row">
+        <div>${label}<div class="bar"><i style="width:${share.toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></i></div></div>
+        <div style="text-align:right;white-space:nowrap">${BRL(value)}<br><span class="muted">${share.toFixed(1)}%</span></div>
+      </div>`;
+    }).join('');
+  return `<section class="panel"><h2>Patrimônio declarado</h2>
+    <div class="wealth-grid">
+      <div><div class="big">${BRL(p.wealth_total)}</div><div class="muted">${p.wealth_capital_pct}% em ações/participações ou exterior</div></div>
+      <div>${rows || '<span class="muted">Sem bens armazenados.</span>'}</div>
+    </div></section>`;
+}
+
+function votesHtml(card){
+  const rows = [];
+  for(const topic of card.topics){
+    for(const law of topic.laws){
+      const score = law.score;
+      rows.push(`<tr>
+        <td><b>${law.label}</b><br><span class="muted">${law.description}</span>
+          <div class="keywords">${law.keywords.map(k => `<span class="keyword">${k.label}</span>`).join('')}</div></td>
+        <td>${topic.title}${law.is_key ? '<br><span class="chip c-mix">chave</span>' : ''}</td>
+        <td><span class="chip ${chipClass(score)}">${score?.vote_label || 'sem score'}</span></td>
+        <td>${score ? `${score.present_count}/${score.nominal_count}` : '—'}</td>
+      </tr>`);
+    }
+  }
+  return `<section class="panel"><h2>Leis, palavras-chave e votos armazenados</h2>
+    <table><thead><tr><th>Lei</th><th>Tópico</th><th>Voto</th><th>Presença</th></tr></thead>
+    <tbody>${rows.join('')}</tbody></table></section>`;
+}
+
+const METHOD_HTML = `<section class="panel">
+  <h2>Como o score é calculado</h2>
+  <p>Para cada palavra-chave associada a uma lei, a direção indica o que um voto <code>Sim</code>
+  representa. <code>+1</code> significa avançar a tese, <code>-1</code> significa bloquear a tese,
+  e <code>0</code> é contexto sem direção de riqueza.</p>
+  <div class="note warn">Ausência continua sendo ausência: o banco guarda presença, cobertura e
+  evidência separadamente para evitar transformar dado faltante em intenção.</div>
+</section>`;
+
+function renderCardBlock(card){
+  const p = card.politic;
+  const anchor = slugify(p.name, p.camara_id);
+  const block = document.createElement('article');
+  block.className = 'card-block';
+  block.id = anchor;
+  block.innerHTML = `<section class="panel">${identityHtml(card)}</section>`
+    + metricsHtml(card) + wealthHtml(card) + votesHtml(card) + METHOD_HTML;
+  return { block, anchor };
+}
+
+function renderNav(cards, anchors){
+  const links = cards.map((card, i) => {
+    const p = card.politic;
+    return `<a href="#${anchors[i]}">${p.name} <span class="muted">· ${p.party || '—'}/${p.uf || '—'}</span></a>`;
+  }).join('');
+  el('nav').innerHTML = `<span class="navlabel">Candidatos</span>${links}`;
+  el('nav').style.display = 'flex';
+}
+
+async function run(){
+  try{
+    const res = await fetch('./data/scorecards.json');
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const payload = await res.json();
+    const cards = payload.scorecards || [];
+    if(!cards.length){
+      el('state').innerHTML = '<span class="muted">Nenhum scorecard disponível neste snapshot.</span>';
+      return;
+    }
+    const container = el('cards');
+    container.innerHTML = '';
+    const anchors = [];
+    for(const card of cards){
+      const { block, anchor } = renderCardBlock(card);
+      container.appendChild(block);
+      anchors.push(anchor);
+    }
+    if(cards.length > 1) renderNav(cards, anchors);
+    el('state').style.display = 'none';
+    const when = payload.generated_at ? new Date(payload.generated_at).toLocaleString('pt-BR') : '—';
+    el('snapshot-badge').textContent = `${cards.length} candidato${cards.length === 1 ? '' : 's'}`;
+    el('sources').textContent = `Snapshot estático · ${cards.length} candidato(s) · gerado em ${when}`;
+  }catch(err){
+    el('state').innerHTML = `<span class="error">Erro ao carregar os dados: ${err}</span>`;
+  }
+}
+run();
+</script>
+</body>
+</html>
