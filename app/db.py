@@ -196,6 +196,29 @@ CREATE TABLE IF NOT EXISTS scores (
   CONSTRAINT fk_scores_politic FOREIGN KEY (politic_id) REFERENCES politics(id) ON DELETE CASCADE,
   CONSTRAINT fk_scores_keyword FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS roll_calls (
+  id VARCHAR(64) PRIMARY KEY,
+  law_id INT NOT NULL,
+  date VARCHAR(32) NOT NULL DEFAULT '',
+  description TEXT NOT NULL,
+  is_nominal TINYINT(1) NOT NULL DEFAULT 0,
+  gov_orientation VARCHAR(32),
+  opp_orientation VARCHAR(32),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at VARCHAR(32) NOT NULL DEFAULT '',
+  KEY idx_roll_calls_law (law_id),
+  CONSTRAINT fk_roll_calls_law FOREIGN KEY (law_id) REFERENCES laws(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS votes (
+  roll_call_id VARCHAR(64) NOT NULL,
+  deputy_id INT NOT NULL,
+  vote_type VARCHAR(32) NOT NULL,
+  PRIMARY KEY (roll_call_id, deputy_id),
+  KEY idx_votes_deputy (deputy_id),
+  CONSTRAINT fk_votes_roll_call FOREIGN KEY (roll_call_id) REFERENCES roll_calls(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
 
@@ -630,6 +653,94 @@ def upsert_score(
             "updated_at": now_iso(),
         },
     )
+
+
+def upsert_roll_call(
+    conn: MySQLConnection,
+    *,
+    roll_call_id: str,
+    law_id: int,
+    date: str | None,
+    description: str | None,
+    is_nominal: bool,
+    gov_orientation: str | None,
+    opp_orientation: str | None,
+) -> None:
+    """Store one roll-call of a law (deputy-independent, immutable). Idempotent on roll_call id."""
+    conn.execute(
+        """
+        INSERT INTO roll_calls (
+          id, law_id, date, description, is_nominal,
+          gov_orientation, opp_orientation, updated_at
+        )
+        VALUES (
+          :id, :law_id, :date, :description, :is_nominal,
+          :gov_orientation, :opp_orientation, :updated_at
+        )
+        ON DUPLICATE KEY UPDATE
+          law_id = VALUES(law_id),
+          date = VALUES(date),
+          description = VALUES(description),
+          is_nominal = VALUES(is_nominal),
+          gov_orientation = VALUES(gov_orientation),
+          opp_orientation = VALUES(opp_orientation),
+          updated_at = VALUES(updated_at)
+        """,
+        {
+            "id": roll_call_id,
+            "law_id": law_id,
+            "date": date or "",
+            "description": description or "",
+            "is_nominal": 1 if is_nominal else 0,
+            "gov_orientation": gov_orientation,
+            "opp_orientation": opp_orientation,
+            "updated_at": now_iso(),
+        },
+    )
+
+
+def upsert_vote(conn: MySQLConnection, roll_call_id: str, deputy_id: int, vote_type: str) -> None:
+    """Store one deputy's vote on a roll-call. Idempotent on (roll_call_id, deputado)."""
+    conn.execute(
+        """
+        INSERT INTO votes (roll_call_id, deputy_id, vote_type)
+        VALUES (:roll_call_id, :deputy_id, :vote_type)
+        ON DUPLICATE KEY UPDATE vote_type = VALUES(vote_type)
+        """,
+        {
+            "roll_call_id": roll_call_id,
+            "deputy_id": deputy_id,
+            "vote_type": vote_type,
+        },
+    )
+
+
+def get_deputy_votes(conn: MySQLConnection, *, camara_id: int, law_ids: list[int]) -> list[dict[str, Any]]:
+    """Look up a deputy's cached votes for the given laws (joined with their roll-call context)."""
+    if not law_ids:
+        return []
+    placeholders = ", ".join("?" for _ in law_ids)
+    return conn.execute(
+        f"""
+        SELECT
+          vt.roll_call_id, vt.vote_type,
+          v.law_id, v.date, v.description, v.is_nominal,
+          v.gov_orientation, v.opp_orientation
+        FROM votes vt
+        JOIN roll_calls v ON v.id = vt.roll_call_id
+        WHERE vt.deputy_id = ? AND v.law_id IN ({placeholders})
+        ORDER BY v.law_id, vt.roll_call_id
+        """,
+        (camara_id, *law_ids),
+    ).fetchall()
+
+
+def get_law_roll_calls(conn: MySQLConnection, law_id: int) -> list[dict[str, Any]]:
+    """All cached roll-calls for a law (deputy-independent)."""
+    return conn.execute(
+        "SELECT * FROM roll_calls WHERE law_id = ? ORDER BY id",
+        (law_id,),
+    ).fetchall()
 
 
 def list_politics(conn: MySQLConnection) -> list[dict[str, Any]]:

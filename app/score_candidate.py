@@ -250,6 +250,45 @@ def infer_law_vote(camara_id: int, law: dict[str, Any], limit_votes: int, pause:
     }
 
 
+def infer_law_vote_from_cache(conn, camara_id: int, law: dict[str, Any]) -> dict[str, Any]:
+    """Compute present/nominal/stance for a deputy from the stored vote cache — no API calls.
+
+    The cache holds every deputy's vote on each of a law's nominal roll-calls, so this is
+    a pure DB lookup. See research/12-topic-packages-and-vote-caching.md.
+    """
+    roll_calls = db.get_law_roll_calls(conn, law["id"])
+    nominal = len(roll_calls)
+    desc_by_id = {v["id"]: (v.get("description") or "") for v in roll_calls}
+
+    mine = db.get_deputy_votes(conn, camara_id=camara_id, law_ids=[law["id"]])
+    present = len(mine)
+    votes: list[str] = []
+    recorded: list[dict[str, Any]] = []
+    passage: str | None = None
+    for row in mine:
+        vote_type = row["vote_type"]
+        votes.append(vote_type)
+        recorded.append({"roll_call_id": row["roll_call_id"], "vote_type": vote_type})
+        if vote_type and re.search("aprovad", desc_by_id.get(row["roll_call_id"], ""), re.IGNORECASE) and passage is None:
+            passage = vote_type
+
+    selected_stance = passage if passage else (votes[0] if len(set(votes)) == 1 and votes else None)
+    vote_status, vote_label, stance = vote_class(selected_stance, nominal, present, votes)
+    return {
+        "present": present,
+        "nominal": nominal,
+        "votes": votes,
+        "passage": passage,
+        "stance": stance,
+        "vote_status": vote_status,
+        "vote_label": vote_label,
+        "nominal_vote_ids": [v["id"] for v in roll_calls],
+        "recorded": recorded,
+        "source_url": f"{CAMARA}/proposicoes/{law['camara_proposicao_id']}/votacoes",
+        "fetch_error": None,
+    }
+
+
 def score_keyword(keyword: dict[str, Any], law_vote: dict[str, Any], wealth_capital: float) -> tuple[float | None, float | None]:
     sign = vote_sign(law_vote["stance"])
     if sign is None:
@@ -321,7 +360,7 @@ def score_camara_candidate(
         for law in db.list_laws_with_keywords(conn):
             if log:
                 log(f"Scoring {name}: {law['label']}...")
-            law_vote = infer_law_vote(camara_id, law, limit_votes, pause)
+            law_vote = infer_law_vote_from_cache(conn, camara_id, law)
             for keyword in law["keywords"]:
                 score_value, self_interest_value = score_keyword(keyword, law_vote, wealth_capital)
                 evidence = {
