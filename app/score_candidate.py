@@ -250,27 +250,59 @@ def infer_law_vote(camara_id: int, law: dict[str, Any], limit_votes: int, pause:
     }
 
 
-def infer_law_vote_from_cache(conn, camara_id: int, law: dict[str, Any]) -> dict[str, Any]:
+def legislature_start(profile: dict[str, Any], fetch=fetch_json) -> str | None:
+    """Start date (ISO) of the deputy's current legislature, for mandate-aware presence."""
+    leg = (profile.get("ultimoStatus") or {}).get("idLegislatura")
+    if not leg:
+        return None
+    try:
+        return (fetch(f"{CAMARA}/legislaturas/{leg}").get("dados") or {}).get("dataInicio")
+    except Exception:
+        return None
+
+
+def infer_law_vote_from_cache(
+    conn, camara_id: int, law: dict[str, Any], since_date: str | None = None
+) -> dict[str, Any]:
     """Compute present/nominal/stance for a deputy from the stored vote cache — no API calls.
 
     The cache holds every deputy's vote on each of a law's nominal roll-calls, so this is
-    a pure DB lookup. See research/12-topic-packages-and-vote-caching.md.
+    a pure DB lookup. When `since_date` (ISO) is given, only roll-calls on/after it are
+    counted — so a deputy is never marked absent for votes before their term began.
+    See research/12-topic-packages-and-vote-caching.md.
     """
     roll_calls = db.get_law_roll_calls(conn, law["id"])
+    if since_date:
+        roll_calls = [v for v in roll_calls if (v.get("date") or "") >= since_date]
     nominal = len(roll_calls)
+    valid_ids = {v["id"] for v in roll_calls}
     desc_by_id = {v["id"]: (v.get("description") or "") for v in roll_calls}
 
     mine = db.get_deputy_votes(conn, camara_id=camara_id, law_ids=[law["id"]])
+    if since_date:
+        mine = [m for m in mine if m["roll_call_id"] in valid_ids]
     present = len(mine)
     votes: list[str] = []
     recorded: list[dict[str, Any]] = []
     passage: str | None = None
+    gov_aligned = gov_comparable = 0
+    opp_aligned = opp_comparable = 0
     for row in mine:
         vote_type = row["vote_type"]
         votes.append(vote_type)
         recorded.append({"roll_call_id": row["roll_call_id"], "vote_type": vote_type})
         if vote_type and re.search("aprovad", desc_by_id.get(row["roll_call_id"], ""), re.IGNORECASE) and passage is None:
             passage = vote_type
+        # government/opposition alignment: only over directional (Sim/Não) votes with a defined line
+        if vote_type in ("Sim", "Não"):
+            if row.get("gov_orientation") in ("Sim", "Não"):
+                gov_comparable += 1
+                if vote_type == row["gov_orientation"]:
+                    gov_aligned += 1
+            if row.get("opp_orientation") in ("Sim", "Não"):
+                opp_comparable += 1
+                if vote_type == row["opp_orientation"]:
+                    opp_aligned += 1
 
     selected_stance = passage if passage else (votes[0] if len(set(votes)) == 1 and votes else None)
     vote_status, vote_label, stance = vote_class(selected_stance, nominal, present, votes)
@@ -284,6 +316,10 @@ def infer_law_vote_from_cache(conn, camara_id: int, law: dict[str, Any]) -> dict
         "vote_label": vote_label,
         "nominal_vote_ids": [v["id"] for v in roll_calls],
         "recorded": recorded,
+        "gov_aligned": gov_aligned,
+        "gov_comparable": gov_comparable,
+        "opp_aligned": opp_aligned,
+        "opp_comparable": opp_comparable,
         "source_url": f"{CAMARA}/proposicoes/{law['camara_proposicao_id']}/votacoes",
         "fetch_error": None,
     }
@@ -357,10 +393,11 @@ def score_camara_candidate(
             wealth_buckets=buckets,
         )
 
+        since_date = legislature_start(profile)
         for law in db.list_laws_with_keywords(conn):
             if log:
                 log(f"Scoring {name}: {law['label']}...")
-            law_vote = infer_law_vote_from_cache(conn, camara_id, law)
+            law_vote = infer_law_vote_from_cache(conn, camara_id, law, since_date=since_date)
             for keyword in law["keywords"]:
                 score_value, self_interest_value = score_keyword(keyword, law_vote, wealth_capital)
                 evidence = {
@@ -370,6 +407,10 @@ def score_camara_candidate(
                     "recorded_votes": law_vote["recorded"],
                     "all_recorded_vote_types": law_vote["votes"],
                     "passage_vote": law_vote["passage"],
+                    "gov_aligned": law_vote["gov_aligned"],
+                    "gov_comparable": law_vote["gov_comparable"],
+                    "opp_aligned": law_vote["opp_aligned"],
+                    "opp_comparable": law_vote["opp_comparable"],
                     "tse_candidate_url": tse_url,
                     "fetch_error": law_vote["fetch_error"],
                 }

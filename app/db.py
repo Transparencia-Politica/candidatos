@@ -915,6 +915,16 @@ def _summary(politic_row: dict[str, Any], rows: list[dict[str, Any]]) -> dict[st
     ]
     protect_count = sum(1 for row in self_interest_rows if float(row["self_interest_value"]) > 0)
 
+    # government/opposition alignment over the fiscal agenda (all laws, dedup per law)
+    gov_aligned = gov_comparable = 0
+    opp_aligned = opp_comparable = 0
+    for row in by_law.values():
+        ev = from_json(row.get("evidence_json"), {})
+        gov_aligned += int(ev.get("gov_aligned") or 0)
+        gov_comparable += int(ev.get("gov_comparable") or 0)
+        opp_aligned += int(ev.get("opp_aligned") or 0)
+        opp_comparable += int(ev.get("opp_comparable") or 0)
+
     return {
         "wealth_capital_pct": round(100 * wealth_capital / wealth_total) if wealth_total else 0,
         "coverage_pct": round(100 * len(recorded_laws) / len(relevant_laws)) if relevant_laws else 0,
@@ -931,4 +941,7 @@ def _summary(politic_row: dict[str, Any], rows: list[dict[str, Any]]) -> dict[st
         "self_interest_n": len(self_interest_rows),
         "relevant_laws_n": len(relevant_laws),
         "recorded_laws_n": len(recorded_laws),
+        "gov_alignment_pct": round(100 * gov_aligned / gov_comparable) if gov_comparable else None,
+        "opp_alignment_pct": round(100 * opp_aligned / opp_comparable) if opp_comparable else None,
+        "gov_comparable_n": gov_comparable,
     }
