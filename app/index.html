@@ -151,7 +151,7 @@ function randomCached(){
     return;
   }
   const pick = localCandidates[Math.floor(Math.random() * localCandidates.length)];
-  loadLocalCandidate(pick.camara_id, pick.name);
+  loadLocal(pick);  // route by house — the pool includes senators (no camara_id)
 }
 
 async function fetchDeputadosPage(page){

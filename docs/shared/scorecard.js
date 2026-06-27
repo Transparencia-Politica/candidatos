@@ -38,16 +38,21 @@ function identityHtml(card){
   </div>`;
 }
 
+// Wealth is "known" when we matched a TSE candidacy (tse_sq). Deputies always have it; senators
+// have it only when resolved (currently 2022-elected). Unresolved -> show '—'/a note, never a
+// misleading R$ 0,00 that reads as "declared nothing".
+const wealthKnown = p => p.tse_sq != null && p.tse_sq !== '';
+
 function metricsHtml(card){
   const s = card.summary;
-  // Senators have no TSE wealth ingested yet -> show '—' for wealth-derived metrics instead of a
-  // misleading 0%. Gov/Oposição line isn't published on the Senado /votacao feed either.
-  const senator = card.politic.house === 'senado';
+  const known = wealthKnown(card.politic);
+  // Gov/Oposição alignment is genuinely absent for senators (the Senado /votacao feed has no
+  // party line); the wealth metrics fall back to '—' only when the TSE candidacy wasn't found.
   const metrics = [
-    [senator ? '—' : pct(s.wealth_capital_pct), 'patrimônio em capital'],
+    [known ? pct(s.wealth_capital_pct) : '—', 'patrimônio em capital'],
     [pct(s.coverage_pct), 'cobertura de leis relevantes'],
     [pct(s.key_attendance_pct), 'presença no projeto-chave'],
-    [senator || s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio'],
+    [!known || s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio'],
     [s.gov_alignment_pct === null || s.gov_alignment_pct === undefined ? '—' : pct(s.gov_alignment_pct), 'alinhado ao Governo'],
     [s.opp_alignment_pct === null || s.opp_alignment_pct === undefined ? '—' : pct(s.opp_alignment_pct), 'alinhado à Oposição']
   ];
@@ -58,10 +63,14 @@ function metricsHtml(card){
 
 function wealthHtml(card){
   const p = card.politic;
-  if(p.house === 'senado'){
+  if(!wealthKnown(p)){
     return `<section class="panel"><h2>Patrimônio declarado</h2>
-      <div class="note">Patrimônio (bens declarados ao TSE) ainda não coletado para senadores — o
-      score do Senado usa apenas os votos nominais nas mesmas leis.</div></section>`;
+      <div class="note"><b>Declaração de bens não disponível para este(a) parlamentar.</b><br>
+      O patrimônio é puxado da base de candidaturas do TSE, que aqui só está mapeada para a eleição
+      de <b>2022</b>. Senadores cumprem mandato de <b>8 anos escalonado</b>, então quem foi eleito
+      em <b>2018</b> ainda não tem os bens coletados por esta fonte. Isso é uma <b>limitação da
+      fonte de dados</b> — não significa que a pessoa não tenha patrimônio. O score baseado em
+      votos nominais não é afetado.</div></section>`;
   }
   const rows = Object.entries(p.wealth_buckets || {})
     .filter(([,v]) => Number(v) > 0)
