@@ -102,6 +102,40 @@ th{color:var(--muted);font-size:.75rem;text-transform:uppercase}
 code{background:var(--code-bg);padding:1px 5px;border-radius:5px}
 .error{color:var(--rose)}
 footer{color:var(--muted);font-size:.8rem;margin-top:16px}
+/* Tabs (live app): underline-style pills built from the same tokens. */
+.tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin:0 0 18px}
+.tabbtn{border:0;background:none;color:var(--muted);cursor:pointer;
+  padding:10px 2px;margin-bottom:-1px;font-size:.96rem;font-weight:650;
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.tabbtn:hover{color:var(--ink)}
+.tabbtn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tabbtn[hidden]{display:none}
+.tabbtn .count{color:var(--muted);font-weight:600;font-size:.82em}
+.tabpane[hidden]{display:none}
+.tabpane{animation:fade .22s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* Cached-candidate grid (Busca tab). */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:12px;margin-top:14px}
+.ccard{display:flex;flex-direction:column;gap:5px;align-items:flex-start;text-align:left;
+  border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);
+  padding:14px;cursor:pointer;animation:rise .3s ease backwards;
+  transition:border-color .15s,box-shadow .15s,transform .15s}
+.ccard:hover{border-color:var(--blue);box-shadow:0 8px 22px var(--shadow);transform:translateY(-2px)}
+.ccard:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ccard-top{display:flex;width:100%;justify-content:space-between;align-items:center;margin-bottom:2px}
+.avatar-sm{width:38px;height:38px;font-size:1rem}
+.ccard-name{font-weight:760;font-size:1.02rem;line-height:1.18}
+.ccard-meta{font-size:.82rem}
+.ccard-wealth{margin-top:auto;padding-top:4px;font-weight:700;font-size:.9rem}
+.ccard-wealth.unknown{color:var(--muted);font-weight:600}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.toolbar .secondary{font-size:.86rem;padding:7px 11px}
+.linkback{border:0;background:none;color:var(--blue);font-weight:650;cursor:pointer;padding:0;margin:0 0 12px;font-size:.9rem}
+.linkback:hover{text-decoration:underline}
+
 .header-actions{display:flex;align-items:center;gap:10px}
 .theme-toggle{display:grid;place-items:center;width:38px;height:38px;flex:0 0 auto;
   border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);
@@ -118,4 +152,5 @@ footer{color:var(--muted);font-size:.8rem;margin-top:16px}
   .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
   .wealth-grid{grid-template-columns:1fr}
   th:nth-child(2),td:nth-child(2){display:none}
+  .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
 }

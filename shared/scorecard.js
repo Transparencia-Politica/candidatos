@@ -128,6 +128,36 @@ function cardBodyHtml(card){
     + metricsHtml(card) + wealthHtml(card) + votesHtml(card) + METHOD_HTML;
 }
 
+/* ---- Cached-candidate grid (reusable components for a roster view) ----
+   A roster entry is {name, party, uf, house, camara_id, senado_id, wealth_total}. */
+
+// Stable key for a roster entry across both chambers (senators have no camara_id).
+function candidateKey(c){ return c.house === 'senado' ? 's' + c.senado_id : 'c' + c.camara_id; }
+
+// One clickable grid tile. `i` (optional) staggers the load animation.
+function candidateCardHtml(c, i){
+  const known = Number(c.wealth_total) > 0;
+  const wealth = known ? BRL(c.wealth_total) : 'patrimônio —';
+  const house = c.house === 'senado'
+    ? '<span class="chip c-mix">Senado</span>'
+    : '<span class="chip c-sim">Câmara</span>';
+  const delay = i ? ` style="animation-delay:${Math.min(i, 14) * 28}ms"` : '';
+  return `<button class="ccard" type="button" data-key="${candidateKey(c)}"${delay}>
+    <span class="ccard-top"><span class="avatar avatar-sm">${(c.name || '?').slice(0, 1)}</span>${house}</span>
+    <b class="ccard-name">${c.name}</b>
+    <span class="muted ccard-meta">${c.party || '—'} · ${c.uf || '—'}</span>
+    <span class="ccard-wealth${known ? '' : ' unknown'}">${wealth}</span>
+  </button>`;
+}
+
+// The grid, or a friendly empty state.
+function candidateGridHtml(list){
+  if(!list.length){
+    return `<div class="sub" style="margin-top:14px">Nenhum candidato no banco corresponde — use <b>Buscar</b> para procurar um nome novo (Câmara → Senado).</div>`;
+  }
+  return `<div class="cgrid">${list.map((c, i) => candidateCardHtml(c, i)).join('')}</div>`;
+}
+
 // Wire the sun/moon toggle. The button (#theme-toggle) starts empty; we inject the icons
 // here so both pages share one copy of the SVGs. Pre-paint theme selection lives inline
 // in each page's <head> to avoid a flash of the wrong theme.

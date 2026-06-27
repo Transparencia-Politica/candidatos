@@ -30,101 +30,131 @@
     </div>
   </header>
 
-  <section class="panel">
-    <form id="search-form" class="search-form">
-      <div class="search-field">
-        <input id="candidate-query" class="search-input" placeholder="Digite um nome, ex.: Luciano Bivar" autocomplete="off">
-        <div id="suggestions" class="suggest" hidden></div>
-      </div>
-      <button id="search-button" class="primary" type="submit">Buscar</button>
-      <button id="random-cached" class="secondary" type="button" title="Sorteia um candidato já no banco">🎲 No banco</button>
-      <button id="random-new" class="secondary" type="button" title="Sorteia um deputado novo e calcula o score">🎲 Novo</button>
-    </form>
-    <div class="sub" style="margin-top:8px">Sugestões aparecem para candidatos já no banco local. Para um nome novo, clique em <b>Buscar</b> (consulta a Câmara).</div>
-    <div id="search-results" class="results"></div>
+  <nav class="tabs" id="tabs">
+    <button class="tabbtn active" type="button" data-tab="busca">Busca <span class="count" id="roster-count"></span></button>
+    <button class="tabbtn" type="button" data-tab="selecionado" id="tab-selecionado" hidden>Selecionado</button>
+  </nav>
+
+  <!-- TAB: Busca — search + grid of cached candidates -->
+  <section id="pane-busca" class="tabpane">
+    <div class="panel">
+      <form id="search-form" class="search-form">
+        <div class="search-field">
+          <input id="candidate-query" class="search-input" placeholder="Filtre a grade ou digite um nome novo…" autocomplete="off">
+        </div>
+        <button id="search-button" class="primary" type="submit">Buscar</button>
+        <button id="random-cached" class="secondary" type="button" title="Abre um candidato já no banco">🎲 No banco</button>
+        <button id="random-new" class="secondary" type="button" title="Sorteia um deputado novo e calcula o score">🎲 Novo</button>
+      </form>
+      <div class="sub" style="margin-top:8px">A grade mostra quem já está no banco — digite para filtrar. Clique em <b>Buscar</b> para procurar um nome novo (Câmara → Senado).</div>
+      <div id="search-results" class="results"></div>
+    </div>
+    <div id="grid-host"></div>
   </section>
 
-  <section id="state" class="panel">Carregando scorecards...</section>
-  <main id="content" style="display:none">
+  <!-- TAB: Selecionado — the full scorecard; tab hidden until something is selected -->
+  <section id="pane-selecionado" class="tabpane" hidden>
+    <button id="back-to-busca" class="linkback" type="button">← Voltar à busca</button>
     <div id="card-host"></div>
-  </main>
-  <footer id="sources"></footer>
+    <footer id="sources"></footer>
+  </section>
 </div>
 
 <script src="shared/scorecard.js"></script>
 <script>
-// Live app shell: search the Câmara, score on the backend, render one stored scorecard.
-// Shared helpers (BRL, pct, chipClass, cardBodyHtml, initThemeToggle, …) come from scorecard.js.
-const form = el('search-form');
-const queryInput = el('candidate-query');
-const searchButton = el('search-button');
-const resultsEl = el('search-results');
-const suggestEl = el('suggestions');
-let localCandidates = [];
-let activeSuggest = -1;
-let suggestMatches = [];
-const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+// Live app shell. Two tabs: Busca (search + cached grid) and Selecionado (one scorecard).
+// Rendering components (cardBodyHtml, candidateGridHtml, candidateCardHtml, candidateKey,
+// initThemeToggle, el) come from shared/scorecard.js — this file is only state + actions + wiring.
 
-async function loadLocalRoster(){
+/* ---------------- state ---------------- */
+let roster = [];                      // cached candidates from /api/politics
+const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const byKey = k => roster.find(c => candidateKey(c) === k);
+
+/* ---------------- data ---------------- */
+async function loadRoster(){
   try{
     const res = await fetch('/api/politics');
     const payload = await res.json();
-    localCandidates = (payload.politics || []).map(p => ({
-      camara_id:p.camara_id, senado_id:p.senado_id, house:p.house || 'camara',
-      name:p.name, party:p.party, uf:p.uf,
+    roster = (payload.politics || []).map(p => ({
+      camara_id: p.camara_id, senado_id: p.senado_id, house: p.house || 'camara',
+      name: p.name, party: p.party, uf: p.uf, wealth_total: p.wealth_total,
     }));
-  }catch(err){ localCandidates = []; }
+  }catch(err){ roster = []; }
+  el('roster-count').textContent = roster.length ? `(${roster.length})` : '';
+  renderGrid();
 }
 
-function matchLocal(q){
-  const n = norm(q);
-  if(n.length < 1) return [];
-  return localCandidates.filter(c => norm(c.name).includes(n)).slice(0, 8);
+/* ---------------- tabs ---------------- */
+function selectTab(id){
+  for(const b of document.querySelectorAll('.tabbtn')) b.classList.toggle('active', b.dataset.tab === id);
+  el('pane-busca').hidden = id !== 'busca';
+  el('pane-selecionado').hidden = id !== 'selecionado';
 }
 
-function hideSuggest(){ suggestEl.hidden = true; suggestEl.innerHTML = ''; activeSuggest = -1; }
-
-function renderSuggestions(q){
-  const matches = matchLocal(q);
-  suggestMatches = matches;
-  if(!matches.length){ hideSuggest(); return; }
-  activeSuggest = -1;
-  suggestEl.innerHTML = matches.map((c, i) => `<button type="button" class="suggest-item" data-idx="${i}">
-    <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · ${c.house === 'senado' ? 'Senado' : 'Câmara'} · já analisado</span></button>`).join('');
-  const items = [...suggestEl.querySelectorAll('.suggest-item')];
-  items.forEach((b, i) => b.addEventListener('mousedown', ev => { ev.preventDefault(); loadLocal(matches[i]); }));
-  suggestEl.hidden = false;
+/* ---------------- Busca: grid + live filter ---------------- */
+function renderGrid(){
+  const q = norm(el('candidate-query').value);
+  const list = q ? roster.filter(c => norm(c.name).includes(q)) : roster;
+  el('grid-host').innerHTML = candidateGridHtml(list);
+  for(const card of el('grid-host').querySelectorAll('.ccard')){
+    card.addEventListener('click', () => loadLocal(byKey(card.dataset.key)));
+  }
 }
 
-// One entry point for an already-scored person: route by house to the right cached read.
+// Remote search results (deputies not yet in the bank) shown as clickable chips in the Busca tab.
+function renderSearchResults(candidates){
+  if(!candidates.length){ el('search-results').innerHTML = ''; return; }
+  el('search-results').innerHTML = candidates.map(c =>
+    `<button class="candidate" type="button" data-camara-id="${c.camara_id}">
+      <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · Câmara ${c.camara_id} · calcular</span>
+    </button>`).join('');
+  for(const b of el('search-results').querySelectorAll('.candidate')){
+    b.addEventListener('click', () => analyzeCandidate(Number(b.dataset.camaraId), b.querySelector('b').textContent));
+  }
+}
+
+/* ---------------- selection (Selecionado tab) ---------------- */
+function showSelected(html){
+  el('card-host').innerHTML = html;
+  el('tab-selecionado').hidden = false;
+  selectTab('selecionado');
+}
+function selectLoading(name){
+  showSelected(`<div class="panel"><span class="muted">Carregando ${name}…</span></div>`);
+  el('sources').textContent = '';
+}
+function selectError(name, err){
+  showSelected(`<div class="panel"><span class="error">Erro ao carregar ${name}: ${err}</span></div>`);
+}
+function select(card, source){
+  showSelected(cardBodyHtml(card));
+  el('sources').textContent = `Dados de /api/scorecards${source ? ` · ${source}` : ''} · renderizado em ${new Date().toLocaleString('pt-BR')}`;
+}
+
+/* ---------------- actions ---------------- */
+// Open an already-scored person from the bank: route by house to the right cached read.
 function loadLocal(c){
+  if(!c) return;
   if(c.house === 'senado') return loadSenator(c.name, c.senado_id);
   return loadLocalCandidate(c.camara_id, c.name);
 }
 
 async function loadLocalCandidate(camaraId, name){
-  hideSuggest();
-  queryInput.value = name;
-  resultsEl.innerHTML = '';
-  setLoading(`Carregando ${name} do banco local...`);
+  selectLoading(name);
   try{
     const res = await fetch(`/api/scorecards/${camaraId}`);
     const payload = await res.json();
     if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
     const card = payload.scorecards?.[0];
     if(!card) throw new Error('scorecard não encontrado no banco local');
-    renderCard(card, 'cache local');
-  }catch(err){
-    el('state').innerHTML = `<span class="error">Erro ao carregar ${name}: ${err}</span>`;
-  }
+    select(card, 'cache local');
+  }catch(err){ selectError(name, err); }
 }
 
-// Load a senator: by senado_id (cached read) when known, else by name (resolve + score).
+// Load a senator by senado_id (cached read) when known, else by name (resolve + score).
 async function loadSenator(name, senadoId){
-  hideSuggest();
-  queryInput.value = name;
-  resultsEl.innerHTML = '';
-  setLoading(`Carregando ${name} (Senado)...`);
+  selectLoading(name);
   try{
     const url = senadoId
       ? `/api/senators/scorecard?senado_id=${senadoId}`
@@ -134,24 +164,77 @@ async function loadSenator(name, senadoId){
     if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
     const card = payload.scorecards?.[0];
     if(!card) throw new Error('scorecard não encontrado');
-    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+    select(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+  }catch(err){ selectError(name, err); }
+}
+
+// Score a deputy (new or refresh) on the backend, then select it.
+async function analyzeCandidate(camaraId, name){
+  selectLoading(`${name} (calculando score)`);
+  try{
+    const res = await fetch('/api/scorecards', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({camara_id: camaraId}),
+    });
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('scorecard não retornado');
+    select(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+    loadRoster();  // newly-scored candidate joins the grid
+  }catch(err){ selectError(name, err); }
+}
+
+// Buscar: jump to an exact cached match, else search remotely (Câmara → Senado).
+function onSubmit(event){
+  event.preventDefault();
+  const q = el('candidate-query').value.trim();
+  if(q.length < 2){ el('search-results').innerHTML = '<span class="error">Digite pelo menos 2 caracteres.</span>'; return; }
+  const exact = roster.find(c => norm(c.name) === norm(q)) || roster.filter(c => norm(c.name).includes(norm(q)))[0];
+  if(exact) return loadLocal(exact);
+  searchRemote(q);
+}
+
+async function searchRemote(q){
+  el('search-button').disabled = true;
+  el('search-results').innerHTML = '<span class="muted">Buscando na Câmara…</span>';
+  try{
+    const res = await fetch(`/api/candidates/search?q=${encodeURIComponent(q)}`);
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const candidates = payload.candidates || [];
+    if(candidates.length){ renderSearchResults(candidates); return; }
+    el('search-results').innerHTML = '<span class="muted">Nada na Câmara. Buscando no Senado e calculando…</span>';
+    await searchSenator(q);
   }catch(err){
-    el('state').innerHTML = `<span class="error">Erro ao carregar ${name}: ${err}</span>`;
+    el('search-results').innerHTML = `<span class="error">Erro na busca: ${err}</span>`;
+  }finally{
+    el('search-button').disabled = false;
   }
 }
 
-// Random pickers (live page only): both hit the backend, so they live in the shell, not shared/.
-function setBusy(b){
-  for(const id of ['search-button','random-cached','random-new']) el(id).disabled = b;
+// Senado leg of the unified search: resolve the name to a current senator, score, select.
+async function searchSenator(q){
+  try{
+    const res = await fetch(`/api/senators/scorecard?name=${encodeURIComponent(q)}`);
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('vazio');
+    el('search-results').innerHTML = '';
+    select(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+    loadRoster();  // newly-scored senator joins the grid
+  }catch(err){
+    el('search-results').innerHTML = `<span class="error">Ninguém encontrado para “${q}” na Câmara nem no Senado.</span>`;
+  }
 }
+
+/* ---------------- random pickers (live page only) ---------------- */
+function setBusy(b){ for(const id of ['search-button','random-cached','random-new']) el(id).disabled = b; }
 
 function randomCached(){
-  if(!localCandidates.length){
-    setLoading('<span class="muted">Nenhum candidato no banco ainda. Use Buscar ou 🎲 Novo.</span>');
-    return;
-  }
-  const pick = localCandidates[Math.floor(Math.random() * localCandidates.length)];
-  loadLocal(pick);  // route by house — the pool includes senators (no camara_id)
+  if(!roster.length){ el('search-results').innerHTML = '<span class="muted">Nenhum candidato no banco ainda. Use Buscar ou 🎲 Novo.</span>'; return; }
+  loadLocal(roster[Math.floor(Math.random() * roster.length)]);
 }
 
 async function fetchDeputadosPage(page){
@@ -161,183 +244,42 @@ async function fetchDeputadosPage(page){
   return res.json();
 }
 
-async function scoreNewCandidate(camaraId, name){
-  setLoading(`Calculando score de ${name} (deputado novo)...`);
-  try{
-    const res = await fetch('/api/scorecards', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({camara_id: camaraId})
-    });
-    const payload = await res.json();
-    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
-    const card = payload.scorecards?.[0];
-    if(!card) throw new Error('scorecard não retornado');
-    queryInput.value = name;
-    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
-    loadLocalRoster();  // newly-scored candidate joins the typeahead pool
-    return true;
-  }catch(err){ return false; }
-}
-
 async function randomNew(){
-  hideSuggest();
   setBusy(true);
-  setLoading('Sorteando um deputado novo...');
+  selectLoading('um deputado novo (sorteando)');
   try{
     const first = await fetchDeputadosPage(1);
     const lastLink = (first.links || []).find(l => l.rel === 'last');
     const lastPage = lastLink ? (Number(new URL(lastLink.href).searchParams.get('pagina')) || 1) : 1;
-    const cachedIds = new Set(localCandidates.map(c => c.camara_id));
+    const cachedIds = new Set(roster.map(c => c.camara_id));
     for(let attempt = 0; attempt < 6; attempt++){
       const page = 1 + Math.floor(Math.random() * lastPage);
       const data = page === 1 ? first : await fetchDeputadosPage(page);
       const fresh = (data.dados || []).filter(d => !cachedIds.has(d.id));
       if(!fresh.length) continue;
       const pick = fresh[Math.floor(Math.random() * fresh.length)];
-      cachedIds.add(pick.id);  // don't repick the same one on retry
-      setLoading(`Sorteado: ${pick.nome}. Calculando score...`);
-      if(await scoreNewCandidate(pick.id, pick.nome)) return;
+      cachedIds.add(pick.id);
+      return await analyzeCandidate(pick.id, pick.nome);
     }
-    el('state').innerHTML = '<span class="error">Não consegui sortear um novo candidato (falha de resolução TSE). Tente de novo.</span>';
+    selectError('sorteio', 'não consegui sortear um novo candidato (resolução TSE). Tente de novo.');
   }catch(err){
-    el('state').innerHTML = `<span class="error">Erro ao sortear: ${err}</span>`;
+    selectError('sorteio', err);
   }finally{
     setBusy(false);
   }
 }
 
-function renderCard(card, source){
-  el('card-host').innerHTML = cardBodyHtml(card);
-  el('state').style.display = 'none';
-  el('content').style.display = 'block';
-  const sourceLabel = source ? ` · ${source}` : '';
-  el('sources').textContent = `Dados servidos por /api/scorecards${sourceLabel} · renderizado em ${new Date().toLocaleString('pt-BR')}`;
-}
-
-function setLoading(message){
-  el('content').style.display = 'none';
-  el('state').style.display = 'block';
-  el('state').innerHTML = message;
-}
-
-function renderCandidateResults(candidates){
-  if(!candidates.length){
-    resultsEl.innerHTML = '<span class="muted">Nenhum deputado encontrado.</span>';
-    return;
-  }
-  resultsEl.innerHTML = candidates.map(c => `<button class="candidate" type="button" data-camara-id="${c.camara_id}">
-    <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · Câmara ${c.camara_id}</span>
-  </button>`).join('');
-  for(const button of resultsEl.querySelectorAll('.candidate')){
-    button.addEventListener('click', () => analyzeCandidate(Number(button.dataset.camaraId), button.querySelector('b').textContent));
-  }
-}
-
-function onSubmit(event){
-  event.preventDefault();
-  const q = queryInput.value.trim();
-  // Prefer a local (already-scored) person: load from DB, no live call.
-  if(!suggestEl.hidden && suggestMatches.length){
-    return loadLocal(suggestMatches[activeSuggest >= 0 ? activeSuggest : 0]);
-  }
-  const exact = matchLocal(q).find(c => norm(c.name) === norm(q)) || matchLocal(q)[0];
-  if(exact) return loadLocal(exact);
-  // No local match → search, Câmara first then Senado.
-  searchCandidates(q);
-}
-
-async function searchCandidates(q){
-  if(q.length < 2){
-    resultsEl.innerHTML = '<span class="error">Digite pelo menos 2 caracteres.</span>';
-    return;
-  }
-  hideSuggest();
-  searchButton.disabled = true;
-  resultsEl.innerHTML = '<span class="muted">Buscando na Câmara...</span>';
-  try{
-    const res = await fetch(`/api/candidates/search?q=${encodeURIComponent(q)}`);
-    const payload = await res.json();
-    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
-    const candidates = payload.candidates || [];
-    if(candidates.length){ renderCandidateResults(candidates); return; }
-    // Nothing in the Câmara → fall back to the Senado.
-    await searchSenator(q);
-  }catch(err){
-    resultsEl.innerHTML = `<span class="error">Erro na busca: ${err}</span>`;
-  }finally{
-    searchButton.disabled = false;
-  }
-}
-
-// Senado leg of the unified search: resolve the name to a current senator, score, render.
-async function searchSenator(q){
-  resultsEl.innerHTML = '<span class="muted">Nada na Câmara. Buscando no Senado e calculando...</span>';
-  try{
-    const res = await fetch(`/api/senators/scorecard?name=${encodeURIComponent(q)}`);
-    const payload = await res.json();
-    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
-    const card = payload.scorecards?.[0];
-    if(!card) throw new Error('vazio');
-    resultsEl.innerHTML = '';
-    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
-    loadLocalRoster();  // so the newly-scored senator appears as a suggestion next time
-  }catch(err){
-    resultsEl.innerHTML = `<span class="error">Ninguém encontrado para “${q}” na Câmara nem no Senado.</span>`;
-  }
-}
-
-async function analyzeCandidate(camaraId, name){
-  setLoading(`Calculando score de ${name} e salvando no MySQL...`);
-  try{
-    const res = await fetch('/api/scorecards', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({camara_id: camaraId})
-    });
-    const payload = await res.json();
-    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
-    const card = payload.scorecards?.[0];
-    if(!card) throw new Error('scorecard não retornado');
-    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
-  }catch(err){
-    el('state').innerHTML = `<span class="error">Erro ao analisar ${name}: ${err}</span>`;
-  }
-}
-
-async function run(){
-  try{
-    const res = await fetch('/api/scorecards');
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const payload = await res.json();
-    const card = payload.scorecards?.[0];
-    if(!card){
-      el('state').innerHTML = '<span class="muted">Nenhum score calculado no banco ainda.</span>';
-      return;
-    }
-    renderCard(card);
-  }catch(err){
-    el('state').innerHTML = `<span class="error">Erro ao carregar a API: ${err}</span>`;
-  }
-}
-
+/* ---------------- wiring ---------------- */
 initThemeToggle();
-form.addEventListener('submit', onSubmit);
-queryInput.addEventListener('input', () => renderSuggestions(queryInput.value));
-queryInput.addEventListener('focus', () => renderSuggestions(queryInput.value));
-queryInput.addEventListener('blur', () => setTimeout(hideSuggest, 150));
-queryInput.addEventListener('keydown', ev => {
-  const items = [...suggestEl.querySelectorAll('.suggest-item')];
-  if(suggestEl.hidden || !items.length) return;
-  if(ev.key === 'ArrowDown'){ ev.preventDefault(); activeSuggest = Math.min(activeSuggest + 1, items.length - 1); }
-  else if(ev.key === 'ArrowUp'){ ev.preventDefault(); activeSuggest = Math.max(activeSuggest - 1, 0); }
-  else if(ev.key === 'Escape'){ hideSuggest(); return; }
-  else return;
-  items.forEach((it, i) => it.classList.toggle('active', i === activeSuggest));
-});
+el('search-form').addEventListener('submit', onSubmit);
+el('candidate-query').addEventListener('input', renderGrid);
 el('random-cached').addEventListener('click', randomCached);
 el('random-new').addEventListener('click', randomNew);
-loadLocalRoster();
-run();
+el('back-to-busca').addEventListener('click', () => selectTab('busca'));
+for(const b of document.querySelectorAll('.tabbtn')){
+  b.addEventListener('click', () => { if(!b.hidden) selectTab(b.dataset.tab); });
+}
+loadRoster();
 </script>
 </body>
 </html>
