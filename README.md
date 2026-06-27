@@ -32,6 +32,45 @@ MySQL -> app/server.py -> app/index.html
 the seeded topic/law/keyword tree. The frontend does not query Câmara or TSE directly; it consumes
 the local API.
 
+## How to add a new topic
+
+A topic = a **title** + the Câmara theme codes (**`cod_temas`**) its laws live under. Only step 1
+needs human judgment; everything after is automatic.
+
+1. **Pick the topic's `cod_temas`** — *MANUAL*. Choose one or more theme codes from the 32 in
+   [`research/13-codtema-themes.md`](research/13-codtema-themes.md).
+   - A *broad* topic = one theme (e.g. environment → `[48]`, health → `[56]`).
+   - A *narrow* topic = the inclusive set of themes it touches (e.g. wealth taxation → `[70, 40, 68]`
+     = Finanças + Economia + Direito Constitucional).
+   - *Where it comes from:* you (a human) decide, using the theme list. An LLM can **propose** the
+     codes from the topic title; you confirm. This is the only judgment call.
+
+2. **Add the topic to the seed** — *MANUAL (one code edit)*. In `app/db.py`, add an entry to `TOPICS`:
+   ```python
+   {"slug": "meio-ambiente", "title": "Meio ambiente",
+    "description": "...", "cod_temas": [48], "sort_order": 30}
+   ```
+   Then apply it: `python app/score_candidate.py --seed-only` (creates schema + seeds the topic).
+
+3. **Build the package** — *AUTOMATIC*. Discover the topic's voted laws and store them:
+   ```python
+   from app import db, discover_laws
+   discover_laws.build_topic(db.init_db(), "meio-ambiente", years=[2023, 2024, 2025])
+   ```
+   It queries `/proposicoes?codTema=…` for the topic's `cod_temas`, keeps bills with a **nominal
+   roll-call**, and stores them under the topic. **Append-only** — laws already stored are left
+   untouched (safe to re-run / weekly refresh).
+
+4. **Ingest roll-calls** — *AUTOMATIC*. Cache each law's votes once:
+   `python -c "from app import db, ingest; ingest.ingest_all(db.init_db())"`
+
+5. **Score & verify** — *AUTOMATIC*. `python app/score_candidate.py --camara-id 156190`, then open
+   the app — the new topic and its laws appear in every scorecard.
+
+**Where each piece of data comes from:** `cod_temas` = human (from the theme list). Laws, votes, and
+the government line = live **Câmara** API. Wealth = live **TSE** API. So the *only* manual work to
+expose a new topic is **steps 1–2** (pick the themes, add one seed entry); steps 3–5 are mechanical.
+
 ## Document map
 
 ### Root
