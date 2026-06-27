@@ -38,6 +38,9 @@ the **Transparência-Política** project. There is no app code yet — the docum
 | [`07-poc-candidate-scoring-bivar.md`](research/07-poc-candidate-scoring-bivar.md) | Live POC: TSE wealth ⨯ Câmara tax votes for one deputy. Verdict + reproducible calls. | Scaling the scoring approach. |
 | [`08-api-field-notes.md`](research/08-api-field-notes.md) | Hard-won API gotchas (DivulgaCand route shape, Câmara `/votos`, rate limits). | **Before coding any ingestion.** |
 | [`09-topic-to-law-discovery.md`](research/09-topic-to-law-discovery.md) | Turning a topic into the relevant bills: `codTema` themes + TECAD thesaurus + query expansion. Full theme list + the "0/0" bug fix. | Designing topic/theme search; the matching engine's bill discovery. |
+| [`10-blocked-bill-discovery.md`](research/10-blocked-bill-discovery.md) | The inverse of 09: surface the bills on a theme that *stalled* (never reached a roll-call), classify **why** (stuck/archived/awaiting-pauta/symbolic), rank by proximity to a vote, name who's blocking. Defines the four tabs + live/ETL split. API verified live. | Building the "blocked laws" feature; the stall-classification engine. |
+| [`11-integration-plan.md`](research/11-integration-plan.md) | How Tiago's DB backend works (schema + scoring + aggregation rollup) and how to port the prelim engine into it: the true 3-item delta (discovery, gov/opp alignment, mandate presence) mapped layer-by-layer (capture→aggregate→render). | Porting our features onto Tiago's base; before touching `score_candidate.py`/`db.py`. |
+| [`12-topic-packages-and-vote-caching.md`](research/12-topic-packages-and-vote-caching.md) | Why a topic's laws + roll-calls are stored once (a "topic package") and never re-fetched: roll-calls are immutable + deputy-independent, so scoring any new politician is a cache lookup. Cost math + the `votacoes`/`votos` cache schema. | Designing the storage/scoring split; before adding the vote cache. |
 
 ### `docs/`
 
@@ -61,6 +64,7 @@ the **Transparência-Política** project. There is no app code yet — the docum
 - **Build data ingestion** → `DATA-SOURCES.md` → `01` / `02` → `08-api-field-notes.md` (read last, it's the gotchas).
 - **Design the matching engine** → `wahl-o-mat-methodology.md` → `04` → `06`.
 - **Find bills about a topic** → `09-topic-to-law-discovery.md` → `01`.
+- **Find *blocked* bills about a topic** → `10-blocked-bill-discovery.md` → `09` → `08`.
 - **Write the thesis bank** → `05` → `06` → `wahl-o-mat-methodology.md`.
 - **Scale the scoring POC** → `07` → `01` / `02`.
 - **Work on the local scorecard DB/API** → `docs/DATABASE.md` → `app/db.py` →

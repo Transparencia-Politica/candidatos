@@ -59,6 +59,24 @@ The biggest time-sink. The route shape is **not** intuitive and the segment orde
   and filter `/proposicoes?codTema=...`.
 - Expenses (CEAP): `/deputados/{id}/despesas?ano=YYYY` — paginated; sum `valorLiquido` across pages.
 
+### `/proposicoes` list-vs-detail & filter traps (verified live 2026-06-27, see doc 10)
+- **The list carries no status.** `/proposicoes` rows = `{id, uri, siglaTipo, codTipo, numero, ano,
+  ementa, dataApresentacao}` only — **no `statusProposicao`, no `keywords`**. Same list-vs-detail
+  trap as TSE above. To classify a bill's situação you **must** call `/proposicoes/{id}` (→
+  `statusProposicao.codSituacao`). Plan N+1 / an ETL pass.
+- **`codSituacao` is silently ignored as a query param.** `?codSituacao=923` and `?codSituacao=1140`
+  return the **same total and identical rows** as no filter ❌. There is no cheap server-side
+  status filter — filter client-side / in ETL after the detail call.
+- **`idLegislatura` does not filter** `/proposicoes` (returns 0 rows) ❌. Window by date instead.
+- **`/proposicoes` defaults to a recent time window.** No date param → a truncated recent set
+  (e.g. 1319 rows for `codTema=48`); add `ano=` or `dataApresentacaoInicio=YYYY-MM-DD` to reach the
+  historical corpus (→ 3489 / 4466 rows). Always pass an explicit window for completeness.
+- **`/proposicoes/{id}/relatores` can be empty** even for reported bills (PEC 45 → 0 rows) ⚠️ —
+  get the relator by scanning `/proposicoes/{id}/tramitacoes` for the *Designação de Relator(a)*
+  event, not this sub-resource.
+- Brand-new bills have `statusProposicao.codSituacao = null` (only an "Apresentação de Proposição"
+  tramitação) — treat `null` as the "submitted, untouched" state, not an error.
+
 ## Senado Federal (`legis.senado.leg.br/dadosabertos`)
 
 - **XML by default** — send `Accept: application/json`.

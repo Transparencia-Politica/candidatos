@@ -4,3 +4,6 @@ data/*.sqlite3
 __pycache__/
 *.pyc
 .env
+
+# Claude Code worktrees & session files
+.claude/
