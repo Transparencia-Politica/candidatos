@@ -63,6 +63,29 @@ fortunes" is a **misattribution**. Each crossed Senado votação needs a curatio
 matches its keyword's `direction` before the score is trusted — the wiring is correct, the
 per-law semantics are not automatic.
 
+## 4b. Senator wealth (TSE bens) — verified 2026-06-28
+
+Senators carry declared wealth too, pulled with the **same** TSE machinery as deputies
+(`bucketize_assets`, `fetch_tse_detail`). The candidate is resolved by **cargo 5 (Senador)**,
+matching name+UF:
+
+```
+GET .../candidatura/listar/{year}/{uf}/{2040602022}/5/candidatos   # cargo 5 = Senador
+GET .../candidatura/buscar/{year}/{uf}/{2040602022}/candidato/{sq} # -> .bens, .totalDeBens
+```
+
+- ✅ **2022 general código `2040602022` verified** for cargo 5 (e.g. Alan Rick → R$ 2.12M, 13 bens).
+- ❌ **2018 código not resolvable** via this REST API: the elections-list routes 404 and
+  `candidatura/listar/2018/.../5/...` returns an empty list for every código tried
+  (`2030402018`, …). Senators serve staggered 8-year terms, so ~half were elected in 2018 — those
+  currently get **no wealth** (`tse_sq = NULL`). `SENATOR_ELECTIONS` holds only the verified 2022
+  entry; **do not add an unverified 2018 código**. Closing the gap means the TSE **bulk dataset**
+  (`DATA-SOURCES.md`), not this API.
+- The fetch is **best-effort**: a TSE outage or unmatched name yields zeros + `tse_sq = NULL`, and
+  the card renders "Patrimônio não localizado no TSE" (driven by `tse_sq`), never a misleading
+  R$ 0,00. Resolved senators feed `wealth_capital` into `score_keyword`, so the
+  self-interest ("protege o próprio patrimônio") metric becomes real for them.
+
 ## 5. Where it lives
 
 `app/senado.py`: `find_materia`, `fetch_votacoes`, `ingest_law`, `build_senado_package`,
