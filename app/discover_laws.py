@@ -91,16 +91,60 @@ def discover(
     return [to_seed_law(topic_slug, p) for p in voted]
 
 
+def search_by_themes(
+    cod_temas: list[int],
+    years: list[int],
+    *,
+    fetch: Callable[[str], dict[str, Any]] = fetch_json,
+    itens: int = 100,
+) -> list[dict[str, Any]]:
+    """Union of votable proposições in the given Câmara theme(s) (codTema), per year.
+
+    The simple by-theme workflow (research/01): a topic maps to one or more codTema
+    (e.g. wealth/finance -> 70 Finanças, 40 Economia), and laws are the bills in it.
+    """
+    found: dict[Any, dict[str, Any]] = {}
+    for cod_tema in cod_temas:
+        for year in years:
+            query = urllib.parse.urlencode(
+                {"codTema": cod_tema, "ano": year, "itens": itens, "ordem": "DESC", "ordenarPor": "id"}
+            )
+            for p in fetch(f"{CAMARA}/proposicoes?{query}").get("dados", []):
+                if p.get("siglaTipo") in VOTABLE_TYPES:
+                    found.setdefault(p["id"], p)
+    return list(found.values())
+
+
+def discover_by_theme(
+    topic_slug: str,
+    cod_temas: list[int],
+    years: list[int],
+    *,
+    fetch: Callable[[str], dict[str, Any]] = fetch_json,
+) -> list[dict[str, Any]]:
+    """codTema(s) -> votable proposições -> keep voted -> proposed LAW seed objects."""
+    proposicoes = search_by_themes(cod_temas, years, fetch=fetch)
+    voted = filter_voted(proposicoes, fetch=fetch)
+    return [to_seed_law(topic_slug, p) for p in voted]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--topic", required=True, help="topic slug, e.g. tributacao-da-riqueza")
-    parser.add_argument("--descriptors", required=True, help="comma-separated TECAD descriptors")
+    parser.add_argument("--cod-temas", help="comma-separated Câmara theme codes, e.g. 70,40 (by-theme workflow)")
+    parser.add_argument("--descriptors", help="comma-separated TECAD descriptors (keyword workflow)")
     parser.add_argument("--years", default="2023,2024,2025", help="comma-separated years")
     args = parser.parse_args(argv)
 
-    descriptors = [d.strip() for d in args.descriptors.split(",") if d.strip()]
     years = [int(y) for y in args.years.split(",") if y.strip()]
-    laws = discover(args.topic, descriptors, years)
+    if args.cod_temas:
+        cod_temas = [int(c) for c in args.cod_temas.split(",") if c.strip()]
+        laws = discover_by_theme(args.topic, cod_temas, years)
+    elif args.descriptors:
+        descriptors = [d.strip() for d in args.descriptors.split(",") if d.strip()]
+        laws = discover(args.topic, descriptors, years)
+    else:
+        parser.error("provide --cod-temas (by-theme) or --descriptors (keyword)")
     json.dump({"laws": laws}, sys.stdout, ensure_ascii=False, indent=2)
     sys.stdout.write("\n")
     return 0
