@@ -34,6 +34,9 @@ except ModuleNotFoundError:  # pragma: no cover - import shim
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SITE_DATA_DIR = os.path.join(ROOT_DIR, "docs", "data")
+SHARED_DIR = os.path.join(ROOT_DIR, "shared")
+SITE_SHARED_DIR = os.path.join(ROOT_DIR, "docs", "shared")
+SHARED_ASSETS = ("theme.css", "scorecard.js")
 
 
 def _topics(conn) -> list[dict[str, Any]]:
@@ -198,17 +201,34 @@ def write_files(snapshot: dict[str, Any], data_dir: str = DATA_DIR) -> list[str]
     return [laws_file, cands_file, snap_file]
 
 
+def copy_shared_assets(src_dir: str = SHARED_DIR, dest_dir: str = SITE_SHARED_DIR) -> list[str]:
+    """Copy the shared frontend assets into docs/ so GitHub Pages can serve them.
+
+    The repo-root `shared/` dir is the source of truth (used by the live server too);
+    `docs/shared/` is a committed copy because Pages only serves files under docs/.
+    """
+    import shutil
+
+    os.makedirs(dest_dir, exist_ok=True)
+    copied = []
+    for name in SHARED_ASSETS:
+        shutil.copyfile(os.path.join(src_dir, name), os.path.join(dest_dir, name))
+        copied.append(os.path.join(dest_dir, name))
+    return copied
+
+
 def export_site(conn, site_data_dir: str = SITE_DATA_DIR) -> str:
     """Bake the assembled scorecards for every candidate to a static JSON file.
 
     Writes the exact `{generated_at, scorecards: [...]}` shape the frontend renders,
     so the GitHub Pages page can read it with no backend. Source of truth is the live
-    DB (same as `export`) via db.get_scorecards.
+    DB (same as `export`) via db.get_scorecards. Also refreshes the shared assets copy.
     """
     payload = db.get_scorecards(conn, None)
     os.makedirs(site_data_dir, exist_ok=True)
     out_file = os.path.join(site_data_dir, "scorecards.json")
     _write(out_file, payload)
+    copy_shared_assets()
     return out_file
 
 
@@ -331,6 +351,7 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             conn.close()
         print(f"Baked {len(payload['scorecards'])} scorecard(s) -> {out_file}")
+        print(f"Copied shared assets ({', '.join(SHARED_ASSETS)}) -> {SITE_SHARED_DIR}")
         return 0
 
     if args.command == "export":

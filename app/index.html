@@ -4,90 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Candidato — Scorecard</title>
-<style>
-  :root{
-    --bg:#f7f8fb;--surface:#ffffff;--ink:#20242c;--muted:#667085;--line:#d9dee7;
-    --teal:#0f766e;--rose:#be123c;--amber:#b45309;--blue:#2563eb;--violet:#7c3aed;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
-  .wrap{max-width:1080px;margin:0 auto;padding:24px 18px 72px;}
-  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
-  h1{font-size:1.45rem;line-height:1.15;margin:0}
-  h2{font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
-  .sub{color:var(--muted);font-size:.92rem;margin-top:4px}
-  .badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;
-    padding:4px 10px;background:var(--surface);color:var(--muted);font-size:.78rem;font-weight:650;white-space:nowrap}
-  .panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;margin:14px 0}
-  .search-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .search-input{min-width:260px;flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);background:#fff}
-  .primary{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:9px 15px;font-weight:700;cursor:pointer}
-  .primary:disabled{opacity:.55;cursor:default}
-  .results{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-  .candidate{border:1px solid var(--line);border-radius:8px;background:#fbfcfe;color:var(--ink);padding:8px 10px;cursor:pointer;text-align:left}
-  .candidate b{display:block}
-  .candidate span{color:var(--muted);font-size:.8rem}
-  .search-field{position:relative;flex:1;min-width:260px;display:flex}
-  .search-field .search-input{width:100%;min-width:0}
-  .suggest{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;background:#fff;
-    border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 28px rgba(20,30,50,.12);overflow:hidden}
-  .suggest[hidden]{display:none}
-  .suggest-item{display:flex;justify-content:space-between;gap:10px;align-items:center;width:100%;
-    border:0;border-bottom:1px solid var(--line);background:#fff;text-align:left;padding:9px 11px;cursor:pointer}
-  .suggest-item:last-child{border-bottom:0}
-  .suggest-item:hover,.suggest-item.active{background:#f0f5ff}
-  .suggest-item b{font-weight:650}
-  .suggest-item span{color:var(--teal);font-size:.74rem;font-weight:650;white-space:nowrap}
-  .identity{display:flex;gap:16px;align-items:center}
-  .avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
-    background:#e7f5f1;color:var(--teal);font-weight:800;font-size:1.35rem;border:1px solid #b9dfd7}
-  .name{font-size:1.28rem;font-weight:760}
-  .muted{color:var(--muted)}
-  .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
-  .metric{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:92px}
-  .metric .n{font-size:1.65rem;font-weight:780;line-height:1.05}
-  .metric .l{color:var(--muted);font-size:.78rem;text-transform:uppercase;margin-top:6px}
-  .wealth-grid{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:start}
-  .big{font-size:2rem;font-weight:800}
-  .row{display:grid;grid-template-columns:1fr auto;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
-  .row:last-child{border-bottom:0}
-  .bar{height:8px;background:#edf0f5;border-radius:999px;overflow:hidden;margin-top:5px}
-  .bar i{display:block;height:100%;border-radius:999px}
-  table{width:100%;border-collapse:collapse}
-  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{color:var(--muted);font-size:.75rem;text-transform:uppercase}
-  .chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 9px;font-size:.77rem;font-weight:700;
-    border:1px solid transparent;white-space:nowrap}
-  .c-sim{background:#e7f5f1;color:var(--teal);border-color:#b9dfd7}
-  .c-nao{background:#fff1f2;color:var(--rose);border-color:#fecdd3}
-  .c-aus{background:#eef1f5;color:#5b6472;border-color:#d8dee8}
-  .c-mix{background:#fff7ed;color:var(--amber);border-color:#fed7aa}
-  .keywords{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
-  .keyword{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:.76rem;color:#384152;background:#fbfcfe}
-  .note{border-left:3px solid var(--blue);background:#f0f5ff;padding:10px 12px;border-radius:6px;color:#344054}
-  .warn{border-left-color:var(--amber);background:#fff7ed}
-  code{background:#edf0f5;padding:1px 5px;border-radius:5px}
-  .error{color:var(--rose)}
-  footer{color:var(--muted);font-size:.8rem;margin-top:16px}
-  @media (max-width:760px){
-    header{align-items:flex-start;flex-direction:column}
-    .search-form{align-items:stretch;flex-direction:column}
-    .search-field,.search-input,.primary{width:100%}
-    .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .wealth-grid{grid-template-columns:1fr}
-    th:nth-child(2),td:nth-child(2){display:none}
-  }
-</style>
+<link rel="stylesheet" href="shared/theme.css">
+<script>
+  // Set theme before first paint to avoid a flash of the wrong theme.
+  (function(){
+    try{
+      var saved = localStorage.getItem('theme');
+      var dark = saved ? saved === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if(dark) document.documentElement.setAttribute('data-theme', 'dark');
+    }catch(e){}
+  })();
+</script>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div>
       <h1>Candidato · Scorecard</h1>
-      <div class="sub">Busque um(a) deputado(a), calcule o score no backend e leia o resultado armazenado em MySQL.</div>
+      <div class="sub">Busque um(a) deputado(a) ou senador(a), calcule o score no backend e leia o resultado armazenado em MySQL.</div>
     </div>
-    <div class="badge">MySQL API</div>
+    <div class="header-actions">
+      <div class="badge">MySQL API</div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema"></button>
+    </div>
   </header>
 
   <section class="panel">
@@ -104,30 +44,15 @@
 
   <section id="state" class="panel">Carregando scorecards...</section>
   <main id="content" style="display:none">
-    <section id="identity" class="panel"></section>
-    <section id="metrics" class="metrics"></section>
-    <section id="wealth" class="panel"></section>
-    <section id="votes" class="panel"></section>
-    <section class="panel">
-      <h2>Como o score é calculado</h2>
-      <p>Para cada palavra-chave associada a uma lei, a direção indica o que um voto <code>Sim</code>
-      representa. <code>+1</code> significa avançar a tese, <code>-1</code> significa bloquear a tese,
-      e <code>0</code> é contexto sem direção de riqueza.</p>
-      <div class="note warn">Ausência continua sendo ausência: o banco guarda presença, cobertura e
-      evidência separadamente para evitar transformar dado faltante em intenção.</div>
-    </section>
+    <div id="card-host"></div>
   </main>
   <footer id="sources"></footer>
 </div>
 
+<script src="shared/scorecard.js"></script>
 <script>
-const BRL = n => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
-});
-const COLORS = ['#0f766e', '#b45309', '#2563eb', '#7c3aed', '#be123c'];
-const el = id => document.getElementById(id);
-const pct = value => value === null || value === undefined ? '—' : `${value}%`;
+// Live app shell: search the Câmara, score on the backend, render one stored scorecard.
+// Shared helpers (BRL, pct, chipClass, cardBodyHtml, initThemeToggle, …) come from scorecard.js.
 const form = el('search-form');
 const queryInput = el('candidate-query');
 const searchButton = el('search-button');
@@ -135,13 +60,17 @@ const resultsEl = el('search-results');
 const suggestEl = el('suggestions');
 let localCandidates = [];
 let activeSuggest = -1;
+let suggestMatches = [];
 const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
 async function loadLocalRoster(){
   try{
     const res = await fetch('/api/politics');
     const payload = await res.json();
-    localCandidates = (payload.politics || []).map(p => ({camara_id:p.camara_id, name:p.name, party:p.party, uf:p.uf}));
+    localCandidates = (payload.politics || []).map(p => ({
+      camara_id:p.camara_id, senado_id:p.senado_id, house:p.house || 'camara',
+      name:p.name, party:p.party, uf:p.uf,
+    }));
   }catch(err){ localCandidates = []; }
 }
 
@@ -155,14 +84,20 @@ function hideSuggest(){ suggestEl.hidden = true; suggestEl.innerHTML = ''; activ
 
 function renderSuggestions(q){
   const matches = matchLocal(q);
+  suggestMatches = matches;
   if(!matches.length){ hideSuggest(); return; }
   activeSuggest = -1;
-  suggestEl.innerHTML = matches.map(c => `<button type="button" class="suggest-item" data-camara-id="${c.camara_id}" data-name="${c.name}">
-    <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · já analisado</span></button>`).join('');
-  for(const b of suggestEl.querySelectorAll('.suggest-item')){
-    b.addEventListener('mousedown', ev => { ev.preventDefault(); loadLocalCandidate(Number(b.dataset.camaraId), b.dataset.name); });
-  }
+  suggestEl.innerHTML = matches.map((c, i) => `<button type="button" class="suggest-item" data-idx="${i}">
+    <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · ${c.house === 'senado' ? 'Senado' : 'Câmara'} · já analisado</span></button>`).join('');
+  const items = [...suggestEl.querySelectorAll('.suggest-item')];
+  items.forEach((b, i) => b.addEventListener('mousedown', ev => { ev.preventDefault(); loadLocal(matches[i]); }));
   suggestEl.hidden = false;
+}
+
+// One entry point for an already-scored person: route by house to the right cached read.
+function loadLocal(c){
+  if(c.house === 'senado') return loadSenator(c.name, c.senado_id);
+  return loadLocalCandidate(c.camara_id, c.name);
 }
 
 async function loadLocalCandidate(camaraId, name){
@@ -182,82 +117,29 @@ async function loadLocalCandidate(camaraId, name){
   }
 }
 
-function chipClass(score){
-  const status = score?.vote_status || '';
-  if(status.includes('sim')) return 'c-sim';
-  if(status.includes('nao') || status.includes('não')) return 'c-nao';
-  if(status.includes('misto')) return 'c-mix';
-  return 'c-aus';
-}
-
-function renderIdentity(card){
-  const p = card.politic;
-  el('identity').innerHTML = `<div class="identity">
-    <div class="avatar">${(p.name || '?').slice(0,1)}</div>
-    <div>
-      <div class="name">${p.name}</div>
-      <div class="muted">${p.party || '—'} · ${p.uf || '—'} · ${p.occupation || 'ocupação não informada'}</div>
-      <div class="muted">Câmara ${p.camara_id} · TSE ${p.tse_year}/${p.tse_uf} · SQ ${p.tse_sq}</div>
-    </div>
-  </div>`;
-}
-
-function renderMetrics(card){
-  const s = card.summary;
-  const metrics = [
-    [pct(s.wealth_capital_pct), 'patrimônio em capital'],
-    [pct(s.coverage_pct), 'cobertura de leis relevantes'],
-    [pct(s.key_attendance_pct), 'presença no projeto-chave'],
-    [s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio'],
-    [s.gov_alignment_pct === null || s.gov_alignment_pct === undefined ? '—' : pct(s.gov_alignment_pct), 'alinhado ao Governo'],
-    [s.opp_alignment_pct === null || s.opp_alignment_pct === undefined ? '—' : pct(s.opp_alignment_pct), 'alinhado à Oposição']
-  ];
-  el('metrics').innerHTML = metrics.map(([n,l]) => `<div class="metric"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
-}
-
-function renderWealth(card){
-  const p = card.politic;
-  const rows = Object.entries(p.wealth_buckets || {})
-    .filter(([,v]) => Number(v) > 0)
-    .sort((a,b) => b[1] - a[1])
-    .map(([label,value], i) => {
-      const share = p.wealth_total ? (100 * value / p.wealth_total) : 0;
-      return `<div class="row">
-        <div>${label}<div class="bar"><i style="width:${share.toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></i></div></div>
-        <div style="text-align:right;white-space:nowrap">${BRL(value)}<br><span class="muted">${share.toFixed(1)}%</span></div>
-      </div>`;
-    }).join('');
-  el('wealth').innerHTML = `<h2>Patrimônio declarado</h2>
-    <div class="wealth-grid">
-      <div><div class="big">${BRL(p.wealth_total)}</div><div class="muted">${p.wealth_capital_pct}% em ações/participações ou exterior</div></div>
-      <div>${rows || '<span class="muted">Sem bens armazenados.</span>'}</div>
-    </div>`;
-}
-
-function renderVotes(card){
-  const rows = [];
-  for(const topic of card.topics){
-    for(const law of topic.laws){
-      const score = law.score;
-      rows.push(`<tr>
-        <td><b>${law.label}</b><br><span class="muted">${law.description}</span>
-          <div class="keywords">${law.keywords.map(k => `<span class="keyword">${k.label}</span>`).join('')}</div></td>
-        <td>${topic.title}${law.is_key ? '<br><span class="chip c-mix">chave</span>' : ''}</td>
-        <td><span class="chip ${chipClass(score)}">${score?.vote_label || 'sem score'}</span></td>
-        <td>${score ? `${score.present_count}/${score.nominal_count}` : '—'}</td>
-      </tr>`);
-    }
+// Load a senator: by senado_id (cached read) when known, else by name (resolve + score).
+async function loadSenator(name, senadoId){
+  hideSuggest();
+  queryInput.value = name;
+  resultsEl.innerHTML = '';
+  setLoading(`Carregando ${name} (Senado)...`);
+  try{
+    const url = senadoId
+      ? `/api/senators/scorecard?senado_id=${senadoId}`
+      : `/api/senators/scorecard?name=${encodeURIComponent(name)}`;
+    const res = await fetch(url);
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('scorecard não encontrado');
+    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+  }catch(err){
+    el('state').innerHTML = `<span class="error">Erro ao carregar ${name}: ${err}</span>`;
   }
-  el('votes').innerHTML = `<h2>Leis, palavras-chave e votos armazenados</h2>
-    <table><thead><tr><th>Lei</th><th>Tópico</th><th>Voto</th><th>Presença</th></tr></thead>
-    <tbody>${rows.join('')}</tbody></table>`;
 }
 
 function renderCard(card, source){
-  renderIdentity(card);
-  renderMetrics(card);
-  renderWealth(card);
-  renderVotes(card);
+  el('card-host').innerHTML = cardBodyHtml(card);
   el('state').style.display = 'none';
   el('content').style.display = 'block';
   const sourceLabel = source ? ` · ${source}` : '';
@@ -286,15 +168,13 @@ function renderCandidateResults(candidates){
 function onSubmit(event){
   event.preventDefault();
   const q = queryInput.value.trim();
-  // Prefer a local (already-scored) candidate: load from DB, no Câmara call.
-  const items = [...suggestEl.querySelectorAll('.suggest-item')];
-  if(!suggestEl.hidden && items.length){
-    const pick = items[activeSuggest >= 0 ? activeSuggest : 0];
-    return loadLocalCandidate(Number(pick.dataset.camaraId), pick.dataset.name);
+  // Prefer a local (already-scored) person: load from DB, no live call.
+  if(!suggestEl.hidden && suggestMatches.length){
+    return loadLocal(suggestMatches[activeSuggest >= 0 ? activeSuggest : 0]);
   }
   const exact = matchLocal(q).find(c => norm(c.name) === norm(q)) || matchLocal(q)[0];
-  if(exact) return loadLocalCandidate(exact.camara_id, exact.name);
-  // No local match → search the Câmara for a new candidate.
+  if(exact) return loadLocal(exact);
+  // No local match → search, Câmara first then Senado.
   searchCandidates(q);
 }
 
@@ -310,11 +190,31 @@ async function searchCandidates(q){
     const res = await fetch(`/api/candidates/search?q=${encodeURIComponent(q)}`);
     const payload = await res.json();
     if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
-    renderCandidateResults(payload.candidates || []);
+    const candidates = payload.candidates || [];
+    if(candidates.length){ renderCandidateResults(candidates); return; }
+    // Nothing in the Câmara → fall back to the Senado.
+    await searchSenator(q);
   }catch(err){
     resultsEl.innerHTML = `<span class="error">Erro na busca: ${err}</span>`;
   }finally{
     searchButton.disabled = false;
+  }
+}
+
+// Senado leg of the unified search: resolve the name to a current senator, score, render.
+async function searchSenator(q){
+  resultsEl.innerHTML = '<span class="muted">Nada na Câmara. Buscando no Senado e calculando...</span>';
+  try{
+    const res = await fetch(`/api/senators/scorecard?name=${encodeURIComponent(q)}`);
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('vazio');
+    resultsEl.innerHTML = '';
+    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+    loadLocalRoster();  // so the newly-scored senator appears as a suggestion next time
+  }catch(err){
+    resultsEl.innerHTML = `<span class="error">Ninguém encontrado para “${q}” na Câmara nem no Senado.</span>`;
   }
 }
 
@@ -351,6 +251,8 @@ async function run(){
     el('state').innerHTML = `<span class="error">Erro ao carregar a API: ${err}</span>`;
   }
 }
+
+initThemeToggle();
 form.addEventListener('submit', onSubmit);
 queryInput.addEventListener('input', () => renderSuggestions(queryInput.value));
 queryInput.addEventListener('focus', () => renderSuggestions(queryInput.value));

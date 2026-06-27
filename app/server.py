@@ -18,6 +18,10 @@ except ModuleNotFoundError:
 ALLOWED = ("dadosabertos.camara.leg.br", "divulgacandcontas.tse.jus.br")
 CACHE = {}
 HERE = os.path.dirname(os.path.abspath(__file__))
+# Shared frontend assets (theme.css, scorecard.js) live at the repo root and are
+# served at /shared/* — the source of truth that docs/shared/ is copied from.
+SHARED_DIR = os.path.join(os.path.dirname(HERE), "shared")
+SHARED_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8"}
 db.init_db().close()
 
 
@@ -52,6 +56,16 @@ class H(http.server.BaseHTTPRequestHandler):
         if p.path in ("/", "/index.html"):
             with open(os.path.join(HERE, "index.html"), "rb") as f:
                 return self._send(200, f.read(), "text/html; charset=utf-8")
+        if p.path.startswith("/shared/"):
+            name = os.path.basename(p.path)  # strip any path-traversal segments
+            ext = os.path.splitext(name)[1]
+            if ext not in SHARED_TYPES:
+                return self._send(404, json.dumps({"error": "not found"}))
+            try:
+                with open(os.path.join(SHARED_DIR, name), "rb") as f:
+                    return self._send(200, f.read(), SHARED_TYPES[ext])
+            except FileNotFoundError:
+                return self._send(404, json.dumps({"error": "not found"}))
         if p.path == "/api/candidates/search":
             query = urllib.parse.parse_qs(p.query)
             name = (query.get("q", [""])[0] or "").strip()
