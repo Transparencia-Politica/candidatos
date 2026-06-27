@@ -44,6 +44,7 @@ frontend.
 | [`11-integration-plan.md`](research/11-integration-plan.md) | How Tiago's DB backend works (schema + scoring + aggregation rollup) and how to port the prelim engine into it: the true 3-item delta (discovery, gov/opp alignment, mandate presence) mapped layer-by-layer (capture→aggregate→render). | Porting our features onto Tiago's base; before touching `score_candidate.py`/`db.py`. |
 | [`12-topic-packages-and-vote-caching.md`](research/12-topic-packages-and-vote-caching.md) | Why a topic's laws + roll-calls are stored once (a "topic package") and never re-fetched: roll-calls are immutable + deputy-independent, so scoring any new politician is a cache lookup. Cost math + the `votacoes`/`votos` cache schema. | Designing the storage/scoring split; before adding the vote cache. |
 | [`13-codtema-themes.md`](research/13-codtema-themes.md) | The 32 official Câmara `codTema` policy themes with a plain-language explanation of what each covers; how to pick a topic's `cod_temas`. | Curating a new topic's themes (see README "How to add a new topic"). |
+| [`14-senado-vote-crossing.md`](research/14-senado-vote-crossing.md) | Crossing the seeded laws with **Senado** nominal roll-calls so senators score on the same law package: verified Senado API contract (senators, matéria lookup, `/votacao`), the `house` pollution guard, symbolic-vote coverage limits, and the substitutive-misattribution caveat. API verified live. | Adding senators; before touching the shared `roll_calls`/`votes` tables or `senado.py`. |
 
 ### `docs/`
 

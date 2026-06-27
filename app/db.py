@@ -156,7 +156,9 @@ CREATE TABLE IF NOT EXISTS keywords (
 
 CREATE TABLE IF NOT EXISTS politics (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  camara_id INT NOT NULL,
+  camara_id INT NULL,
+  senado_id INT NULL,
+  house VARCHAR(16) NOT NULL DEFAULT 'camara',
   tse_sq VARCHAR(64),
   tse_year INT,
   tse_uf VARCHAR(2),
@@ -172,7 +174,8 @@ CREATE TABLE IF NOT EXISTS politics (
   wealth_buckets_json LONGTEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at VARCHAR(32) NOT NULL DEFAULT '',
-  UNIQUE KEY uq_politics_camara_id (camara_id)
+  UNIQUE KEY uq_politics_camara_id (camara_id),
+  UNIQUE KEY uq_politics_senado_id (senado_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS scores (
@@ -201,6 +204,7 @@ CREATE TABLE IF NOT EXISTS scores (
 CREATE TABLE IF NOT EXISTS roll_calls (
   id VARCHAR(64) PRIMARY KEY,
   law_id INT NOT NULL,
+  house VARCHAR(16) NOT NULL DEFAULT 'camara',
   date VARCHAR(32) NOT NULL DEFAULT '',
   description TEXT NOT NULL,
   is_nominal TINYINT(1) NOT NULL DEFAULT 0,
@@ -215,12 +219,60 @@ CREATE TABLE IF NOT EXISTS roll_calls (
 CREATE TABLE IF NOT EXISTS votes (
   roll_call_id VARCHAR(64) NOT NULL,
   deputy_id INT NOT NULL,
+  house VARCHAR(16) NOT NULL DEFAULT 'camara',
   vote_type VARCHAR(32) NOT NULL,
   PRIMARY KEY (roll_call_id, deputy_id),
   KEY idx_votes_deputy (deputy_id),
   CONSTRAINT fk_votes_roll_call FOREIGN KEY (roll_call_id) REFERENCES roll_calls(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
+
+
+# Columns added after the initial schema shipped. `init_db` applies these idempotently so an
+# already-created database (CREATE TABLE IF NOT EXISTS won't alter it) gains the Senado-crossing
+# columns. MySQL 8.4 has no `ADD COLUMN IF NOT EXISTS`, so we check information_schema first.
+MIGRATIONS = [
+    ("roll_calls", "house", "ALTER TABLE roll_calls ADD COLUMN house VARCHAR(16) NOT NULL DEFAULT 'camara' AFTER law_id"),
+    ("votes", "house", "ALTER TABLE votes ADD COLUMN house VARCHAR(16) NOT NULL DEFAULT 'camara' AFTER deputy_id"),
+    ("politics", "senado_id", "ALTER TABLE politics ADD COLUMN senado_id INT NULL AFTER camara_id"),
+    ("politics", "house", "ALTER TABLE politics ADD COLUMN house VARCHAR(16) NOT NULL DEFAULT 'camara' AFTER senado_id"),
+]
+
+
+def migrate(conn: MySQLConnection) -> None:
+    """Idempotently add post-ship columns and relax constraints. Safe to run on every init."""
+    schema = conn.execute("SELECT DATABASE() AS db").fetchone()["db"]
+    for table, column, ddl in MIGRATIONS:
+        exists = conn.execute(
+            """
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = ? AND table_name = ? AND column_name = ?
+            """,
+            (schema, table, column),
+        ).fetchone()
+        if not exists:
+            conn.execute(ddl)
+    # camara_id must allow NULL (senators have none); only alter if it is still NOT NULL.
+    nullable = conn.execute(
+        """
+        SELECT is_nullable AS is_nullable FROM information_schema.columns
+        WHERE table_schema = ? AND table_name = 'politics' AND column_name = 'camara_id'
+        """,
+        (schema,),
+    ).fetchone()
+    if nullable and nullable["is_nullable"] == "NO":
+        conn.execute("ALTER TABLE politics MODIFY COLUMN camara_id INT NULL")
+    # A unique index on senado_id lets senators upsert without colliding (multiple NULLs allowed).
+    has_idx = conn.execute(
+        """
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema = ? AND table_name = 'politics' AND index_name = 'uq_politics_senado_id'
+        """,
+        (schema,),
+    ).fetchone()
+    if not has_idx:
+        conn.execute("ALTER TABLE politics ADD UNIQUE KEY uq_politics_senado_id (senado_id)")
+    conn.commit()
 
 
 TOPICS = [
@@ -382,6 +434,7 @@ KEYWORDS = [
 def init_db(database_url: str | None = None) -> MySQLConnection:
     conn = connect(database_url)
     conn.executescript(SCHEMA)
+    migrate(conn)
     seed_reference_data(conn)
     conn.commit()
     return conn
@@ -696,6 +749,59 @@ def upsert_politic(
     return int(row["id"])
 
 
+def upsert_senator(
+    conn: MySQLConnection,
+    *,
+    senado_id: int,
+    name: str,
+    party: str,
+    uf: str,
+    occupation: str = "",
+    profile: dict[str, Any] | None = None,
+    wealth_total: float = 0.0,
+    wealth_capital: float = 0.0,
+    wealth_buckets: dict[str, float] | None = None,
+) -> int:
+    """Upsert a senator as a politic (house='senado', no camara_id). Returns the politic id."""
+    payload = {
+        "senado_id": senado_id,
+        "name": name,
+        "party": party,
+        "uf": uf,
+        "occupation": occupation,
+        "profile_json": as_json(profile or {}),
+        "wealth_total": wealth_total,
+        "wealth_capital": wealth_capital,
+        "wealth_buckets_json": as_json(wealth_buckets or {}),
+        "updated_at": now_iso(),
+    }
+    conn.execute(
+        """
+        INSERT INTO politics (
+          senado_id, house, name, party, uf, occupation, profile_json,
+          wealth_total, wealth_capital, wealth_buckets_json, updated_at
+        )
+        VALUES (
+          :senado_id, 'senado', :name, :party, :uf, :occupation, :profile_json,
+          :wealth_total, :wealth_capital, :wealth_buckets_json, :updated_at
+        )
+        ON DUPLICATE KEY UPDATE
+          name = VALUES(name),
+          party = VALUES(party),
+          uf = VALUES(uf),
+          occupation = VALUES(occupation),
+          profile_json = VALUES(profile_json),
+          wealth_total = VALUES(wealth_total),
+          wealth_capital = VALUES(wealth_capital),
+          wealth_buckets_json = VALUES(wealth_buckets_json),
+          updated_at = VALUES(updated_at)
+        """,
+        payload,
+    )
+    row = conn.execute("SELECT id FROM politics WHERE senado_id = ?", (senado_id,)).fetchone()
+    return int(row["id"])
+
+
 def upsert_score(
     conn: MySQLConnection,
     *,
@@ -764,20 +870,26 @@ def upsert_roll_call(
     is_nominal: bool,
     gov_orientation: str | None,
     opp_orientation: str | None,
+    house: str = "camara",
 ) -> None:
-    """Store one roll-call of a law (deputy-independent, immutable). Idempotent on roll_call id."""
+    """Store one roll-call of a law (voter-independent, immutable). Idempotent on roll_call id.
+
+    `house` ('camara'|'senado') tags which chamber the roll-call belongs to, so a deputy is never
+    measured against a Senado roll-call and vice versa. See research/14-senado-vote-crossing.md.
+    """
     conn.execute(
         """
         INSERT INTO roll_calls (
-          id, law_id, date, description, is_nominal,
+          id, law_id, house, date, description, is_nominal,
           gov_orientation, opp_orientation, updated_at
         )
         VALUES (
-          :id, :law_id, :date, :description, :is_nominal,
+          :id, :law_id, :house, :date, :description, :is_nominal,
           :gov_orientation, :opp_orientation, :updated_at
         )
         ON DUPLICATE KEY UPDATE
           law_id = VALUES(law_id),
+          house = VALUES(house),
           date = VALUES(date),
           description = VALUES(description),
           is_nominal = VALUES(is_nominal),
@@ -788,6 +900,7 @@ def upsert_roll_call(
         {
             "id": roll_call_id,
             "law_id": law_id,
+            "house": house,
             "date": date or "",
             "description": description or "",
             "is_nominal": 1 if is_nominal else 0,
@@ -798,24 +911,36 @@ def upsert_roll_call(
     )
 
 
-def upsert_vote(conn: MySQLConnection, roll_call_id: str, deputy_id: int, vote_type: str) -> None:
-    """Store one deputy's vote on a roll-call. Idempotent on (roll_call_id, deputado)."""
+def upsert_vote(
+    conn: MySQLConnection, roll_call_id: str, deputy_id: int, vote_type: str, house: str = "camara"
+) -> None:
+    """Store one voter's vote on a roll-call. Idempotent on (roll_call_id, voter).
+
+    `deputy_id` holds the voter's chamber id — a Câmara `deputado_.id` or a Senado
+    `codigoParlamentar`; `house` disambiguates the two id spaces.
+    """
     conn.execute(
         """
-        INSERT INTO votes (roll_call_id, deputy_id, vote_type)
-        VALUES (:roll_call_id, :deputy_id, :vote_type)
-        ON DUPLICATE KEY UPDATE vote_type = VALUES(vote_type)
+        INSERT INTO votes (roll_call_id, deputy_id, house, vote_type)
+        VALUES (:roll_call_id, :deputy_id, :house, :vote_type)
+        ON DUPLICATE KEY UPDATE house = VALUES(house), vote_type = VALUES(vote_type)
         """,
         {
             "roll_call_id": roll_call_id,
             "deputy_id": deputy_id,
+            "house": house,
             "vote_type": vote_type,
         },
     )
 
 
-def get_deputy_votes(conn: MySQLConnection, *, camara_id: int, law_ids: list[int]) -> list[dict[str, Any]]:
-    """Look up a deputy's cached votes for the given laws (joined with their roll-call context)."""
+def get_deputy_votes(
+    conn: MySQLConnection, *, camara_id: int, law_ids: list[int], house: str = "camara"
+) -> list[dict[str, Any]]:
+    """Look up a voter's cached votes for the given laws (joined with their roll-call context).
+
+    Filtered to one `house` so a deputy's lookup never picks up Senado rows (and vice versa).
+    """
     if not law_ids:
         return []
     placeholders = ", ".join("?" for _ in law_ids)
@@ -827,18 +952,22 @@ def get_deputy_votes(conn: MySQLConnection, *, camara_id: int, law_ids: list[int
           v.gov_orientation, v.opp_orientation
         FROM votes vt
         JOIN roll_calls v ON v.id = vt.roll_call_id
-        WHERE vt.deputy_id = ? AND v.law_id IN ({placeholders})
+        WHERE vt.deputy_id = ? AND vt.house = ? AND v.law_id IN ({placeholders})
         ORDER BY v.law_id, vt.roll_call_id
         """,
-        (camara_id, *law_ids),
+        (camara_id, house, *law_ids),
     ).fetchall()
 
 
-def get_law_roll_calls(conn: MySQLConnection, law_id: int) -> list[dict[str, Any]]:
-    """All cached roll-calls for a law (deputy-independent)."""
+def get_law_roll_calls(conn: MySQLConnection, law_id: int, house: str = "camara") -> list[dict[str, Any]]:
+    """A law's cached roll-calls for one chamber (voter-independent).
+
+    Defaults to `camara` so existing deputy scoring is unaffected by Senado roll-calls sharing
+    the table — the nominal count (the scoring denominator) stays chamber-scoped.
+    """
     return conn.execute(
-        "SELECT * FROM roll_calls WHERE law_id = ? ORDER BY id",
-        (law_id,),
+        "SELECT * FROM roll_calls WHERE law_id = ? AND house = ? ORDER BY id",
+        (law_id, house),
     ).fetchall()
 
 
@@ -847,12 +976,17 @@ def list_politics(conn: MySQLConnection) -> list[dict[str, Any]]:
     return [_politic_payload(row) for row in rows]
 
 
-def get_scorecards(conn: MySQLConnection, camara_id: int | None = None) -> dict[str, Any]:
+def get_scorecards(
+    conn: MySQLConnection, camara_id: int | None = None, senado_id: int | None = None
+) -> dict[str, Any]:
     params: tuple[Any, ...] = ()
     where = ""
     if camara_id is not None:
         where = "WHERE camara_id = ?"
         params = (camara_id,)
+    elif senado_id is not None:
+        where = "WHERE senado_id = ?"
+        params = (senado_id,)
     politics = conn.execute(f"SELECT * FROM politics {where} ORDER BY name", params).fetchall()
     cards = [get_scorecard_for_politic(conn, row) for row in politics]
     return {"generated_at": now_iso(), "scorecards": cards}
@@ -886,6 +1020,8 @@ def _politic_payload(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": row["id"],
         "camara_id": row["camara_id"],
+        "senado_id": row.get("senado_id"),
+        "house": row.get("house") or "camara",
         "tse_sq": row["tse_sq"],
         "tse_year": row["tse_year"],
         "tse_uf": row["tse_uf"],

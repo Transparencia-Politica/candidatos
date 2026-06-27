@@ -262,23 +262,25 @@ def legislature_start(profile: dict[str, Any], fetch=fetch_json) -> str | None:
 
 
 def infer_law_vote_from_cache(
-    conn, camara_id: int, law: dict[str, Any], since_date: str | None = None
+    conn, camara_id: int, law: dict[str, Any], since_date: str | None = None, house: str = "camara"
 ) -> dict[str, Any]:
-    """Compute present/nominal/stance for a deputy from the stored vote cache — no API calls.
+    """Compute present/nominal/stance for a voter from the stored vote cache — no API calls.
 
-    The cache holds every deputy's vote on each of a law's nominal roll-calls, so this is
+    The cache holds every voter's vote on each of a law's nominal roll-calls, so this is
     a pure DB lookup. When `since_date` (ISO) is given, only roll-calls on/after it are
-    counted — so a deputy is never marked absent for votes before their term began.
-    See research/12-topic-packages-and-vote-caching.md.
+    counted — so a voter is never marked absent for votes before their term began.
+    `house` ('camara'|'senado') scopes both the roll-calls (the nominal denominator) and the
+    voter's votes to one chamber, so deputies and senators never cross-pollute the same law's
+    stored roll-calls. See research/12 and research/13.
     """
-    roll_calls = db.get_law_roll_calls(conn, law["id"])
+    roll_calls = db.get_law_roll_calls(conn, law["id"], house=house)
     if since_date:
         roll_calls = [v for v in roll_calls if (v.get("date") or "") >= since_date]
     nominal = len(roll_calls)
     valid_ids = {v["id"] for v in roll_calls}
     desc_by_id = {v["id"]: (v.get("description") or "") for v in roll_calls}
 
-    mine = db.get_deputy_votes(conn, camara_id=camara_id, law_ids=[law["id"]])
+    mine = db.get_deputy_votes(conn, camara_id=camara_id, law_ids=[law["id"]], house=house)
     if since_date:
         mine = [m for m in mine if m["roll_call_id"] in valid_ids]
     present = len(mine)

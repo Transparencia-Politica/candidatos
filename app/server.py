@@ -9,9 +9,11 @@ import http.server, urllib.request, urllib.parse, json, os
 try:
     import db
     import score_candidate
+    import senado
 except ModuleNotFoundError:
     from app import db
     from app import score_candidate
+    from app import senado
 
 ALLOWED = ("dadosabertos.camara.leg.br", "divulgacandcontas.tse.jus.br")
 CACHE = {}
@@ -78,6 +80,30 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(400, json.dumps({"error": "invalid camara_id"}))
             payload = with_db(lambda conn: db.get_scorecards(conn, camara_id))
             return self._send(200, json.dumps(payload, ensure_ascii=False))
+        if p.path == "/api/senators/scorecard":
+            # The Senado fallback for the unified search. `senado_id` reads an already-scored
+            # senator from MySQL (no re-score); `name` resolves a current senator and scores them
+            # from senado roll-calls. See research/14-senado-vote-crossing.md.
+            query = urllib.parse.parse_qs(p.query)
+            senado_id = query.get("senado_id", [None])[0]
+            if senado_id:
+                payload = with_db(lambda conn: db.get_scorecards(conn, senado_id=int(senado_id)))
+                if not payload["scorecards"]:
+                    return self._send(404, json.dumps({"error": "senator not scored yet"}))
+                payload["source"] = "cache"
+                return self._send(200, json.dumps(payload, ensure_ascii=False))
+            name = (query.get("name", [""])[0] or "").strip()
+            if len(name) < 2:
+                return self._send(400, json.dumps({"error": "name must have at least 2 characters"}))
+            try:
+                sen = senado.resolve_senator(name)
+                senado.score_senator(senado_id=sen["senado_id"], name=sen["name"],
+                                     party=sen["party"], uf=sen["uf"], database_url=db.DATABASE_URL)
+                payload = with_db(lambda conn: db.get_scorecards(conn, senado_id=sen["senado_id"]))
+                payload["source"] = "calculated"
+                return self._send(200, json.dumps(payload, ensure_ascii=False))
+            except Exception as e:
+                return self._send(502, json.dumps({"error": str(e)}, ensure_ascii=False))
         if p.path == "/proxy":
             url = urllib.parse.parse_qs(p.query).get("url", [""])[0]
             host = (urllib.parse.urlparse(url).hostname or "")
