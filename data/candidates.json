@@ -1,0 +1,34 @@
+{
+  "candidates": [
+    {
+      "camara_id": 74478,
+      "name": "Luciano Bivar",
+      "party": "MDB",
+      "tse_election_id": "2040602022",
+      "tse_sq": "170001609112",
+      "tse_uf": "PE",
+      "tse_year": 2022,
+      "uf": "PE"
+    },
+    {
+      "camara_id": 156190,
+      "name": "Marcel van Hattem",
+      "party": "NOVO",
+      "tse_election_id": "2040602022",
+      "tse_sq": "210001597011",
+      "tse_uf": "RS",
+      "tse_year": 2022,
+      "uf": "RS"
+    },
+    {
+      "camara_id": 204515,
+      "name": "André Janones",
+      "party": "REDE",
+      "tse_election_id": "2040602022",
+      "tse_sq": "130001608227",
+      "tse_uf": "MG",
+      "tse_year": 2022,
+      "uf": "MG"
+    }
+  ]
+}
