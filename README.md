@@ -1,11 +1,36 @@
-# candidatos — Candidato (Transparência-Política) (research & data layer)
+# candidatos — Candidato (Transparência-Política) (research, data layer & local app)
 
 A Brazilian analog of Germany's [Wahl-O-Mat](https://www.wahl-o-mat.de/), targeting the
 **2026 Brazilian general election** (1st round **4 Oct 2026**). The distinguishing idea: instead
 of matching voters to *self-reported* party answers, ground each thesis in **real legislative
 behavior** — how parties/candidates actually voted, attended, authored, and were financed.
 
-This repo currently holds the **research and data-access groundwork** (no app code yet).
+This repo currently holds the **research corpus plus a Dockerized local scorecard app**. The app
+uses a MySQL-backed data model for `topics -> laws -> keywords -> scores <- politics`, exposes a
+small Python HTTP API, and serves a static frontend that consumes that API.
+
+## Current tech stack
+
+| Layer | Technology |
+|---|---|
+| Local environment | Docker Compose |
+| Database | MySQL 8.4 |
+| Backend | Python 3.12 standard-library HTTP server |
+| DB client | PyMySQL |
+| Frontend | Static HTML/CSS/JavaScript |
+| Official data sources | Câmara Dados Abertos + TSE DivulgaCandContas |
+
+## Architecture
+
+```text
+Câmara/TSE APIs -> app/score_candidate.py -> MySQL
+MySQL -> app/server.py -> app/index.html
+```
+
+`app/score_candidate.py` calculates and stores score rows for one politician at a time. The API in
+`app/server.py` serves candidate search, scorecard generation, stored scorecards, politicians, and
+the seeded topic/law/keyword tree. The frontend does not query Câmara or TSE directly; it consumes
+the local API.
 
 ## Document map
 
@@ -43,6 +68,9 @@ Local app/database environment:
 docker compose up --build
 docker compose run --rm app python app/score_candidate.py
 ```
+
+The app is available at <http://127.0.0.1:8765>. MySQL is the only supported application database;
+set `DATABASE_URL` to a MySQL URL when running outside Compose.
 
 The two reference MCP repos analyzed in `REPO-ANALYSIS.md` are **not bundled** here — clone them
 from their GitHub URLs (listed in that doc) if you want to read their source.

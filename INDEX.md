@@ -5,8 +5,10 @@ For the narrative overview and the design decisions, start at [`README.md`](READ
 for the working contract (including the rule to document findings), read
 [`AGENTS.md`](AGENTS.md).*
 
-This repo is the **research & data layer** for **Candidato**, the voting-advice application of
-the **Transparência-Política** project. There is no app code yet — the documents are the product.
+This repo is the **research, data, and local app layer** for **Candidato**, the voting-advice
+application of the **Transparência-Política** project. The research documents remain the source of
+methodological context, while `app/` now contains the Dockerized MySQL-backed scorecard API and
+frontend.
 
 ## How to use this folder
 
@@ -69,6 +71,17 @@ the **Transparência-Política** project. There is no app code yet — the docum
 - **Scale the scoring POC** → `07` → `01` / `02`.
 - **Work on the local scorecard DB/API** → `docs/DATABASE.md` → `app/db.py` →
   `app/score_candidate.py` → `app/server.py`.
+
+## Current local architecture
+
+```text
+Docker Compose
+  ├─ mysql:8.4 stores topics, laws, keywords, politics, and scores
+  └─ Python 3.12 app serves app/index.html and /api/*
+```
+
+The frontend consumes the local API. Candidate scoring is calculated by `app/score_candidate.py`
+and persisted in MySQL through `app/db.py`.
 
 ## Documenting findings (research mode)
 

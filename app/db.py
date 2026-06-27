@@ -5,23 +5,13 @@ from __future__ import annotations
 import json
 import os
 import re
-import sqlite3
 from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import unquote, urlparse
 
 
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(APP_DIR)
-DATA_DIR = os.path.join(ROOT_DIR, "data")
 DEFAULT_DATABASE_URL = "mysql://candidato:candidato@127.0.0.1:3306/candidato"
-DATABASE_URL = (
-    os.environ.get("DATABASE_URL")
-    or os.environ.get("CANDIDATO_DATABASE_URL")
-    or os.environ.get("CANDIDATO_DB")
-    or DEFAULT_DATABASE_URL
-)
-DB_PATH = DATABASE_URL
+DATABASE_URL = os.environ.get("DATABASE_URL") or os.environ.get("CANDIDATO_DATABASE_URL") or DEFAULT_DATABASE_URL
 
 
 def now_iso() -> str:
@@ -59,8 +49,6 @@ class MySQLResult:
 
 
 class MySQLConnection:
-    dialect = "mysql"
-
     def __init__(self, raw: Any):
         self.raw = raw
 
@@ -89,31 +77,11 @@ def split_sql_script(script: str) -> list[str]:
     return [statement.strip() for statement in script.split(";") if statement.strip()]
 
 
-def is_sqlite_target(target: str) -> bool:
-    return (
-        target.startswith("sqlite:///")
-        or target.endswith(".db")
-        or target.endswith(".sqlite")
-        or target.endswith(".sqlite3")
-        or "://" not in target
-    )
-
-
-def connect(database_url: str | None = None) -> sqlite3.Connection | MySQLConnection:
+def connect(database_url: str | None = None) -> MySQLConnection:
     target = database_url or DATABASE_URL
-    if is_sqlite_target(target):
-        db_path = target.removeprefix("sqlite:///")
-        if not os.path.isabs(db_path):
-            db_path = os.path.abspath(db_path)
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-        return conn
-
     parsed = urlparse(target)
     if parsed.scheme not in ("mysql", "mysql+pymysql"):
-        raise ValueError(f"Unsupported DATABASE_URL scheme: {parsed.scheme}")
+        raise ValueError(f"Unsupported DATABASE_URL scheme: {parsed.scheme or '(missing)'}. Use mysql://...")
     try:
         import pymysql
         import pymysql.cursors
@@ -133,7 +101,7 @@ def connect(database_url: str | None = None) -> sqlite3.Connection | MySQLConnec
     return MySQLConnection(raw)
 
 
-SCHEMA_MYSQL = """
+SCHEMA = """
 CREATE TABLE IF NOT EXISTS topics (
   id INT AUTO_INCREMENT PRIMARY KEY,
   slug VARCHAR(160) NOT NULL,
@@ -228,95 +196,6 @@ CREATE TABLE IF NOT EXISTS scores (
   CONSTRAINT fk_scores_politic FOREIGN KEY (politic_id) REFERENCES politics(id) ON DELETE CASCADE,
   CONSTRAINT fk_scores_keyword FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-"""
-
-
-SCHEMA_SQLITE = """
-CREATE TABLE IF NOT EXISTS topics (
-  id INTEGER PRIMARY KEY,
-  slug TEXT NOT NULL UNIQUE,
-  title TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS laws (
-  id INTEGER PRIMARY KEY,
-  topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE,
-  slug TEXT NOT NULL UNIQUE,
-  camara_proposicao_id INTEGER NOT NULL UNIQUE,
-  label TEXT NOT NULL,
-  kind TEXT NOT NULL,
-  number TEXT NOT NULL,
-  year INTEGER NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  source_url TEXT NOT NULL DEFAULT '',
-  is_key INTEGER NOT NULL DEFAULT 0,
-  wealth_relevant INTEGER NOT NULL DEFAULT 1,
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS keywords (
-  id INTEGER PRIMARY KEY,
-  law_id INTEGER NOT NULL REFERENCES laws(id) ON DELETE CASCADE,
-  slug TEXT NOT NULL UNIQUE,
-  label TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  direction INTEGER NOT NULL DEFAULT 1 CHECK (direction IN (-1, 0, 1)),
-  weight REAL NOT NULL DEFAULT 1.0,
-  wealth_relevant INTEGER NOT NULL DEFAULT 1,
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS politics (
-  id INTEGER PRIMARY KEY,
-  camara_id INTEGER NOT NULL UNIQUE,
-  tse_sq TEXT,
-  tse_year INTEGER,
-  tse_uf TEXT,
-  tse_election_id TEXT,
-  name TEXT NOT NULL,
-  party TEXT NOT NULL DEFAULT '',
-  uf TEXT NOT NULL DEFAULT '',
-  birth_date TEXT,
-  occupation TEXT NOT NULL DEFAULT '',
-  profile_json TEXT NOT NULL DEFAULT '{}',
-  wealth_total REAL NOT NULL DEFAULT 0,
-  wealth_capital REAL NOT NULL DEFAULT 0,
-  wealth_buckets_json TEXT NOT NULL DEFAULT '{}',
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS scores (
-  id INTEGER PRIMARY KEY,
-  politic_id INTEGER NOT NULL REFERENCES politics(id) ON DELETE CASCADE,
-  keyword_id INTEGER NOT NULL REFERENCES keywords(id) ON DELETE CASCADE,
-  score_value REAL,
-  self_interest_value REAL,
-  vote_status TEXT NOT NULL,
-  vote_label TEXT NOT NULL,
-  stance TEXT,
-  present_count INTEGER NOT NULL DEFAULT 0,
-  nominal_count INTEGER NOT NULL DEFAULT 0,
-  coverage_value REAL NOT NULL DEFAULT 0,
-  evidence_json TEXT NOT NULL DEFAULT '{}',
-  calculated_at TEXT NOT NULL,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE (politic_id, keyword_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_laws_topic ON laws(topic_id);
-CREATE INDEX IF NOT EXISTS idx_keywords_law ON keywords(law_id);
-CREATE INDEX IF NOT EXISTS idx_scores_politic ON scores(politic_id);
-CREATE INDEX IF NOT EXISTS idx_scores_keyword ON scores(keyword_id);
 """
 
 
@@ -426,159 +305,88 @@ KEYWORDS = [
 ]
 
 
-def is_mysql(conn: sqlite3.Connection | MySQLConnection) -> bool:
-    return getattr(conn, "dialect", "sqlite") == "mysql"
-
-
-def init_db(database_url: str | None = None) -> sqlite3.Connection | MySQLConnection:
+def init_db(database_url: str | None = None) -> MySQLConnection:
     conn = connect(database_url)
-    conn.executescript(SCHEMA_MYSQL if is_mysql(conn) else SCHEMA_SQLITE)
+    conn.executescript(SCHEMA)
     seed_reference_data(conn)
     conn.commit()
     return conn
 
 
-def seed_reference_data(conn: sqlite3.Connection | MySQLConnection) -> None:
+def seed_reference_data(conn: MySQLConnection) -> None:
     for topic in TOPICS:
-        payload = {**topic, "updated_at": now_iso()}
-        if is_mysql(conn):
-            conn.execute(
-                """
-                INSERT INTO topics (slug, title, description, sort_order, updated_at)
-                VALUES (:slug, :title, :description, :sort_order, :updated_at)
-                ON DUPLICATE KEY UPDATE
-                  title = VALUES(title),
-                  description = VALUES(description),
-                  sort_order = VALUES(sort_order),
-                  updated_at = VALUES(updated_at)
-                """,
-                payload,
-            )
-        else:
-            conn.execute(
-                """
-                INSERT INTO topics (slug, title, description, sort_order, updated_at)
-                VALUES (:slug, :title, :description, :sort_order, :updated_at)
-                ON CONFLICT(slug) DO UPDATE SET
-                  title = excluded.title,
-                  description = excluded.description,
-                  sort_order = excluded.sort_order,
-                  updated_at = excluded.updated_at
-                """,
-                payload,
-            )
+        conn.execute(
+            """
+            INSERT INTO topics (slug, title, description, sort_order, updated_at)
+            VALUES (:slug, :title, :description, :sort_order, :updated_at)
+            ON DUPLICATE KEY UPDATE
+              title = VALUES(title),
+              description = VALUES(description),
+              sort_order = VALUES(sort_order),
+              updated_at = VALUES(updated_at)
+            """,
+            {**topic, "updated_at": now_iso()},
+        )
 
     topic_ids = {row["slug"]: row["id"] for row in conn.execute("SELECT id, slug FROM topics")}
     for law in LAWS:
         payload = {**law, "topic_id": topic_ids[law["topic_slug"]], "updated_at": now_iso()}
-        if is_mysql(conn):
-            conn.execute(
-                """
-                INSERT INTO laws (
-                  topic_id, slug, camara_proposicao_id, label, kind, number, year,
-                  description, source_url, is_key, wealth_relevant, sort_order, updated_at
-                )
-                VALUES (
-                  :topic_id, :slug, :camara_proposicao_id, :label, :kind, :number, :year,
-                  :description, :source_url, :is_key, :wealth_relevant, :sort_order, :updated_at
-                )
-                ON DUPLICATE KEY UPDATE
-                  topic_id = VALUES(topic_id),
-                  slug = VALUES(slug),
-                  camara_proposicao_id = VALUES(camara_proposicao_id),
-                  label = VALUES(label),
-                  kind = VALUES(kind),
-                  number = VALUES(number),
-                  year = VALUES(year),
-                  description = VALUES(description),
-                  source_url = VALUES(source_url),
-                  is_key = VALUES(is_key),
-                  wealth_relevant = VALUES(wealth_relevant),
-                  sort_order = VALUES(sort_order),
-                  updated_at = VALUES(updated_at)
-                """,
-                payload,
+        conn.execute(
+            """
+            INSERT INTO laws (
+              topic_id, slug, camara_proposicao_id, label, kind, number, year,
+              description, source_url, is_key, wealth_relevant, sort_order, updated_at
             )
-        else:
-            conn.execute(
-                """
-                INSERT INTO laws (
-                  topic_id, slug, camara_proposicao_id, label, kind, number, year,
-                  description, source_url, is_key, wealth_relevant, sort_order, updated_at
-                )
-                VALUES (
-                  :topic_id, :slug, :camara_proposicao_id, :label, :kind, :number, :year,
-                  :description, :source_url, :is_key, :wealth_relevant, :sort_order, :updated_at
-                )
-                ON CONFLICT(slug) DO UPDATE SET
-                  topic_id = excluded.topic_id,
-                  camara_proposicao_id = excluded.camara_proposicao_id,
-                  label = excluded.label,
-                  kind = excluded.kind,
-                  number = excluded.number,
-                  year = excluded.year,
-                  description = excluded.description,
-                  source_url = excluded.source_url,
-                  is_key = excluded.is_key,
-                  wealth_relevant = excluded.wealth_relevant,
-                  sort_order = excluded.sort_order,
-                  updated_at = excluded.updated_at
-                """,
-                payload,
+            VALUES (
+              :topic_id, :slug, :camara_proposicao_id, :label, :kind, :number, :year,
+              :description, :source_url, :is_key, :wealth_relevant, :sort_order, :updated_at
             )
+            ON DUPLICATE KEY UPDATE
+              topic_id = VALUES(topic_id),
+              slug = VALUES(slug),
+              camara_proposicao_id = VALUES(camara_proposicao_id),
+              label = VALUES(label),
+              kind = VALUES(kind),
+              number = VALUES(number),
+              year = VALUES(year),
+              description = VALUES(description),
+              source_url = VALUES(source_url),
+              is_key = VALUES(is_key),
+              wealth_relevant = VALUES(wealth_relevant),
+              sort_order = VALUES(sort_order),
+              updated_at = VALUES(updated_at)
+            """,
+            payload,
+        )
 
     law_ids = {row["slug"]: row["id"] for row in conn.execute("SELECT id, slug FROM laws")}
     for keyword in KEYWORDS:
         payload = {**keyword, "law_id": law_ids[keyword["law_slug"]], "updated_at": now_iso()}
-        if is_mysql(conn):
-            conn.execute(
-                """
-                INSERT INTO keywords (
-                  law_id, slug, label, description, direction, weight,
-                  wealth_relevant, sort_order, updated_at
-                )
-                VALUES (
-                  :law_id, :slug, :label, :description, :direction, :weight,
-                  :wealth_relevant, :sort_order, :updated_at
-                )
-                ON DUPLICATE KEY UPDATE
-                  law_id = VALUES(law_id),
-                  label = VALUES(label),
-                  description = VALUES(description),
-                  direction = VALUES(direction),
-                  weight = VALUES(weight),
-                  wealth_relevant = VALUES(wealth_relevant),
-                  sort_order = VALUES(sort_order),
-                  updated_at = VALUES(updated_at)
-                """,
-                payload,
+        conn.execute(
+            """
+            INSERT INTO keywords (
+              law_id, slug, label, description, direction, weight,
+              wealth_relevant, sort_order, updated_at
             )
-        else:
-            conn.execute(
-                """
-                INSERT INTO keywords (
-                  law_id, slug, label, description, direction, weight,
-                  wealth_relevant, sort_order, updated_at
-                )
-                VALUES (
-                  :law_id, :slug, :label, :description, :direction, :weight,
-                  :wealth_relevant, :sort_order, :updated_at
-                )
-                ON CONFLICT(slug) DO UPDATE SET
-                  law_id = excluded.law_id,
-                  label = excluded.label,
-                  description = excluded.description,
-                  direction = excluded.direction,
-                  weight = excluded.weight,
-                  wealth_relevant = excluded.wealth_relevant,
-                  sort_order = excluded.sort_order,
-                  updated_at = excluded.updated_at
-                """,
-                payload,
+            VALUES (
+              :law_id, :slug, :label, :description, :direction, :weight,
+              :wealth_relevant, :sort_order, :updated_at
             )
+            ON DUPLICATE KEY UPDATE
+              law_id = VALUES(law_id),
+              label = VALUES(label),
+              description = VALUES(description),
+              direction = VALUES(direction),
+              weight = VALUES(weight),
+              wealth_relevant = VALUES(wealth_relevant),
+              sort_order = VALUES(sort_order),
+              updated_at = VALUES(updated_at)
+            """,
+            payload,
+        )
 
 
-def list_laws_with_keywords(conn: sqlite3.Connection | MySQLConnection) -> list[dict[str, Any]]:
+def list_laws_with_keywords(conn: MySQLConnection) -> list[dict[str, Any]]:
     rows = conn.execute(
         """
         SELECT
@@ -631,7 +439,7 @@ def list_laws_with_keywords(conn: sqlite3.Connection | MySQLConnection) -> list[
     return list(laws.values())
 
 
-def list_topics(conn: sqlite3.Connection | MySQLConnection) -> list[dict[str, Any]]:
+def list_topics(conn: MySQLConnection) -> list[dict[str, Any]]:
     rows = conn.execute(
         """
         SELECT
@@ -698,7 +506,7 @@ def list_topics(conn: sqlite3.Connection | MySQLConnection) -> list[dict[str, An
 
 
 def upsert_politic(
-    conn: sqlite3.Connection | MySQLConnection,
+    conn: MySQLConnection,
     *,
     camara_id: int,
     tse_sq: str,
@@ -732,74 +540,42 @@ def upsert_politic(
         "wealth_buckets_json": as_json(wealth_buckets),
         "updated_at": now_iso(),
     }
-    if is_mysql(conn):
-        conn.execute(
-            """
-            INSERT INTO politics (
-              camara_id, tse_sq, tse_year, tse_uf, tse_election_id, name, party, uf,
-              birth_date, occupation, profile_json, wealth_total, wealth_capital,
-              wealth_buckets_json, updated_at
-            )
-            VALUES (
-              :camara_id, :tse_sq, :tse_year, :tse_uf, :tse_election_id, :name, :party, :uf,
-              :birth_date, :occupation, :profile_json, :wealth_total, :wealth_capital,
-              :wealth_buckets_json, :updated_at
-            )
-            ON DUPLICATE KEY UPDATE
-              tse_sq = VALUES(tse_sq),
-              tse_year = VALUES(tse_year),
-              tse_uf = VALUES(tse_uf),
-              tse_election_id = VALUES(tse_election_id),
-              name = VALUES(name),
-              party = VALUES(party),
-              uf = VALUES(uf),
-              birth_date = VALUES(birth_date),
-              occupation = VALUES(occupation),
-              profile_json = VALUES(profile_json),
-              wealth_total = VALUES(wealth_total),
-              wealth_capital = VALUES(wealth_capital),
-              wealth_buckets_json = VALUES(wealth_buckets_json),
-              updated_at = VALUES(updated_at)
-            """,
-            payload,
+    conn.execute(
+        """
+        INSERT INTO politics (
+          camara_id, tse_sq, tse_year, tse_uf, tse_election_id, name, party, uf,
+          birth_date, occupation, profile_json, wealth_total, wealth_capital,
+          wealth_buckets_json, updated_at
         )
-    else:
-        conn.execute(
-            """
-            INSERT INTO politics (
-              camara_id, tse_sq, tse_year, tse_uf, tse_election_id, name, party, uf,
-              birth_date, occupation, profile_json, wealth_total, wealth_capital,
-              wealth_buckets_json, updated_at
-            )
-            VALUES (
-              :camara_id, :tse_sq, :tse_year, :tse_uf, :tse_election_id, :name, :party, :uf,
-              :birth_date, :occupation, :profile_json, :wealth_total, :wealth_capital,
-              :wealth_buckets_json, :updated_at
-            )
-            ON CONFLICT(camara_id) DO UPDATE SET
-              tse_sq = excluded.tse_sq,
-              tse_year = excluded.tse_year,
-              tse_uf = excluded.tse_uf,
-              tse_election_id = excluded.tse_election_id,
-              name = excluded.name,
-              party = excluded.party,
-              uf = excluded.uf,
-              birth_date = excluded.birth_date,
-              occupation = excluded.occupation,
-              profile_json = excluded.profile_json,
-              wealth_total = excluded.wealth_total,
-              wealth_capital = excluded.wealth_capital,
-              wealth_buckets_json = excluded.wealth_buckets_json,
-              updated_at = excluded.updated_at
-            """,
-            payload,
+        VALUES (
+          :camara_id, :tse_sq, :tse_year, :tse_uf, :tse_election_id, :name, :party, :uf,
+          :birth_date, :occupation, :profile_json, :wealth_total, :wealth_capital,
+          :wealth_buckets_json, :updated_at
         )
+        ON DUPLICATE KEY UPDATE
+          tse_sq = VALUES(tse_sq),
+          tse_year = VALUES(tse_year),
+          tse_uf = VALUES(tse_uf),
+          tse_election_id = VALUES(tse_election_id),
+          name = VALUES(name),
+          party = VALUES(party),
+          uf = VALUES(uf),
+          birth_date = VALUES(birth_date),
+          occupation = VALUES(occupation),
+          profile_json = VALUES(profile_json),
+          wealth_total = VALUES(wealth_total),
+          wealth_capital = VALUES(wealth_capital),
+          wealth_buckets_json = VALUES(wealth_buckets_json),
+          updated_at = VALUES(updated_at)
+        """,
+        payload,
+    )
     row = conn.execute("SELECT id FROM politics WHERE camara_id = ?", (camara_id,)).fetchone()
     return int(row["id"])
 
 
 def upsert_score(
-    conn: sqlite3.Connection | MySQLConnection,
+    conn: MySQLConnection,
     *,
     politic_id: int,
     keyword_id: int,
@@ -813,85 +589,55 @@ def upsert_score(
     coverage_value: float,
     evidence: dict[str, Any],
 ) -> None:
-    payload = {
-        "politic_id": politic_id,
-        "keyword_id": keyword_id,
-        "score_value": score_value,
-        "self_interest_value": self_interest_value,
-        "vote_status": vote_status,
-        "vote_label": vote_label,
-        "stance": stance,
-        "present_count": present_count,
-        "nominal_count": nominal_count,
-        "coverage_value": coverage_value,
-        "evidence_json": as_json(evidence),
-        "calculated_at": now_iso(),
-        "updated_at": now_iso(),
-    }
-    if is_mysql(conn):
-        conn.execute(
-            """
-            INSERT INTO scores (
-              politic_id, keyword_id, score_value, self_interest_value, vote_status,
-              vote_label, stance, present_count, nominal_count, coverage_value,
-              evidence_json, calculated_at, updated_at
-            )
-            VALUES (
-              :politic_id, :keyword_id, :score_value, :self_interest_value, :vote_status,
-              :vote_label, :stance, :present_count, :nominal_count, :coverage_value,
-              :evidence_json, :calculated_at, :updated_at
-            )
-            ON DUPLICATE KEY UPDATE
-              score_value = VALUES(score_value),
-              self_interest_value = VALUES(self_interest_value),
-              vote_status = VALUES(vote_status),
-              vote_label = VALUES(vote_label),
-              stance = VALUES(stance),
-              present_count = VALUES(present_count),
-              nominal_count = VALUES(nominal_count),
-              coverage_value = VALUES(coverage_value),
-              evidence_json = VALUES(evidence_json),
-              calculated_at = VALUES(calculated_at),
-              updated_at = VALUES(updated_at)
-            """,
-            payload,
+    conn.execute(
+        """
+        INSERT INTO scores (
+          politic_id, keyword_id, score_value, self_interest_value, vote_status,
+          vote_label, stance, present_count, nominal_count, coverage_value,
+          evidence_json, calculated_at, updated_at
         )
-    else:
-        conn.execute(
-            """
-            INSERT INTO scores (
-              politic_id, keyword_id, score_value, self_interest_value, vote_status,
-              vote_label, stance, present_count, nominal_count, coverage_value,
-              evidence_json, calculated_at, updated_at
-            )
-            VALUES (
-              :politic_id, :keyword_id, :score_value, :self_interest_value, :vote_status,
-              :vote_label, :stance, :present_count, :nominal_count, :coverage_value,
-              :evidence_json, :calculated_at, :updated_at
-            )
-            ON CONFLICT(politic_id, keyword_id) DO UPDATE SET
-              score_value = excluded.score_value,
-              self_interest_value = excluded.self_interest_value,
-              vote_status = excluded.vote_status,
-              vote_label = excluded.vote_label,
-              stance = excluded.stance,
-              present_count = excluded.present_count,
-              nominal_count = excluded.nominal_count,
-              coverage_value = excluded.coverage_value,
-              evidence_json = excluded.evidence_json,
-              calculated_at = excluded.calculated_at,
-              updated_at = excluded.updated_at
-            """,
-            payload,
+        VALUES (
+          :politic_id, :keyword_id, :score_value, :self_interest_value, :vote_status,
+          :vote_label, :stance, :present_count, :nominal_count, :coverage_value,
+          :evidence_json, :calculated_at, :updated_at
         )
+        ON DUPLICATE KEY UPDATE
+          score_value = VALUES(score_value),
+          self_interest_value = VALUES(self_interest_value),
+          vote_status = VALUES(vote_status),
+          vote_label = VALUES(vote_label),
+          stance = VALUES(stance),
+          present_count = VALUES(present_count),
+          nominal_count = VALUES(nominal_count),
+          coverage_value = VALUES(coverage_value),
+          evidence_json = VALUES(evidence_json),
+          calculated_at = VALUES(calculated_at),
+          updated_at = VALUES(updated_at)
+        """,
+        {
+            "politic_id": politic_id,
+            "keyword_id": keyword_id,
+            "score_value": score_value,
+            "self_interest_value": self_interest_value,
+            "vote_status": vote_status,
+            "vote_label": vote_label,
+            "stance": stance,
+            "present_count": present_count,
+            "nominal_count": nominal_count,
+            "coverage_value": coverage_value,
+            "evidence_json": as_json(evidence),
+            "calculated_at": now_iso(),
+            "updated_at": now_iso(),
+        },
+    )
 
 
-def list_politics(conn: sqlite3.Connection | MySQLConnection) -> list[dict[str, Any]]:
+def list_politics(conn: MySQLConnection) -> list[dict[str, Any]]:
     rows = conn.execute("SELECT * FROM politics ORDER BY name").fetchall()
     return [_politic_payload(row) for row in rows]
 
 
-def get_scorecards(conn: sqlite3.Connection | MySQLConnection, camara_id: int | None = None) -> dict[str, Any]:
+def get_scorecards(conn: MySQLConnection, camara_id: int | None = None) -> dict[str, Any]:
     params: tuple[Any, ...] = ()
     where = ""
     if camara_id is not None:
@@ -902,7 +648,7 @@ def get_scorecards(conn: sqlite3.Connection | MySQLConnection, camara_id: int | 
     return {"generated_at": now_iso(), "scorecards": cards}
 
 
-def get_scorecard_for_politic(conn: sqlite3.Connection | MySQLConnection, politic_row: dict[str, Any]) -> dict[str, Any]:
+def get_scorecard_for_politic(conn: MySQLConnection, politic_row: dict[str, Any]) -> dict[str, Any]:
     topics = _topics_for_politic(conn, int(politic_row["id"]))
     rows = conn.execute(
         """
@@ -965,7 +711,7 @@ def _score_payload(row: dict[str, Any] | None) -> dict[str, Any] | None:
     }
 
 
-def _topics_for_politic(conn: sqlite3.Connection | MySQLConnection, politic_id: int) -> list[dict[str, Any]]:
+def _topics_for_politic(conn: MySQLConnection, politic_id: int) -> list[dict[str, Any]]:
     rows = conn.execute(
         """
         SELECT
