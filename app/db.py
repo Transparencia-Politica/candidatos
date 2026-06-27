@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS topics (
   slug VARCHAR(160) NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
+  cod_temas TEXT,
   sort_order INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at VARCHAR(32) NOT NULL DEFAULT '',
@@ -196,6 +197,29 @@ CREATE TABLE IF NOT EXISTS scores (
   CONSTRAINT fk_scores_politic FOREIGN KEY (politic_id) REFERENCES politics(id) ON DELETE CASCADE,
   CONSTRAINT fk_scores_keyword FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS roll_calls (
+  id VARCHAR(64) PRIMARY KEY,
+  law_id INT NOT NULL,
+  date VARCHAR(32) NOT NULL DEFAULT '',
+  description TEXT NOT NULL,
+  is_nominal TINYINT(1) NOT NULL DEFAULT 0,
+  gov_orientation VARCHAR(32),
+  opp_orientation VARCHAR(32),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at VARCHAR(32) NOT NULL DEFAULT '',
+  KEY idx_roll_calls_law (law_id),
+  CONSTRAINT fk_roll_calls_law FOREIGN KEY (law_id) REFERENCES laws(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS votes (
+  roll_call_id VARCHAR(64) NOT NULL,
+  deputy_id INT NOT NULL,
+  vote_type VARCHAR(32) NOT NULL,
+  PRIMARY KEY (roll_call_id, deputy_id),
+  KEY idx_votes_deputy (deputy_id),
+  CONSTRAINT fk_votes_roll_call FOREIGN KEY (roll_call_id) REFERENCES roll_calls(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
 
@@ -204,12 +228,14 @@ TOPICS = [
         "slug": "tributacao-da-riqueza",
         "title": "Tributação da riqueza",
         "description": "Projetos que afetam renda de capital, dividendos, fundos exclusivos e ativos no exterior.",
+        "cod_temas": [70, 40, 68],  # manually designed: Finanças, Economia, Direito Constitucional
         "sort_order": 10,
     },
     {
         "slug": "reforma-tributaria",
         "title": "Reforma tributária",
         "description": "Projetos tributários amplos usados como contexto, mesmo quando não medem riqueza diretamente.",
+        "cod_temas": [70, 40],
         "sort_order": 20,
     },
 ]
@@ -243,6 +269,34 @@ LAWS = [
         "is_key": 0,
         "wealth_relevant": 1,
         "sort_order": 20,
+    },
+    {
+        "topic_slug": "tributacao-da-riqueza",
+        "slug": "igf-grandes-fortunas",
+        "camara_proposicao_id": 2438459,
+        "label": "IGF — Grandes Fortunas",
+        "kind": "PLP",
+        "number": "108",
+        "year": 2024,
+        "description": "Destaque (Emenda de Plenário nº 8, 30/10/2024) ao PLP 108/2024 que criaria o Imposto sobre Grandes Fortunas: 0,5% a 1,5% ao ano sobre patrimônio acima de R$ 10 milhões. Rejeitado por 262 a 136. Único voto nominal sobre tributar patrimônio.",
+        "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2438459",
+        "is_key": 1,
+        "wealth_relevant": 1,
+        "sort_order": 5,
+    },
+    {
+        "topic_slug": "tributacao-da-riqueza",
+        "slug": "pl-1087-2025",
+        "camara_proposicao_id": 2487436,
+        "label": "PL 1087/2025",
+        "kind": "PL",
+        "number": "1087",
+        "year": 2025,
+        "description": "Isenta o IR até R$ 5 mil e cria imposto mínimo sobre altas rendas (IRPFM); tributa lucros e dividendos acima de R$ 50 mil/mês. Virou a Lei 15.270/2025.",
+        "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2487436",
+        "is_key": 1,
+        "wealth_relevant": 1,
+        "sort_order": 15,
     },
     {
         "topic_slug": "reforma-tributaria",
@@ -293,6 +347,26 @@ KEYWORDS = [
         "sort_order": 30,
     },
     {
+        "law_slug": "igf-grandes-fortunas",
+        "slug": "igf-patrimonio",
+        "label": "Imposto sobre Grandes Fortunas",
+        "description": "Tributação anual do patrimônio acima de R$ 10 milhões (alíquotas de 0,5% a 1,5%). Votar 'Sim' = a favor de tributar a riqueza.",
+        "direction": 1,
+        "weight": 1.0,
+        "wealth_relevant": 1,
+        "sort_order": 5,
+    },
+    {
+        "law_slug": "pl-1087-2025",
+        "slug": "imposto-minimo-super-ricos",
+        "label": "Imposto mínimo dos super-ricos",
+        "description": "Alíquota efetiva mínima de IRPF sobre altas rendas (IRPFM) e 10% na fonte sobre lucros e dividendos acima de R$ 50 mil/mês.",
+        "direction": 1,
+        "weight": 1.0,
+        "wealth_relevant": 1,
+        "sort_order": 15,
+    },
+    {
         "law_slug": "pec-45-2019",
         "slug": "tributacao-do-consumo",
         "label": "Tributação do consumo",
@@ -317,15 +391,16 @@ def seed_reference_data(conn: MySQLConnection) -> None:
     for topic in TOPICS:
         conn.execute(
             """
-            INSERT INTO topics (slug, title, description, sort_order, updated_at)
-            VALUES (:slug, :title, :description, :sort_order, :updated_at)
+            INSERT INTO topics (slug, title, description, cod_temas, sort_order, updated_at)
+            VALUES (:slug, :title, :description, :cod_temas, :sort_order, :updated_at)
             ON DUPLICATE KEY UPDATE
               title = VALUES(title),
               description = VALUES(description),
+              cod_temas = VALUES(cod_temas),
               sort_order = VALUES(sort_order),
               updated_at = VALUES(updated_at)
             """,
-            {**topic, "updated_at": now_iso()},
+            {**topic, "cod_temas": as_json(topic.get("cod_temas", [])), "updated_at": now_iso()},
         )
 
     topic_ids = {row["slug"]: row["id"] for row in conn.execute("SELECT id, slug FROM topics")}
@@ -437,6 +512,53 @@ def list_laws_with_keywords(conn: MySQLConnection) -> list[dict[str, Any]]:
             }
         )
     return list(laws.values())
+
+
+def get_topic(conn: MySQLConnection, slug: str) -> dict[str, Any] | None:
+    """A topic with its discovery config (cod_temas parsed to a list)."""
+    row = conn.execute("SELECT * FROM topics WHERE slug = ?", (slug,)).fetchone()
+    if row is None:
+        return None
+    row["cod_temas"] = from_json(row.get("cod_temas"), [])
+    return row
+
+
+def upsert_law(conn: MySQLConnection, *, topic_id: int, slug: str, camara_proposicao_id: int,
+               label: str, kind: str, number: str, year: int, description: str, source_url: str,
+               is_key: int, wealth_relevant: int, sort_order: int) -> None:
+    """Store a discovered law under a topic. Append-only: an existing hit is left untouched."""
+    conn.execute(
+        """
+        INSERT INTO laws (
+          topic_id, slug, camara_proposicao_id, label, kind, number, year,
+          description, source_url, is_key, wealth_relevant, sort_order, updated_at
+        )
+        VALUES (
+          :topic_id, :slug, :camara_proposicao_id, :label, :kind, :number, :year,
+          :description, :source_url, :is_key, :wealth_relevant, :sort_order, :updated_at
+        )
+        ON DUPLICATE KEY UPDATE id = id
+        """,
+        {"topic_id": topic_id, "slug": slug, "camara_proposicao_id": camara_proposicao_id,
+         "label": label, "kind": kind, "number": number, "year": year, "description": description,
+         "source_url": source_url, "is_key": is_key, "wealth_relevant": wealth_relevant,
+         "sort_order": sort_order, "updated_at": now_iso()},
+    )
+
+
+def upsert_keyword(conn: MySQLConnection, *, law_id: int, slug: str, label: str, description: str,
+                   direction: int, weight: float, wealth_relevant: int, sort_order: int) -> None:
+    """Store a keyword under a law. Append-only: an existing hit is left untouched."""
+    conn.execute(
+        """
+        INSERT INTO keywords (law_id, slug, label, description, direction, weight, wealth_relevant, sort_order, updated_at)
+        VALUES (:law_id, :slug, :label, :description, :direction, :weight, :wealth_relevant, :sort_order, :updated_at)
+        ON DUPLICATE KEY UPDATE id = id
+        """,
+        {"law_id": law_id, "slug": slug, "label": label, "description": description,
+         "direction": direction, "weight": weight, "wealth_relevant": wealth_relevant,
+         "sort_order": sort_order, "updated_at": now_iso()},
+    )
 
 
 def list_topics(conn: MySQLConnection) -> list[dict[str, Any]]:
@@ -632,6 +754,94 @@ def upsert_score(
     )
 
 
+def upsert_roll_call(
+    conn: MySQLConnection,
+    *,
+    roll_call_id: str,
+    law_id: int,
+    date: str | None,
+    description: str | None,
+    is_nominal: bool,
+    gov_orientation: str | None,
+    opp_orientation: str | None,
+) -> None:
+    """Store one roll-call of a law (deputy-independent, immutable). Idempotent on roll_call id."""
+    conn.execute(
+        """
+        INSERT INTO roll_calls (
+          id, law_id, date, description, is_nominal,
+          gov_orientation, opp_orientation, updated_at
+        )
+        VALUES (
+          :id, :law_id, :date, :description, :is_nominal,
+          :gov_orientation, :opp_orientation, :updated_at
+        )
+        ON DUPLICATE KEY UPDATE
+          law_id = VALUES(law_id),
+          date = VALUES(date),
+          description = VALUES(description),
+          is_nominal = VALUES(is_nominal),
+          gov_orientation = VALUES(gov_orientation),
+          opp_orientation = VALUES(opp_orientation),
+          updated_at = VALUES(updated_at)
+        """,
+        {
+            "id": roll_call_id,
+            "law_id": law_id,
+            "date": date or "",
+            "description": description or "",
+            "is_nominal": 1 if is_nominal else 0,
+            "gov_orientation": gov_orientation,
+            "opp_orientation": opp_orientation,
+            "updated_at": now_iso(),
+        },
+    )
+
+
+def upsert_vote(conn: MySQLConnection, roll_call_id: str, deputy_id: int, vote_type: str) -> None:
+    """Store one deputy's vote on a roll-call. Idempotent on (roll_call_id, deputado)."""
+    conn.execute(
+        """
+        INSERT INTO votes (roll_call_id, deputy_id, vote_type)
+        VALUES (:roll_call_id, :deputy_id, :vote_type)
+        ON DUPLICATE KEY UPDATE vote_type = VALUES(vote_type)
+        """,
+        {
+            "roll_call_id": roll_call_id,
+            "deputy_id": deputy_id,
+            "vote_type": vote_type,
+        },
+    )
+
+
+def get_deputy_votes(conn: MySQLConnection, *, camara_id: int, law_ids: list[int]) -> list[dict[str, Any]]:
+    """Look up a deputy's cached votes for the given laws (joined with their roll-call context)."""
+    if not law_ids:
+        return []
+    placeholders = ", ".join("?" for _ in law_ids)
+    return conn.execute(
+        f"""
+        SELECT
+          vt.roll_call_id, vt.vote_type,
+          v.law_id, v.date, v.description, v.is_nominal,
+          v.gov_orientation, v.opp_orientation
+        FROM votes vt
+        JOIN roll_calls v ON v.id = vt.roll_call_id
+        WHERE vt.deputy_id = ? AND v.law_id IN ({placeholders})
+        ORDER BY v.law_id, vt.roll_call_id
+        """,
+        (camara_id, *law_ids),
+    ).fetchall()
+
+
+def get_law_roll_calls(conn: MySQLConnection, law_id: int) -> list[dict[str, Any]]:
+    """All cached roll-calls for a law (deputy-independent)."""
+    return conn.execute(
+        "SELECT * FROM roll_calls WHERE law_id = ? ORDER BY id",
+        (law_id,),
+    ).fetchall()
+
+
 def list_politics(conn: MySQLConnection) -> list[dict[str, Any]]:
     rows = conn.execute("SELECT * FROM politics ORDER BY name").fetchall()
     return [_politic_payload(row) for row in rows]
@@ -804,6 +1014,16 @@ def _summary(politic_row: dict[str, Any], rows: list[dict[str, Any]]) -> dict[st
     ]
     protect_count = sum(1 for row in self_interest_rows if float(row["self_interest_value"]) > 0)
 
+    # government/opposition alignment over the fiscal agenda (all laws, dedup per law)
+    gov_aligned = gov_comparable = 0
+    opp_aligned = opp_comparable = 0
+    for row in by_law.values():
+        ev = from_json(row.get("evidence_json"), {})
+        gov_aligned += int(ev.get("gov_aligned") or 0)
+        gov_comparable += int(ev.get("gov_comparable") or 0)
+        opp_aligned += int(ev.get("opp_aligned") or 0)
+        opp_comparable += int(ev.get("opp_comparable") or 0)
+
     return {
         "wealth_capital_pct": round(100 * wealth_capital / wealth_total) if wealth_total else 0,
         "coverage_pct": round(100 * len(recorded_laws) / len(relevant_laws)) if relevant_laws else 0,
@@ -820,4 +1040,7 @@ def _summary(politic_row: dict[str, Any], rows: list[dict[str, Any]]) -> dict[st
         "self_interest_n": len(self_interest_rows),
         "relevant_laws_n": len(relevant_laws),
         "recorded_laws_n": len(recorded_laws),
+        "gov_alignment_pct": round(100 * gov_aligned / gov_comparable) if gov_comparable else None,
+        "opp_alignment_pct": round(100 * opp_aligned / opp_comparable) if opp_comparable else None,
+        "gov_comparable_n": gov_comparable,
     }
