@@ -85,11 +85,16 @@ function votesHtml(card){
   for(const topic of card.topics){
     for(const law of topic.laws){
       const score = law.score;
+      // A law added after this scorecard was computed has no score yet — say so plainly
+      // ('não avaliado' + tooltip) instead of an ambiguous 'sem score' that reads like an absence.
+      const voteCell = score
+        ? `<span class="chip ${chipClass(score)}">${score.vote_label}</span>`
+        : `<span class="chip c-na" title="Esta lei foi adicionada depois deste scorecard — recalcule o candidato (Buscar) para avaliá-la. Não significa ausência.">não avaliado</span>`;
       rows.push(`<tr>
         <td><b>${law.label}</b><br><span class="muted">${law.description}</span>
           <div class="keywords">${law.keywords.map(k => `<span class="keyword">${k.label}</span>`).join('')}</div></td>
         <td>${topic.title}${law.is_key ? '<br><span class="chip c-mix">chave</span>' : ''}</td>
-        <td><span class="chip ${chipClass(score)}">${score?.vote_label || 'sem score'}</span></td>
+        <td>${voteCell}</td>
         <td>${score ? `${score.present_count}/${score.nominal_count}` : '—'}</td>
       </tr>`);
     }

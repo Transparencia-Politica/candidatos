@@ -37,6 +37,8 @@
         <div id="suggestions" class="suggest" hidden></div>
       </div>
       <button id="search-button" class="primary" type="submit">Buscar</button>
+      <button id="random-cached" class="secondary" type="button" title="Sorteia um candidato já no banco">🎲 No banco</button>
+      <button id="random-new" class="secondary" type="button" title="Sorteia um deputado novo e calcula o score">🎲 Novo</button>
     </form>
     <div class="sub" style="margin-top:8px">Sugestões aparecem para candidatos já no banco local. Para um nome novo, clique em <b>Buscar</b> (consulta a Câmara).</div>
     <div id="search-results" class="results"></div>
@@ -135,6 +137,72 @@ async function loadSenator(name, senadoId){
     renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
   }catch(err){
     el('state').innerHTML = `<span class="error">Erro ao carregar ${name}: ${err}</span>`;
+  }
+}
+
+// Random pickers (live page only): both hit the backend, so they live in the shell, not shared/.
+function setBusy(b){
+  for(const id of ['search-button','random-cached','random-new']) el(id).disabled = b;
+}
+
+function randomCached(){
+  if(!localCandidates.length){
+    setLoading('<span class="muted">Nenhum candidato no banco ainda. Use Buscar ou 🎲 Novo.</span>');
+    return;
+  }
+  const pick = localCandidates[Math.floor(Math.random() * localCandidates.length)];
+  loadLocalCandidate(pick.camara_id, pick.name);
+}
+
+async function fetchDeputadosPage(page){
+  const url = `https://dadosabertos.camara.leg.br/api/v2/deputados?idLegislatura=57&itens=100&pagina=${page}`;
+  const res = await fetch(`/proxy?url=${encodeURIComponent(url)}`);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function scoreNewCandidate(camaraId, name){
+  setLoading(`Calculando score de ${name} (deputado novo)...`);
+  try{
+    const res = await fetch('/api/scorecards', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({camara_id: camaraId})
+    });
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('scorecard não retornado');
+    queryInput.value = name;
+    renderCard(card, payload.source === 'cache' ? 'cache MySQL' : 'calculado agora');
+    loadLocalRoster();  // newly-scored candidate joins the typeahead pool
+    return true;
+  }catch(err){ return false; }
+}
+
+async function randomNew(){
+  hideSuggest();
+  setBusy(true);
+  setLoading('Sorteando um deputado novo...');
+  try{
+    const first = await fetchDeputadosPage(1);
+    const lastLink = (first.links || []).find(l => l.rel === 'last');
+    const lastPage = lastLink ? (Number(new URL(lastLink.href).searchParams.get('pagina')) || 1) : 1;
+    const cachedIds = new Set(localCandidates.map(c => c.camara_id));
+    for(let attempt = 0; attempt < 6; attempt++){
+      const page = 1 + Math.floor(Math.random() * lastPage);
+      const data = page === 1 ? first : await fetchDeputadosPage(page);
+      const fresh = (data.dados || []).filter(d => !cachedIds.has(d.id));
+      if(!fresh.length) continue;
+      const pick = fresh[Math.floor(Math.random() * fresh.length)];
+      cachedIds.add(pick.id);  // don't repick the same one on retry
+      setLoading(`Sorteado: ${pick.nome}. Calculando score...`);
+      if(await scoreNewCandidate(pick.id, pick.nome)) return;
+    }
+    el('state').innerHTML = '<span class="error">Não consegui sortear um novo candidato (falha de resolução TSE). Tente de novo.</span>';
+  }catch(err){
+    el('state').innerHTML = `<span class="error">Erro ao sortear: ${err}</span>`;
+  }finally{
+    setBusy(false);
   }
 }
 
@@ -266,6 +334,8 @@ queryInput.addEventListener('keydown', ev => {
   else return;
   items.forEach((it, i) => it.classList.toggle('active', i === activeSuggest));
 });
+el('random-cached').addEventListener('click', randomCached);
+el('random-new').addEventListener('click', randomNew);
 loadLocalRoster();
 run();
 </script>
