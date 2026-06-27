@@ -66,6 +66,7 @@
   .c-nao{background:#fff1f2;color:var(--rose);border-color:#fecdd3}
   .c-aus{background:#eef1f5;color:#5b6472;border-color:#d8dee8}
   .c-mix{background:#fff7ed;color:var(--amber);border-color:#fed7aa}
+  .c-na{background:#fbfcfe;color:#8a93a3;border-color:var(--line);border-style:dashed}
   .keywords{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
   .keyword{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:.76rem;color:#384152;background:#fbfcfe}
   .note{border-left:3px solid var(--blue);background:#f0f5ff;padding:10px 12px;border-radius:6px;color:#344054}
@@ -309,11 +310,14 @@ function renderVotes(card){
   for(const topic of card.topics){
     for(const law of topic.laws){
       const score = law.score;
+      const voteCell = score
+        ? `<span class="chip ${chipClass(score)}">${score.vote_label}</span>`
+        : `<span class="chip c-na" title="Esta lei foi adicionada depois deste scorecard — recalcule o candidato (Buscar) para avaliá-la. Não significa ausência.">não avaliado</span>`;
       rows.push(`<tr>
         <td><b>${law.label}</b><br><span class="muted">${law.description}</span>
           <div class="keywords">${law.keywords.map(k => `<span class="keyword">${k.label}</span>`).join('')}</div></td>
         <td>${topic.title}${law.is_key ? '<br><span class="chip c-mix">chave</span>' : ''}</td>
-        <td><span class="chip ${chipClass(score)}">${score?.vote_label || 'sem score'}</span></td>
+        <td>${voteCell}</td>
         <td>${score ? `${score.present_count}/${score.nominal_count}` : '—'}</td>
       </tr>`);
     }
