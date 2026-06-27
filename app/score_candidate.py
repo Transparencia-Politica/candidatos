@@ -361,7 +361,7 @@ def run(args: argparse.Namespace) -> int:
     if args.seed_only:
         conn = db.init_db(args.db)
         conn.close()
-        print(f"Seeded DB schema/reference data at {args.db or db.DB_PATH}")
+        print(f"Seeded MySQL schema/reference data at {args.db or db.DATABASE_URL}")
         return 0
 
     result = score_camara_candidate(
@@ -377,7 +377,7 @@ def run(args: argparse.Namespace) -> int:
         log=lambda message: print(message, flush=True),
     )
     name = result["name"]
-    print(f"Stored scores for {name} in {args.db or db.DB_PATH}", flush=True)
+    print(f"Stored scores for {name} in {args.db or db.DATABASE_URL}", flush=True)
     return 0
 
 

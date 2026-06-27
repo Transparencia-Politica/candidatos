@@ -9,6 +9,29 @@ The scorecard database follows the chain:
 topics -> laws -> keywords -> scores <- politics
 ```
 
+## Current tech stack
+
+| Layer | Technology |
+|---|---|
+| Local environment | Docker Compose |
+| Database | MySQL 8.4 |
+| Backend/API | Python 3.12 standard-library HTTP server |
+| Database driver | PyMySQL |
+| Frontend | Static HTML/CSS/JavaScript served by the Python app |
+| External sources | Câmara Dados Abertos and TSE DivulgaCandContas |
+
+## Architecture
+
+```text
+Câmara/TSE APIs
+    |
+    v
+app/score_candidate.py -> MySQL <- app/server.py -> app/index.html
+```
+
+The script scores one politician at a time and persists the calculated rows in `scores`. The API
+then serves the persisted scorecards and reference tree to the frontend.
+
 ## Tables
 
 | Table | Role |
@@ -60,6 +83,6 @@ To populate the scorecard data:
 docker compose run --rm app python app/score_candidate.py
 ```
 
-The MySQL data lives in the Docker volume `candidatos_candidato_mysql_data` by default. A small
-SQLite fallback still exists for throwaway tests by setting `DATABASE_URL=sqlite:////tmp/test.sqlite3`,
-but the application default is MySQL.
+The MySQL data lives in the Docker volume `candidatos_candidato_mysql_data` by default. MySQL is
+the only supported application database; set `DATABASE_URL` to a MySQL URL when running outside
+Compose.
