@@ -24,6 +24,14 @@ except ModuleNotFoundError:  # pragma: no cover - import shim
     from app.score_candidate import CAMARA, fetch_json
 
 
+# Some laws represent a single *destaque* (side-vote), not a bill's passage. For these,
+# cache only that one roll-call so scoring reads the intended vote — keyed by proposição id
+# so the pin survives a future build_topic upsert (the unique key is on proposição, not slug).
+PINNED_VOTACAO = {
+    2438459: "2438459-77",  # IGF destaque (Emenda de Plenário nº 8) on PLP 108/2024, 30/10/2024
+}
+
+
 def parse_orientation(orientations: list[dict[str, Any]], bloc_regex: str) -> str | None:
     for o in orientations:
         if re.search(bloc_regex, o.get("siglaPartidoBloco") or "", re.IGNORECASE):
@@ -71,6 +79,10 @@ def ingest_law(
     raw_roll_calls = fetch(
         f"{CAMARA}/proposicoes/{proposicao_id}/votacoes?ordem=DESC&ordenarPor=dataHoraRegistro"
     ).get("dados", [])
+
+    pin = PINNED_VOTACAO.get(proposicao_id)
+    if pin:
+        raw_roll_calls = [rc for rc in raw_roll_calls if str(rc.get("id")) == pin]
 
     stored_roll_calls = 0
     stored_votes = 0
