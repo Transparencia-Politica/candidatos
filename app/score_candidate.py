@@ -256,9 +256,9 @@ def infer_law_vote_from_cache(conn, camara_id: int, law: dict[str, Any]) -> dict
     The cache holds every deputy's vote on each of a law's nominal roll-calls, so this is
     a pure DB lookup. See research/12-topic-packages-and-vote-caching.md.
     """
-    votacoes = db.get_law_votacoes(conn, law["id"])
-    nominal = len(votacoes)
-    desc_by_id = {v["id"]: (v.get("description") or "") for v in votacoes}
+    roll_calls = db.get_law_roll_calls(conn, law["id"])
+    nominal = len(roll_calls)
+    desc_by_id = {v["id"]: (v.get("description") or "") for v in roll_calls}
 
     mine = db.get_deputy_votes(conn, camara_id=camara_id, law_ids=[law["id"]])
     present = len(mine)
@@ -266,11 +266,11 @@ def infer_law_vote_from_cache(conn, camara_id: int, law: dict[str, Any]) -> dict
     recorded: list[dict[str, Any]] = []
     passage: str | None = None
     for row in mine:
-        tipo = row["tipo_voto"]
-        votes.append(tipo)
-        recorded.append({"vote_id": row["votacao_id"], "tipo_voto": tipo})
-        if tipo and re.search("aprovad", desc_by_id.get(row["votacao_id"], ""), re.IGNORECASE) and passage is None:
-            passage = tipo
+        vote_type = row["vote_type"]
+        votes.append(vote_type)
+        recorded.append({"roll_call_id": row["roll_call_id"], "vote_type": vote_type})
+        if vote_type and re.search("aprovad", desc_by_id.get(row["roll_call_id"], ""), re.IGNORECASE) and passage is None:
+            passage = vote_type
 
     selected_stance = passage if passage else (votes[0] if len(set(votes)) == 1 and votes else None)
     vote_status, vote_label, stance = vote_class(selected_stance, nominal, present, votes)
@@ -282,7 +282,7 @@ def infer_law_vote_from_cache(conn, camara_id: int, law: dict[str, Any]) -> dict
         "stance": stance,
         "vote_status": vote_status,
         "vote_label": vote_label,
-        "nominal_vote_ids": [v["id"] for v in votacoes],
+        "nominal_vote_ids": [v["id"] for v in roll_calls],
         "recorded": recorded,
         "source_url": f"{CAMARA}/proposicoes/{law['camara_proposicao_id']}/votacoes",
         "fetch_error": None,

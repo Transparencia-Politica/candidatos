@@ -19,12 +19,12 @@ def _safe(conn, sql):
 @pytest.fixture
 def conn():
     c = db.init_db()
-    # isolate the cache tables (defensive: they may not exist before implementation)
-    _safe(c, "DELETE FROM votos")
-    _safe(c, "DELETE FROM votacoes")
+    # isolate the cache tables (votes has FK to roll_calls; delete child first)
+    _safe(c, "DELETE FROM votes")
+    _safe(c, "DELETE FROM roll_calls")
     yield c
-    _safe(c, "DELETE FROM votos")
-    _safe(c, "DELETE FROM votacoes")
+    _safe(c, "DELETE FROM votes")
+    _safe(c, "DELETE FROM roll_calls")
     c.close()
 
 

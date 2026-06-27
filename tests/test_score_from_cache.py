@@ -5,11 +5,11 @@ from conftest import law_id
 
 
 def _cache_pl4173(conn, lid):
-    db.upsert_votacao(conn, votacao_id="x1", law_id=lid, date=None, description="Rejeitada emenda",
+    db.upsert_roll_call(conn, roll_call_id="x1", law_id=lid, date=None, description="Rejeitada emenda",
                       is_nominal=True, gov_orientation="Não", opp_orientation="Sim")
-    db.upsert_votacao(conn, votacao_id="x2", law_id=lid, date=None, description="Aprovada a Subemenda",
+    db.upsert_roll_call(conn, roll_call_id="x2", law_id=lid, date=None, description="Aprovada a Subemenda",
                       is_nominal=True, gov_orientation="Sim", opp_orientation="Não")
-    db.upsert_votacao(conn, votacao_id="x3", law_id=lid, date=None, description="Rejeitado requerimento",
+    db.upsert_roll_call(conn, roll_call_id="x3", law_id=lid, date=None, description="Rejeitado requerimento",
                       is_nominal=True, gov_orientation="Não", opp_orientation="Sim")
     conn.commit()
 
@@ -18,8 +18,8 @@ def test_infer_from_cache_uses_passage_vote_and_counts_presence(conn):
     lid = law_id(conn, "pl-4173-2023")
     law = {"id": lid, "camara_proposicao_id": 2383287}
     _cache_pl4173(conn, lid)
-    db.upsert_voto(conn, "x1", 74478, "Não")
-    db.upsert_voto(conn, "x2", 74478, "Sim")  # the 'Aprovada' passage vote
+    db.upsert_vote(conn, "x1", 74478, "Não")
+    db.upsert_vote(conn, "x2", 74478, "Sim")  # the 'Aprovada' passage vote
     conn.commit()  # absent on x3
 
     r = sc.infer_law_vote_from_cache(conn, 74478, law)
@@ -44,7 +44,7 @@ def test_infer_from_cache_makes_no_network_calls(conn, monkeypatch):
     lid = law_id(conn, "pl-4173-2023")
     law = {"id": lid, "camara_proposicao_id": 2383287}
     _cache_pl4173(conn, lid)
-    db.upsert_voto(conn, "x2", 74478, "Sim")
+    db.upsert_vote(conn, "x2", 74478, "Sim")
     conn.commit()
 
     def boom(*a, **k):

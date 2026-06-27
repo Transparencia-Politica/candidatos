@@ -66,6 +66,20 @@ question was answered in chat.
 - Portuguese terms kept in Portuguese (cargo, tema, ficha-limpa…) with a gloss on first use.
 - Convert relative dates to absolute (e.g. "today" → `2026-06-26`).
 
+## Code conventions
+
+- **Code is written in English.** All schema identifiers (table names, columns, indexes,
+  constraints), function/variable names, and code in general use English — e.g. `roll_calls`,
+  `votes`, `vote_type`, `deputy_id`, not `votacoes`/`votos`/`tipo_voto`.
+- **Two exceptions stay in Portuguese:** (a) user-facing strings shown to voters, and (b) the
+  external Câmara/TSE API contract — their URL paths (`/votacoes`, `/votos`, `/orientacoes`)
+  and JSON field names (`tipoVoto`, `deputado_`, `dados`, `descricao`) are mirrored verbatim,
+  never translated.
+- Pre-existing Portuguese identifiers from before this rule (e.g. `laws.camara_proposicao_id`)
+  are migrated opportunistically, not via unrelated PRs.
+- Docs prose follows its own rule (keep domain terms in Portuguese with a gloss — see above);
+  this section governs **code only**.
+
 ## Working norms
 
 - **Answer questions as questions.** Don't start editing files or running ingestion just because
