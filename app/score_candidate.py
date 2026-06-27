@@ -135,6 +135,55 @@ def br_float(value: Any) -> float:
     return float(str(value).replace(".", "").replace(",", ".") if "," in str(value) else value)
 
 
+# Senators serve 8-year staggered terms, so a sitting senator was elected in 2018 or 2022.
+# TSE cargo 5 = Senador. Only the 2022 general código (2040602022) is verified live against
+# DivulgaCandContas; the 2018 código isn't resolvable through this REST API (elections-list routes
+# 404, candidate-list returns empty for the códigos tried), so 2018-elected senators fall through
+# to "wealth not found" until we wire the TSE bulk dataset. See research/14.
+SENATOR_ELECTIONS = [(2022, "2040602022")]
+
+
+def resolve_tse_senator(
+    name: str, uf: str, elections: list[tuple[int, str]] = SENATOR_ELECTIONS
+) -> tuple[dict[str, Any], int, str, str] | None:
+    """Find a senator's TSE candidacy (cargo 5) across their possible election years, by name+UF.
+
+    Returns (detail, tse_year, tse_election_id, tse_sq) or None if not resolvable. Best-effort:
+    a TSE outage or an unmatched name yields None, never an exception that breaks scoring.
+    """
+    target = normalize_name(name)
+    for year, eid in elections:
+        try:
+            cands = tse_candidates_from_response(
+                fetch_json(f"{TSE}/candidatura/listar/{year}/{uf}/{eid}/5/candidatos")
+            )
+        except Exception:
+            continue
+        for c in cands:
+            names = [n for n in (normalize_name(c.get("nomeUrna")), normalize_name(c.get("nomeCompleto"))) if n]
+            if target in names or any(target in n or n in target for n in names):
+                try:
+                    return fetch_tse_detail(year, uf, eid, str(c["id"])), year, eid, str(c["id"])
+                except Exception:
+                    return None
+    return None
+
+
+def senator_wealth(name: str, uf: str) -> dict[str, Any]:
+    """Best-effort TSE bens for a senator. Zeros (and null provenance) if not resolvable."""
+    empty = {"wealth_total": 0.0, "wealth_capital": 0.0, "buckets": {},
+             "tse_sq": None, "tse_year": None, "tse_uf": None}
+    resolved = resolve_tse_senator(name, uf)
+    if not resolved:
+        return empty
+    detail, year, _eid, sq = resolved
+    buckets = bucketize_assets(detail.get("bens") or [])
+    total = br_float(detail.get("totalDeBens")) or sum(buckets.values())
+    capital = buckets["Ações / participações"] + buckets["Depósito no exterior"]
+    return {"wealth_total": total, "wealth_capital": capital, "buckets": buckets,
+            "tse_sq": sq, "tse_year": year, "tse_uf": uf}
+
+
 def bucketize_assets(assets: list[dict[str, Any]]) -> dict[str, float]:
     buckets = {
         "Ações / participações": 0.0,

@@ -761,8 +761,14 @@ def upsert_senator(
     wealth_total: float = 0.0,
     wealth_capital: float = 0.0,
     wealth_buckets: dict[str, float] | None = None,
+    tse_sq: str | None = None,
+    tse_year: int | None = None,
+    tse_uf: str | None = None,
 ) -> int:
-    """Upsert a senator as a politic (house='senado', no camara_id). Returns the politic id."""
+    """Upsert a senator as a politic (house='senado', no camara_id). Returns the politic id.
+
+    `tse_*` record the TSE candidacy the wealth (bens) was pulled from, for provenance.
+    """
     payload = {
         "senado_id": senado_id,
         "name": name,
@@ -773,17 +779,22 @@ def upsert_senator(
         "wealth_total": wealth_total,
         "wealth_capital": wealth_capital,
         "wealth_buckets_json": as_json(wealth_buckets or {}),
+        "tse_sq": tse_sq,
+        "tse_year": tse_year,
+        "tse_uf": tse_uf,
         "updated_at": now_iso(),
     }
     conn.execute(
         """
         INSERT INTO politics (
           senado_id, house, name, party, uf, occupation, profile_json,
-          wealth_total, wealth_capital, wealth_buckets_json, updated_at
+          wealth_total, wealth_capital, wealth_buckets_json,
+          tse_sq, tse_year, tse_uf, updated_at
         )
         VALUES (
           :senado_id, 'senado', :name, :party, :uf, :occupation, :profile_json,
-          :wealth_total, :wealth_capital, :wealth_buckets_json, :updated_at
+          :wealth_total, :wealth_capital, :wealth_buckets_json,
+          :tse_sq, :tse_year, :tse_uf, :updated_at
         )
         ON DUPLICATE KEY UPDATE
           name = VALUES(name),
@@ -794,6 +805,9 @@ def upsert_senator(
           wealth_total = VALUES(wealth_total),
           wealth_capital = VALUES(wealth_capital),
           wealth_buckets_json = VALUES(wealth_buckets_json),
+          tse_sq = VALUES(tse_sq),
+          tse_year = VALUES(tse_year),
+          tse_uf = VALUES(tse_uf),
           updated_at = VALUES(updated_at)
         """,
         payload,

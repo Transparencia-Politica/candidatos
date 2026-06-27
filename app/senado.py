@@ -148,11 +148,22 @@ def score_senator(
             log(f"Building Senado package for the seeded laws...")
         build_senado_package(conn, log=log)
 
-        politic_id = db.upsert_senator(conn, senado_id=senado_id, name=name, party=party, uf=uf)
+        # Pull the senator's TSE declared wealth (bens), same machinery as deputies. Best-effort:
+        # zeros if TSE can't resolve them, so a missing match never blocks the vote score.
+        wealth = sc.senator_wealth(name, uf)
+        if log:
+            log(f"  wealth: R$ {wealth['wealth_total']:,.2f} "
+                f"(TSE {wealth['tse_year'] or '—'}/{wealth['tse_uf'] or uf})")
+        politic_id = db.upsert_senator(
+            conn, senado_id=senado_id, name=name, party=party, uf=uf,
+            wealth_total=wealth["wealth_total"], wealth_capital=wealth["wealth_capital"],
+            wealth_buckets=wealth["buckets"], tse_sq=wealth["tse_sq"],
+            tse_year=wealth["tse_year"], tse_uf=wealth["tse_uf"],
+        )
         for law in db.list_laws_with_keywords(conn):
             law_vote = sc.infer_law_vote_from_cache(conn, senado_id, law, house="senado")
             for keyword in law["keywords"]:
-                score_value, self_interest_value = sc.score_keyword(keyword, law_vote, 0.0)
+                score_value, self_interest_value = sc.score_keyword(keyword, law_vote, wealth["wealth_capital"])
                 evidence = {
                     "house": "senado",
                     "senado_votacao_ids": law_vote["nominal_vote_ids"],
