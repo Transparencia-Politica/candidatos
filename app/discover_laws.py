@@ -19,8 +19,10 @@ import urllib.parse
 from typing import Any, Callable
 
 try:
+    import db
     from score_candidate import CAMARA, fetch_json
 except ModuleNotFoundError:  # pragma: no cover - import shim
+    from app import db
     from app.score_candidate import CAMARA, fetch_json
 
 VOTABLE_TYPES = {"PL", "PEC", "PLP", "MPV"}
@@ -126,6 +128,36 @@ def discover_by_theme(
     proposicoes = search_by_themes(cod_temas, years, fetch=fetch)
     voted = filter_voted(proposicoes, fetch=fetch)
     return [to_seed_law(topic_slug, p) for p in voted]
+
+
+def build_topic(conn, topic_slug: str, years: list[int], *, fetch: Callable[[str], dict[str, Any]] = fetch_json) -> dict[str, Any]:
+    """Read a topic's cod_temas config -> discover voted laws -> store them under the topic.
+
+    Append-only: laws already stored are left untouched (db.upsert_law is a no-op on hit).
+    Each stored law gets one default keyword (direction +1) so it scores/renders; a curator
+    can refine direction later. Roll-call ingestion (ingest.ingest_all) is a separate step.
+    """
+    topic = db.get_topic(conn, topic_slug)
+    if topic is None:
+        raise ValueError(f"unknown topic: {topic_slug}")
+    laws = discover_by_theme(topic_slug, topic["cod_temas"], years, fetch=fetch)
+    stored = 0
+    for i, law in enumerate(laws):
+        db.upsert_law(
+            conn, topic_id=topic["id"], slug=law["slug"], camara_proposicao_id=law["camara_proposicao_id"],
+            label=law["label"], kind=law["kind"], number=law["number"], year=law["year"],
+            description=law["description"], source_url=law["source_url"],
+            is_key=law["is_key"], wealth_relevant=law["wealth_relevant"], sort_order=100 + i,
+        )
+        law_id = conn.execute("SELECT id FROM laws WHERE slug = ?", (law["slug"],)).fetchone()["id"]
+        db.upsert_keyword(
+            conn, law_id=law_id, slug=law["slug"] + "-trib", label="Tributação",
+            description=(law["description"] or "")[:200], direction=1, weight=1.0,
+            wealth_relevant=1, sort_order=0,
+        )
+        stored += 1
+    conn.commit()
+    return {"topic": topic_slug, "cod_temas": topic["cod_temas"], "discovered": len(laws), "stored": stored}
 
 
 def main(argv: list[str] | None = None) -> int:

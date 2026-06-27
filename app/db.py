@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS topics (
   slug VARCHAR(160) NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
+  cod_temas TEXT,
   sort_order INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at VARCHAR(32) NOT NULL DEFAULT '',
@@ -227,12 +228,14 @@ TOPICS = [
         "slug": "tributacao-da-riqueza",
         "title": "Tributação da riqueza",
         "description": "Projetos que afetam renda de capital, dividendos, fundos exclusivos e ativos no exterior.",
+        "cod_temas": [70, 40, 68],  # manually designed: Finanças, Economia, Direito Constitucional
         "sort_order": 10,
     },
     {
         "slug": "reforma-tributaria",
         "title": "Reforma tributária",
         "description": "Projetos tributários amplos usados como contexto, mesmo quando não medem riqueza diretamente.",
+        "cod_temas": [70, 40],
         "sort_order": 20,
     },
 ]
@@ -340,15 +343,16 @@ def seed_reference_data(conn: MySQLConnection) -> None:
     for topic in TOPICS:
         conn.execute(
             """
-            INSERT INTO topics (slug, title, description, sort_order, updated_at)
-            VALUES (:slug, :title, :description, :sort_order, :updated_at)
+            INSERT INTO topics (slug, title, description, cod_temas, sort_order, updated_at)
+            VALUES (:slug, :title, :description, :cod_temas, :sort_order, :updated_at)
             ON DUPLICATE KEY UPDATE
               title = VALUES(title),
               description = VALUES(description),
+              cod_temas = VALUES(cod_temas),
               sort_order = VALUES(sort_order),
               updated_at = VALUES(updated_at)
             """,
-            {**topic, "updated_at": now_iso()},
+            {**topic, "cod_temas": as_json(topic.get("cod_temas", [])), "updated_at": now_iso()},
         )
 
     topic_ids = {row["slug"]: row["id"] for row in conn.execute("SELECT id, slug FROM topics")}
@@ -460,6 +464,53 @@ def list_laws_with_keywords(conn: MySQLConnection) -> list[dict[str, Any]]:
             }
         )
     return list(laws.values())
+
+
+def get_topic(conn: MySQLConnection, slug: str) -> dict[str, Any] | None:
+    """A topic with its discovery config (cod_temas parsed to a list)."""
+    row = conn.execute("SELECT * FROM topics WHERE slug = ?", (slug,)).fetchone()
+    if row is None:
+        return None
+    row["cod_temas"] = from_json(row.get("cod_temas"), [])
+    return row
+
+
+def upsert_law(conn: MySQLConnection, *, topic_id: int, slug: str, camara_proposicao_id: int,
+               label: str, kind: str, number: str, year: int, description: str, source_url: str,
+               is_key: int, wealth_relevant: int, sort_order: int) -> None:
+    """Store a discovered law under a topic. Append-only: an existing hit is left untouched."""
+    conn.execute(
+        """
+        INSERT INTO laws (
+          topic_id, slug, camara_proposicao_id, label, kind, number, year,
+          description, source_url, is_key, wealth_relevant, sort_order, updated_at
+        )
+        VALUES (
+          :topic_id, :slug, :camara_proposicao_id, :label, :kind, :number, :year,
+          :description, :source_url, :is_key, :wealth_relevant, :sort_order, :updated_at
+        )
+        ON DUPLICATE KEY UPDATE id = id
+        """,
+        {"topic_id": topic_id, "slug": slug, "camara_proposicao_id": camara_proposicao_id,
+         "label": label, "kind": kind, "number": number, "year": year, "description": description,
+         "source_url": source_url, "is_key": is_key, "wealth_relevant": wealth_relevant,
+         "sort_order": sort_order, "updated_at": now_iso()},
+    )
+
+
+def upsert_keyword(conn: MySQLConnection, *, law_id: int, slug: str, label: str, description: str,
+                   direction: int, weight: float, wealth_relevant: int, sort_order: int) -> None:
+    """Store a keyword under a law. Append-only: an existing hit is left untouched."""
+    conn.execute(
+        """
+        INSERT INTO keywords (law_id, slug, label, description, direction, weight, wealth_relevant, sort_order, updated_at)
+        VALUES (:law_id, :slug, :label, :description, :direction, :weight, :wealth_relevant, :sort_order, :updated_at)
+        ON DUPLICATE KEY UPDATE id = id
+        """,
+        {"law_id": law_id, "slug": slug, "label": label, "description": description,
+         "direction": direction, "weight": weight, "wealth_relevant": wealth_relevant,
+         "sort_order": sort_order, "updated_at": now_iso()},
+    )
 
 
 def list_topics(conn: MySQLConnection) -> list[dict[str, Any]]:
