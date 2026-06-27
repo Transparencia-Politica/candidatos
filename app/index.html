@@ -144,7 +144,9 @@ function renderMetrics(card){
     [pct(s.wealth_capital_pct), 'patrimônio em capital'],
     [pct(s.coverage_pct), 'cobertura de leis relevantes'],
     [pct(s.key_attendance_pct), 'presença no projeto-chave'],
-    [s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio']
+    [s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio'],
+    [s.gov_alignment_pct === null || s.gov_alignment_pct === undefined ? '—' : pct(s.gov_alignment_pct), 'alinhado ao Governo'],
+    [s.opp_alignment_pct === null || s.opp_alignment_pct === undefined ? '—' : pct(s.opp_alignment_pct), 'alinhado à Oposição']
   ];
   el('metrics').innerHTML = metrics.map(([n,l]) => `<div class="metric"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
 }
