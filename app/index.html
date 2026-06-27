@@ -28,6 +28,17 @@
   .candidate{border:1px solid var(--line);border-radius:8px;background:#fbfcfe;color:var(--ink);padding:8px 10px;cursor:pointer;text-align:left}
   .candidate b{display:block}
   .candidate span{color:var(--muted);font-size:.8rem}
+  .search-field{position:relative;flex:1;min-width:260px;display:flex}
+  .search-field .search-input{width:100%;min-width:0}
+  .suggest{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;background:#fff;
+    border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 28px rgba(20,30,50,.12);overflow:hidden}
+  .suggest[hidden]{display:none}
+  .suggest-item{display:flex;justify-content:space-between;gap:10px;align-items:center;width:100%;
+    border:0;border-bottom:1px solid var(--line);background:#fff;text-align:left;padding:9px 11px;cursor:pointer}
+  .suggest-item:last-child{border-bottom:0}
+  .suggest-item:hover,.suggest-item.active{background:#f0f5ff}
+  .suggest-item b{font-weight:650}
+  .suggest-item span{color:var(--teal);font-size:.74rem;font-weight:650;white-space:nowrap}
   .identity{display:flex;gap:16px;align-items:center}
   .avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
     background:#e7f5f1;color:var(--teal);font-weight:800;font-size:1.35rem;border:1px solid #b9dfd7}
@@ -62,7 +73,7 @@
   @media (max-width:760px){
     header{align-items:flex-start;flex-direction:column}
     .search-form{align-items:stretch;flex-direction:column}
-    .search-input,.primary{width:100%}
+    .search-field,.search-input,.primary{width:100%}
     .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
     .wealth-grid{grid-template-columns:1fr}
     th:nth-child(2),td:nth-child(2){display:none}
@@ -81,9 +92,13 @@
 
   <section class="panel">
     <form id="search-form" class="search-form">
-      <input id="candidate-query" class="search-input" placeholder="Digite um nome, ex.: Luciano Bivar" autocomplete="off">
+      <div class="search-field">
+        <input id="candidate-query" class="search-input" placeholder="Digite um nome, ex.: Luciano Bivar" autocomplete="off">
+        <div id="suggestions" class="suggest" hidden></div>
+      </div>
       <button id="search-button" class="primary" type="submit">Buscar</button>
     </form>
+    <div class="sub" style="margin-top:8px">Sugestões aparecem para candidatos já no banco local. Para um nome novo, clique em <b>Buscar</b> (consulta a Câmara).</div>
     <div id="search-results" class="results"></div>
   </section>
 
@@ -117,6 +132,55 @@ const form = el('search-form');
 const queryInput = el('candidate-query');
 const searchButton = el('search-button');
 const resultsEl = el('search-results');
+const suggestEl = el('suggestions');
+let localCandidates = [];
+let activeSuggest = -1;
+const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+async function loadLocalRoster(){
+  try{
+    const res = await fetch('/api/politics');
+    const payload = await res.json();
+    localCandidates = (payload.politics || []).map(p => ({camara_id:p.camara_id, name:p.name, party:p.party, uf:p.uf}));
+  }catch(err){ localCandidates = []; }
+}
+
+function matchLocal(q){
+  const n = norm(q);
+  if(n.length < 1) return [];
+  return localCandidates.filter(c => norm(c.name).includes(n)).slice(0, 8);
+}
+
+function hideSuggest(){ suggestEl.hidden = true; suggestEl.innerHTML = ''; activeSuggest = -1; }
+
+function renderSuggestions(q){
+  const matches = matchLocal(q);
+  if(!matches.length){ hideSuggest(); return; }
+  activeSuggest = -1;
+  suggestEl.innerHTML = matches.map(c => `<button type="button" class="suggest-item" data-camara-id="${c.camara_id}" data-name="${c.name}">
+    <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · já analisado</span></button>`).join('');
+  for(const b of suggestEl.querySelectorAll('.suggest-item')){
+    b.addEventListener('mousedown', ev => { ev.preventDefault(); loadLocalCandidate(Number(b.dataset.camaraId), b.dataset.name); });
+  }
+  suggestEl.hidden = false;
+}
+
+async function loadLocalCandidate(camaraId, name){
+  hideSuggest();
+  queryInput.value = name;
+  resultsEl.innerHTML = '';
+  setLoading(`Carregando ${name} do banco local...`);
+  try{
+    const res = await fetch(`/api/scorecards/${camaraId}`);
+    const payload = await res.json();
+    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
+    const card = payload.scorecards?.[0];
+    if(!card) throw new Error('scorecard não encontrado no banco local');
+    renderCard(card, 'cache local');
+  }catch(err){
+    el('state').innerHTML = `<span class="error">Erro ao carregar ${name}: ${err}</span>`;
+  }
+}
 
 function chipClass(score){
   const status = score?.vote_status || '';
@@ -219,13 +283,27 @@ function renderCandidateResults(candidates){
   }
 }
 
-async function searchCandidates(event){
+function onSubmit(event){
   event.preventDefault();
   const q = queryInput.value.trim();
+  // Prefer a local (already-scored) candidate: load from DB, no Câmara call.
+  const items = [...suggestEl.querySelectorAll('.suggest-item')];
+  if(!suggestEl.hidden && items.length){
+    const pick = items[activeSuggest >= 0 ? activeSuggest : 0];
+    return loadLocalCandidate(Number(pick.dataset.camaraId), pick.dataset.name);
+  }
+  const exact = matchLocal(q).find(c => norm(c.name) === norm(q)) || matchLocal(q)[0];
+  if(exact) return loadLocalCandidate(exact.camara_id, exact.name);
+  // No local match → search the Câmara for a new candidate.
+  searchCandidates(q);
+}
+
+async function searchCandidates(q){
   if(q.length < 2){
     resultsEl.innerHTML = '<span class="error">Digite pelo menos 2 caracteres.</span>';
     return;
   }
+  hideSuggest();
   searchButton.disabled = true;
   resultsEl.innerHTML = '<span class="muted">Buscando na Câmara...</span>';
   try{
@@ -273,7 +351,20 @@ async function run(){
     el('state').innerHTML = `<span class="error">Erro ao carregar a API: ${err}</span>`;
   }
 }
-form.addEventListener('submit', searchCandidates);
+form.addEventListener('submit', onSubmit);
+queryInput.addEventListener('input', () => renderSuggestions(queryInput.value));
+queryInput.addEventListener('focus', () => renderSuggestions(queryInput.value));
+queryInput.addEventListener('blur', () => setTimeout(hideSuggest, 150));
+queryInput.addEventListener('keydown', ev => {
+  const items = [...suggestEl.querySelectorAll('.suggest-item')];
+  if(suggestEl.hidden || !items.length) return;
+  if(ev.key === 'ArrowDown'){ ev.preventDefault(); activeSuggest = Math.min(activeSuggest + 1, items.length - 1); }
+  else if(ev.key === 'ArrowUp'){ ev.preventDefault(); activeSuggest = Math.max(activeSuggest - 1, 0); }
+  else if(ev.key === 'Escape'){ hideSuggest(); return; }
+  else return;
+  items.forEach((it, i) => it.classList.toggle('active', i === activeSuggest));
+});
+loadLocalRoster();
 run();
 </script>
 </body>
