@@ -1,0 +1,495 @@
+{
+  "laws": [
+    {
+      "camara_proposicao_id": 2438459,
+      "description": "Destaque (Emenda de Plenário nº 8, 30/10/2024) ao PLP 108/2024 que criaria o Imposto sobre Grandes Fortunas: 0,5% a 1,5% ao ano sobre patrimônio acima de R$ 10 milhões. Rejeitado por 262 a 136. Único voto nominal sobre tributar patrimônio.",
+      "is_key": 1,
+      "keywords": [
+        {
+          "description": "Tributação anual do patrimônio acima de R$ 10 milhões (alíquotas de 0,5% a 1,5%). Votar 'Sim' = a favor de tributar a riqueza.",
+          "direction": 1,
+          "label": "Imposto sobre Grandes Fortunas",
+          "slug": "igf-patrimonio",
+          "sort_order": 5,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PLP",
+      "label": "IGF — Grandes Fortunas",
+      "number": "108",
+      "slug": "igf-grandes-fortunas",
+      "sort_order": 5,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2438459",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2024
+    },
+    {
+      "camara_proposicao_id": 2383287,
+      "description": "Tributa renda no exterior e fundos exclusivos.",
+      "is_key": 1,
+      "keywords": [
+        {
+          "description": "offshore",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-4173-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        },
+        {
+          "description": "Renda auferida por pessoas físicas em entidades controladas no exterior.",
+          "direction": 1,
+          "label": "Offshore",
+          "slug": "offshore",
+          "sort_order": 10,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        },
+        {
+          "description": "Tributação periódica de fundos exclusivos.",
+          "direction": 1,
+          "label": "Fundos exclusivos",
+          "slug": "fundos-exclusivos",
+          "sort_order": 20,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 4173/2023",
+      "number": "4173",
+      "slug": "pl-4173-2023",
+      "sort_order": 10,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2487436,
+      "description": "Isenta o IR até R$ 5 mil e cria imposto mínimo sobre altas rendas (IRPFM); tributa lucros e dividendos acima de R$ 50 mil/mês. Virou a Lei 15.270/2025.",
+      "is_key": 1,
+      "keywords": [
+        {
+          "description": "Alíquota efetiva mínima de IRPF sobre altas rendas (IRPFM) e 10% na fonte sobre lucros e dividendos acima de R$ 50 mil/mês.",
+          "direction": 1,
+          "label": "Imposto mínimo dos super-ricos",
+          "slug": "imposto-minimo-super-ricos",
+          "sort_order": 15,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 1087/2025",
+      "number": "1087",
+      "slug": "pl-1087-2025",
+      "sort_order": 15,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2487436",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2025
+    },
+    {
+      "camara_proposicao_id": 2288389,
+      "description": "Reforma do imposto de renda, incluindo tributação de dividendos.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Tributação de lucros e dividendos distribuídos.",
+          "direction": 1,
+          "label": "Dividendos",
+          "slug": "dividendos",
+          "sort_order": 30,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 2337/2021",
+      "number": "2337",
+      "slug": "pl-2337-2021",
+      "sort_order": 20,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2021
+    },
+    {
+      "camara_proposicao_id": 2543171,
+      "description": "Estabelece o sistema brasileiro de apoio oficial ao crédito à exportação e altera a Lei nº 12.712, de 30 de agosto de 2012, a Lei nº 9.818, de 23 de agosto de 1999, e a Lei nº 10.184, de 12 de fevereiro de 2001.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Estabelece o sistema brasileiro de apoio oficial ao crédito à exportação e altera a Lei nº 12.712, de 30 de agosto de 2012, a Lei nº 9.818, de 23 de agosto de 1999, e a Lei nº 10.184, de 12 de feverei",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6139-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6139/2023",
+      "number": "6139",
+      "slug": "pl-6139-2023",
+      "sort_order": 100,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2543171",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2492307,
+      "description": "Estabelece critérios para suspensão de concessões comerciais, de investimentos e de obrigações relativas a direitos de propriedade intelectual em resposta a medidas unilaterais adotadas por país ou bloco econômico que impactem negativamente a competitivid",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Estabelece critérios para suspensão de concessões comerciais, de investimentos e de obrigações relativas a direitos de propriedade intelectual em resposta a medidas unilaterais adotadas por país ou bl",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-2088-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 2088/2023",
+      "number": "2088",
+      "slug": "pl-2088-2023",
+      "sort_order": 101,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2492307",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2467306,
+      "description": "Altera a Lei nº 13.999, de 18 de maio de 2020, e a Lei nº 12.087, de 11 de novembro de 2009, para assegurar que os recursos do Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte (Pronampe) sejam permanentes, e dá outras providências.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei nº 13.999, de 18 de maio de 2020, e a Lei nº 12.087, de 11 de novembro de 2009, para assegurar que os recursos do Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte (",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6012-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6012/2023",
+      "number": "6012",
+      "slug": "pl-6012-2023",
+      "sort_order": 102,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2467306",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2454495,
+      "description": "Institui limite para o pagamento de precatórios pelos Municípios, abre novo prazo de parcelamento especial de débitos dos Municípios com seus regimes próprios de previdência social e com o Regime Geral de Previdência Social e dá outras providências.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Institui limite para o pagamento de precatórios pelos Municípios, abre novo prazo de parcelamento especial de débitos dos Municípios com seus regimes próprios de previdência social e com o Regime Gera",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pec-66-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 66/2023",
+      "number": "66",
+      "slug": "pec-66-2023",
+      "sort_order": 103,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2454495",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2422905,
+      "description": "Altera o art. 155 da Constituição Federal para conceder imunidade do Imposto sobre a Propriedade de Veículos Automotores (IPVA) aos veículos que especifica.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera o art. 155 da Constituição Federal para conceder imunidade do Imposto sobre a Propriedade de Veículos Automotores (IPVA) aos veículos que especifica.",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pec-72-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 72/2023",
+      "number": "72",
+      "slug": "pec-72-2023",
+      "sort_order": 104,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2422905",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2416790,
+      "description": "Revoga os benefícios fiscais de que tratam o art. 4º da Lei nº 14.148, de 3 de maio de 2021, e os art. 7º a art. 10 da Lei nº 12.546, de 14 de dezembro de 2011, desonera parcialmente a contribuição previdenciária sobre a folha de pagamento, revoga a alíqu",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Revoga os benefícios fiscais de que tratam o art. 4º da Lei nº 14.148, de 3 de maio de 2021, e os art. 7º a art. 10 da Lei nº 12.546, de 14 de dezembro de 2011, desonera parcialmente a contribuição pr",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "mpv-1202-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "MPV",
+      "label": "MPV 1202/2023",
+      "number": "1202",
+      "slug": "mpv-1202-2023",
+      "sort_order": 105,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416790",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2416733,
+      "description": "Institui a Letra de Crédito do Desenvolvimento e altera a Lei nº 13.483, de 21 de setembro de 2017. \n  NOVA EMENTA: Institui a Letra de Crédito do Desenvolvimento (LCD); altera as Leis nºs 13.483, de 21 de setembro de 2017, e 11.076, de 30 de dezembro de ",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Institui a Letra de Crédito do Desenvolvimento e altera a Lei nº 13.483, de 21 de setembro de 2017. \n  NOVA EMENTA: Institui a Letra de Crédito do Desenvolvimento (LCD); altera as Leis nºs 13.483, de ",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6235-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6235/2023",
+      "number": "6235",
+      "slug": "pl-6235-2023",
+      "sort_order": 106,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416733",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2481721,
+      "description": "Altera a Lei Complementar nº 116, de 31 de julho de 2003, para explicitar que o Imposto Sobre Serviços de Qualquer Natureza (ISS) incidente sobre os serviços de guincho intramunicipal, de guindaste e de içamento é devido no local da execução da obra.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei Complementar nº 116, de 31 de julho de 2003, para explicitar que o Imposto Sobre Serviços de Qualquer Natureza (ISS) incidente sobre os serviços de guincho intramunicipal, de guindaste e ",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "plp-92-2024-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PLP",
+      "label": "PLP 92/2024",
+      "number": "92",
+      "slug": "plp-92-2024",
+      "sort_order": 107,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2481721",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2024
+    },
+    {
+      "camara_proposicao_id": 2480979,
+      "description": "Dispõe sobre incentivos e benefícios para fomentar as atividades de caráter desportivo e dá outras providências.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Dispõe sobre incentivos e benefícios para fomentar as atividades de caráter desportivo e dá outras providências.",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "plp-234-2024-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PLP",
+      "label": "PLP 234/2024",
+      "number": "234",
+      "slug": "plp-234-2024",
+      "sort_order": 108,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2480979",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2024
+    },
+    {
+      "camara_proposicao_id": 2416729,
+      "description": "Altera a Lei nº 10.406, de 10 de janeiro de 2002 - Código Civil, para dispor sobre atualização monetária e juros.  NOVA EMENTA: Altera a Lei nº 10.406, de 10 de janeiro de 2002 (Código Civil), para dispor sobre atualização monetária e juros.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei nº 10.406, de 10 de janeiro de 2002 - Código Civil, para dispor sobre atualização monetária e juros.  NOVA EMENTA: Altera a Lei nº 10.406, de 10 de janeiro de 2002 (Código Civil), para di",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6233-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6233/2023",
+      "number": "6233",
+      "slug": "pl-6233-2023",
+      "sort_order": 109,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416729",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2409046,
+      "description": "Altera a Lei nº 11.033, de 21 de dezembro de 2004, para prorrogar o Regime Tributário para Incentivo à Modernização e à Ampliação da Estrutura Portuária (Reporto).",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei nº 11.033, de 21 de dezembro de 2004, para prorrogar o Regime Tributário para Incentivo à Modernização e à Ampliação da Estrutura Portuária (Reporto).",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-5610-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 5610/2023",
+      "number": "5610",
+      "slug": "pl-5610-2023",
+      "sort_order": 110,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2409046",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2374540,
+      "description": "Dispõe sobre o processo e o julgamento das ações de controle concentrado de constitucionalidade perante o Supremo Tribunal Federal; e altera a Lei nº 13.105, de 16 de março de 2015 (Código de Processo Civil).",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Dispõe sobre o processo e o julgamento das ações de controle concentrado de constitucionalidade perante o Supremo Tribunal Federal; e altera a Lei nº 13.105, de 16 de março de 2015 (Código de Processo",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-3640-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 3640/2023",
+      "number": "3640",
+      "slug": "pl-3640-2023",
+      "sort_order": 111,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2374540",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2351506,
+      "description": "Acrescenta § 4º-A ao art. 150 da Constituição Federal, para dispor sobre a imunidade tributária de que tratam as suas alíneas “b” e “c” do inciso VI.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Acrescenta § 4º-A ao art. 150 da Constituição Federal, para dispor sobre a imunidade tributária de que tratam as suas alíneas “b” e “c” do inciso VI.",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pec-5-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 5/2023",
+      "number": "5",
+      "slug": "pec-5-2023",
+      "sort_order": 112,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2351506",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2196833,
+      "description": "Reforma tributária sobre consumo; contexto fraco para patrimônio pessoal.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Reorganização de impostos sobre consumo, sem medir diretamente patrimônio pessoal.",
+          "direction": 0,
+          "label": "Tributação do consumo",
+          "slug": "tributacao-do-consumo",
+          "sort_order": 40,
+          "wealth_relevant": 0,
+          "weight": 0.4
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 45/2019",
+      "number": "45",
+      "slug": "pec-45-2019",
+      "sort_order": 30,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833",
+      "topic_slug": "reforma-tributaria",
+      "wealth_relevant": 0,
+      "year": 2019
+    }
+  ],
+  "topics": [
+    {
+      "cod_temas": [
+        70,
+        40,
+        68
+      ],
+      "description": "Projetos que afetam renda de capital, dividendos, fundos exclusivos e ativos no exterior.",
+      "slug": "tributacao-da-riqueza",
+      "sort_order": 10,
+      "title": "Tributação da riqueza"
+    },
+    {
+      "cod_temas": [
+        70,
+        40
+      ],
+      "description": "Projetos tributários amplos usados como contexto, mesmo quando não medem riqueza diretamente.",
+      "slug": "reforma-tributaria",
+      "sort_order": 20,
+      "title": "Reforma tributária"
+    }
+  ]
+}

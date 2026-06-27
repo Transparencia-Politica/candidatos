@@ -1,0 +1,3886 @@
+{
+  "candidates": [
+    {
+      "camara_id": 74478,
+      "name": "Luciano Bivar",
+      "party": "MDB",
+      "tse_election_id": "2040602022",
+      "tse_sq": "170001609112",
+      "tse_uf": "PE",
+      "tse_year": 2022,
+      "uf": "PE"
+    },
+    {
+      "camara_id": 156190,
+      "name": "Marcel van Hattem",
+      "party": "NOVO",
+      "tse_election_id": "2040602022",
+      "tse_sq": "210001597011",
+      "tse_uf": "RS",
+      "tse_year": 2022,
+      "uf": "RS"
+    },
+    {
+      "camara_id": 204515,
+      "name": "André Janones",
+      "party": "REDE",
+      "tse_election_id": "2040602022",
+      "tse_sq": "130001608227",
+      "tse_uf": "MG",
+      "tse_year": 2022,
+      "uf": "MG"
+    }
+  ],
+  "laws": [
+    {
+      "camara_proposicao_id": 2438459,
+      "description": "Destaque (Emenda de Plenário nº 8, 30/10/2024) ao PLP 108/2024 que criaria o Imposto sobre Grandes Fortunas: 0,5% a 1,5% ao ano sobre patrimônio acima de R$ 10 milhões. Rejeitado por 262 a 136. Único voto nominal sobre tributar patrimônio.",
+      "is_key": 1,
+      "keywords": [
+        {
+          "description": "Tributação anual do patrimônio acima de R$ 10 milhões (alíquotas de 0,5% a 1,5%). Votar 'Sim' = a favor de tributar a riqueza.",
+          "direction": 1,
+          "label": "Imposto sobre Grandes Fortunas",
+          "slug": "igf-patrimonio",
+          "sort_order": 5,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PLP",
+      "label": "IGF — Grandes Fortunas",
+      "number": "108",
+      "slug": "igf-grandes-fortunas",
+      "sort_order": 5,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2438459",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2024
+    },
+    {
+      "camara_proposicao_id": 2383287,
+      "description": "Tributa renda no exterior e fundos exclusivos.",
+      "is_key": 1,
+      "keywords": [
+        {
+          "description": "offshore",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-4173-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        },
+        {
+          "description": "Renda auferida por pessoas físicas em entidades controladas no exterior.",
+          "direction": 1,
+          "label": "Offshore",
+          "slug": "offshore",
+          "sort_order": 10,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        },
+        {
+          "description": "Tributação periódica de fundos exclusivos.",
+          "direction": 1,
+          "label": "Fundos exclusivos",
+          "slug": "fundos-exclusivos",
+          "sort_order": 20,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 4173/2023",
+      "number": "4173",
+      "slug": "pl-4173-2023",
+      "sort_order": 10,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2487436,
+      "description": "Isenta o IR até R$ 5 mil e cria imposto mínimo sobre altas rendas (IRPFM); tributa lucros e dividendos acima de R$ 50 mil/mês. Virou a Lei 15.270/2025.",
+      "is_key": 1,
+      "keywords": [
+        {
+          "description": "Alíquota efetiva mínima de IRPF sobre altas rendas (IRPFM) e 10% na fonte sobre lucros e dividendos acima de R$ 50 mil/mês.",
+          "direction": 1,
+          "label": "Imposto mínimo dos super-ricos",
+          "slug": "imposto-minimo-super-ricos",
+          "sort_order": 15,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 1087/2025",
+      "number": "1087",
+      "slug": "pl-1087-2025",
+      "sort_order": 15,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2487436",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2025
+    },
+    {
+      "camara_proposicao_id": 2288389,
+      "description": "Reforma do imposto de renda, incluindo tributação de dividendos.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Tributação de lucros e dividendos distribuídos.",
+          "direction": 1,
+          "label": "Dividendos",
+          "slug": "dividendos",
+          "sort_order": 30,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 2337/2021",
+      "number": "2337",
+      "slug": "pl-2337-2021",
+      "sort_order": 20,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2021
+    },
+    {
+      "camara_proposicao_id": 2543171,
+      "description": "Estabelece o sistema brasileiro de apoio oficial ao crédito à exportação e altera a Lei nº 12.712, de 30 de agosto de 2012, a Lei nº 9.818, de 23 de agosto de 1999, e a Lei nº 10.184, de 12 de fevereiro de 2001.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Estabelece o sistema brasileiro de apoio oficial ao crédito à exportação e altera a Lei nº 12.712, de 30 de agosto de 2012, a Lei nº 9.818, de 23 de agosto de 1999, e a Lei nº 10.184, de 12 de feverei",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6139-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6139/2023",
+      "number": "6139",
+      "slug": "pl-6139-2023",
+      "sort_order": 100,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2543171",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2492307,
+      "description": "Estabelece critérios para suspensão de concessões comerciais, de investimentos e de obrigações relativas a direitos de propriedade intelectual em resposta a medidas unilaterais adotadas por país ou bloco econômico que impactem negativamente a competitivid",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Estabelece critérios para suspensão de concessões comerciais, de investimentos e de obrigações relativas a direitos de propriedade intelectual em resposta a medidas unilaterais adotadas por país ou bl",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-2088-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 2088/2023",
+      "number": "2088",
+      "slug": "pl-2088-2023",
+      "sort_order": 101,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2492307",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2467306,
+      "description": "Altera a Lei nº 13.999, de 18 de maio de 2020, e a Lei nº 12.087, de 11 de novembro de 2009, para assegurar que os recursos do Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte (Pronampe) sejam permanentes, e dá outras providências.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei nº 13.999, de 18 de maio de 2020, e a Lei nº 12.087, de 11 de novembro de 2009, para assegurar que os recursos do Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte (",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6012-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6012/2023",
+      "number": "6012",
+      "slug": "pl-6012-2023",
+      "sort_order": 102,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2467306",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2454495,
+      "description": "Institui limite para o pagamento de precatórios pelos Municípios, abre novo prazo de parcelamento especial de débitos dos Municípios com seus regimes próprios de previdência social e com o Regime Geral de Previdência Social e dá outras providências.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Institui limite para o pagamento de precatórios pelos Municípios, abre novo prazo de parcelamento especial de débitos dos Municípios com seus regimes próprios de previdência social e com o Regime Gera",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pec-66-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 66/2023",
+      "number": "66",
+      "slug": "pec-66-2023",
+      "sort_order": 103,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2454495",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2422905,
+      "description": "Altera o art. 155 da Constituição Federal para conceder imunidade do Imposto sobre a Propriedade de Veículos Automotores (IPVA) aos veículos que especifica.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera o art. 155 da Constituição Federal para conceder imunidade do Imposto sobre a Propriedade de Veículos Automotores (IPVA) aos veículos que especifica.",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pec-72-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 72/2023",
+      "number": "72",
+      "slug": "pec-72-2023",
+      "sort_order": 104,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2422905",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2416790,
+      "description": "Revoga os benefícios fiscais de que tratam o art. 4º da Lei nº 14.148, de 3 de maio de 2021, e os art. 7º a art. 10 da Lei nº 12.546, de 14 de dezembro de 2011, desonera parcialmente a contribuição previdenciária sobre a folha de pagamento, revoga a alíqu",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Revoga os benefícios fiscais de que tratam o art. 4º da Lei nº 14.148, de 3 de maio de 2021, e os art. 7º a art. 10 da Lei nº 12.546, de 14 de dezembro de 2011, desonera parcialmente a contribuição pr",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "mpv-1202-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "MPV",
+      "label": "MPV 1202/2023",
+      "number": "1202",
+      "slug": "mpv-1202-2023",
+      "sort_order": 105,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416790",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2416733,
+      "description": "Institui a Letra de Crédito do Desenvolvimento e altera a Lei nº 13.483, de 21 de setembro de 2017. \n  NOVA EMENTA: Institui a Letra de Crédito do Desenvolvimento (LCD); altera as Leis nºs 13.483, de 21 de setembro de 2017, e 11.076, de 30 de dezembro de ",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Institui a Letra de Crédito do Desenvolvimento e altera a Lei nº 13.483, de 21 de setembro de 2017. \n  NOVA EMENTA: Institui a Letra de Crédito do Desenvolvimento (LCD); altera as Leis nºs 13.483, de ",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6235-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6235/2023",
+      "number": "6235",
+      "slug": "pl-6235-2023",
+      "sort_order": 106,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416733",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2481721,
+      "description": "Altera a Lei Complementar nº 116, de 31 de julho de 2003, para explicitar que o Imposto Sobre Serviços de Qualquer Natureza (ISS) incidente sobre os serviços de guincho intramunicipal, de guindaste e de içamento é devido no local da execução da obra.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei Complementar nº 116, de 31 de julho de 2003, para explicitar que o Imposto Sobre Serviços de Qualquer Natureza (ISS) incidente sobre os serviços de guincho intramunicipal, de guindaste e ",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "plp-92-2024-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PLP",
+      "label": "PLP 92/2024",
+      "number": "92",
+      "slug": "plp-92-2024",
+      "sort_order": 107,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2481721",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2024
+    },
+    {
+      "camara_proposicao_id": 2480979,
+      "description": "Dispõe sobre incentivos e benefícios para fomentar as atividades de caráter desportivo e dá outras providências.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Dispõe sobre incentivos e benefícios para fomentar as atividades de caráter desportivo e dá outras providências.",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "plp-234-2024-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PLP",
+      "label": "PLP 234/2024",
+      "number": "234",
+      "slug": "plp-234-2024",
+      "sort_order": 108,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2480979",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2024
+    },
+    {
+      "camara_proposicao_id": 2416729,
+      "description": "Altera a Lei nº 10.406, de 10 de janeiro de 2002 - Código Civil, para dispor sobre atualização monetária e juros.  NOVA EMENTA: Altera a Lei nº 10.406, de 10 de janeiro de 2002 (Código Civil), para dispor sobre atualização monetária e juros.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei nº 10.406, de 10 de janeiro de 2002 - Código Civil, para dispor sobre atualização monetária e juros.  NOVA EMENTA: Altera a Lei nº 10.406, de 10 de janeiro de 2002 (Código Civil), para di",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-6233-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 6233/2023",
+      "number": "6233",
+      "slug": "pl-6233-2023",
+      "sort_order": 109,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416729",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2409046,
+      "description": "Altera a Lei nº 11.033, de 21 de dezembro de 2004, para prorrogar o Regime Tributário para Incentivo à Modernização e à Ampliação da Estrutura Portuária (Reporto).",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Altera a Lei nº 11.033, de 21 de dezembro de 2004, para prorrogar o Regime Tributário para Incentivo à Modernização e à Ampliação da Estrutura Portuária (Reporto).",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-5610-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 5610/2023",
+      "number": "5610",
+      "slug": "pl-5610-2023",
+      "sort_order": 110,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2409046",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2374540,
+      "description": "Dispõe sobre o processo e o julgamento das ações de controle concentrado de constitucionalidade perante o Supremo Tribunal Federal; e altera a Lei nº 13.105, de 16 de março de 2015 (Código de Processo Civil).",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Dispõe sobre o processo e o julgamento das ações de controle concentrado de constitucionalidade perante o Supremo Tribunal Federal; e altera a Lei nº 13.105, de 16 de março de 2015 (Código de Processo",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pl-3640-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PL",
+      "label": "PL 3640/2023",
+      "number": "3640",
+      "slug": "pl-3640-2023",
+      "sort_order": 111,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2374540",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2351506,
+      "description": "Acrescenta § 4º-A ao art. 150 da Constituição Federal, para dispor sobre a imunidade tributária de que tratam as suas alíneas “b” e “c” do inciso VI.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Acrescenta § 4º-A ao art. 150 da Constituição Federal, para dispor sobre a imunidade tributária de que tratam as suas alíneas “b” e “c” do inciso VI.",
+          "direction": 1,
+          "label": "Tributação",
+          "slug": "pec-5-2023-trib",
+          "sort_order": 0,
+          "wealth_relevant": 1,
+          "weight": 1.0
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 5/2023",
+      "number": "5",
+      "slug": "pec-5-2023",
+      "sort_order": 112,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2351506",
+      "topic_slug": "tributacao-da-riqueza",
+      "wealth_relevant": 1,
+      "year": 2023
+    },
+    {
+      "camara_proposicao_id": 2196833,
+      "description": "Reforma tributária sobre consumo; contexto fraco para patrimônio pessoal.",
+      "is_key": 0,
+      "keywords": [
+        {
+          "description": "Reorganização de impostos sobre consumo, sem medir diretamente patrimônio pessoal.",
+          "direction": 0,
+          "label": "Tributação do consumo",
+          "slug": "tributacao-do-consumo",
+          "sort_order": 40,
+          "wealth_relevant": 0,
+          "weight": 0.4
+        }
+      ],
+      "kind": "PEC",
+      "label": "PEC 45/2019",
+      "number": "45",
+      "slug": "pec-45-2019",
+      "sort_order": 30,
+      "source_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833",
+      "topic_slug": "reforma-tributaria",
+      "wealth_relevant": 0,
+      "year": 2019
+    }
+  ],
+  "politics": [
+    {
+      "birth_date": "1944-11-29",
+      "camara_id": 74478,
+      "name": "Luciano Bivar",
+      "occupation": "Empresário",
+      "party": "MDB",
+      "profile": {
+        "camara": {
+          "cpf": "01818961415",
+          "dataFalecimento": null,
+          "dataNascimento": "1944-11-29",
+          "escolaridade": "Superior",
+          "id": 74478,
+          "municipioNascimento": "Recife",
+          "nomeCivil": "LUCIANO CALDAS BIVAR",
+          "redeSocial": [],
+          "sexo": "M",
+          "ufNascimento": "PE",
+          "ultimoStatus": {
+            "condicaoEleitoral": "Titular",
+            "data": "2023-02-01",
+            "descricaoStatus": null,
+            "email": null,
+            "gabinete": {
+              "andar": "2",
+              "email": "dep.lucianobivar@camara.leg.br",
+              "nome": "215",
+              "predio": "4",
+              "sala": "215",
+              "telefone": "3215-5215"
+            },
+            "id": 74478,
+            "idLegislatura": 57,
+            "nome": "Luciano Bivar",
+            "nomeEleitoral": "Luciano Bivar",
+            "siglaPartido": "MDB",
+            "siglaUf": "PE",
+            "situacao": "Exercício",
+            "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/74478",
+            "uriPartido": null,
+            "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/74478.jpg"
+          },
+          "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/74478",
+          "urlWebsite": null
+        },
+        "tse": {
+          "arquivos": [
+            {
+              "codTipo": "15",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 170010903546,
+              "nome": "15_1659896635048.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/PE/546/candidatos/902548/"
+            },
+            {
+              "codTipo": "13",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 170010903545,
+              "nome": "13_1659896633515.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/PE/546/candidatos/902548/"
+            },
+            {
+              "codTipo": "12",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 170010903544,
+              "nome": "12_1659896632681.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/PE/546/candidatos/902548/"
+            },
+            {
+              "codTipo": "11",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 170010903543,
+              "nome": "11_1659896631836.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/PE/546/candidatos/902548/"
+            }
+          ],
+          "bens": [
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES ORDINARIAS NOMINATIVAS ",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 1,
+              "valor": 8688573.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "SALDO EM CONTA CORRENTE - CONTA ESTILO BANCO DO BRASIL",
+              "descricaoDeTipoDeBem": "Depósito bancário em conta corrente no País",
+              "ordem": 6,
+              "valor": 33994.83
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO AB FCP AMERICAN GROWTH FUND CL ",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 16,
+              "valor": 128890.11
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO MS INVF GLOBAL OPPONTUNITY FUND CLASS ",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 17,
+              "valor": 121542.67
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO JPM GLOBAL MACRO OPPORTUNITIES FUND CLASS C",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 19,
+              "valor": 99496.76
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO PICTET TOTAL RETURN ATLAS FUND CLASS",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 20,
+              "valor": 98671.1
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO LEGG MASON MARTIN CURRIE GLOBAL EMERGIN MARKETS FUND CLAS",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 22,
+              "valor": 47487.24
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO WELLINGTON GLOBAL QUALITY GROWTH FD",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 15,
+              "valor": 165269.22
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DA GERENCIAL B. SERVIÇOS TEC. ",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 23,
+              "valor": 4655250.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "SALDO EM CONTA CORRENTE BANCO DO BRASIL CONTA ESTILO",
+              "descricaoDeTipoDeBem": "Depósito bancário em conta corrente no País",
+              "ordem": 7,
+              "valor": 9874.98
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO MFS MERIDIAN EUROPEAN RESERCH FUND",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 21,
+              "valor": 71025.1
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO PIMCO GIS LOW DURACTION INCOME FD IND CL",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 12,
+              "valor": 227983.22
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO JPM GLOBAL CORPORATE BOND FUND",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 14,
+              "valor": 195663.6
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO BGF GLOBAL HIGTH YIELD BOND FUND CL D2 ",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 13,
+              "valor": 215186.67
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO LOOMIS SAYLES SCHORT",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 18,
+              "valor": 109170.24
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "SALDO EM CARTÃO PRÉ PAGO BANCO DO BRASIL",
+              "descricaoDeTipoDeBem": "Outros créditos e poupança vinculados",
+              "ordem": 9,
+              "valor": 448.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES GOLDMAN SACHS EMERGING MARKETS CORPORATE BOND PORT FUND CLASS",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 11,
+              "valor": 317438.39
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "APLICAÇÃO CDB BANCO DO BRASIL",
+              "descricaoDeTipoDeBem": "Aplicação de renda fixa (CDB, RDB e outros)",
+              "ordem": 4,
+              "valor": 30000.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "APLICAÇÃO EM FUNDO DE INVESTIMENTO EM COTA - BANCO BRADESCO",
+              "descricaoDeTipoDeBem": "Aplicação de renda fixa (CDB, RDB e outros)",
+              "ordem": 5,
+              "valor": 749.93
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "SALDO EM CONTA CORRENTE NO EXTERIOR - BGT PACTUAL US LLC, EM NOVA YORK USA",
+              "descricaoDeTipoDeBem": "Depósito bancário em conta corrente no exterior",
+              "ordem": 10,
+              "valor": 85503.88
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES DO BSF GLOBAL EVENT DRIVEN FUND",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 24,
+              "valor": 111870.3
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "AÇÕES ORDINÁRIAS NOMINATIVAS ",
+              "descricaoDeTipoDeBem": "Ações (inclusive as provenientes de linha telefônica)",
+              "ordem": 2,
+              "valor": 3042209.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "SALDO EM CADERNETA DE POUPANÇA BRADESCO",
+              "descricaoDeTipoDeBem": "Caderneta de poupança",
+              "ordem": 3,
+              "valor": 65287.22
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-08",
+              "descricao": "DINHEIRO EM ESPÉCIE MOEDA CORRENTE NACIONAL",
+              "descricaoDeTipoDeBem": "Dinheiro em espécie - moeda nacional",
+              "ordem": 8,
+              "valor": 100000.0
+            }
+          ],
+          "candidatoApto": true,
+          "cargo": {
+            "codSuperior": 0,
+            "codigo": 6,
+            "contagem": 0,
+            "nome": "Deputado Federal",
+            "sigla": null,
+            "titular": true
+          },
+          "cdSituacaoCassacao": null,
+          "cdSituacaoDiploma": null,
+          "cnpjcampanha": "47463778000109",
+          "codigoSituacaoCandidato": 2,
+          "codigoSituacaoCandidatoSuperior": 12,
+          "codigoSituacaoPartido": "D",
+          "composicaoColigacao": "**",
+          "cpf": null,
+          "dataDeNascimento": "1944-11-29",
+          "dataUltimaAtualizacao": "2022-12-19 09:43",
+          "descricaoCorRaca": "BRANCA",
+          "descricaoEstadoCivil": "Casado(a)",
+          "descricaoNaturalidade": "PE-RECIFE",
+          "descricaoSexo": "MASC.",
+          "descricaoSituacao": "Deferido",
+          "descricaoSituacaoCandidato": "Consta da urna",
+          "descricaoSituacaoPartido": "Deferido",
+          "descricaoTipoDrap": "Partido Isolado",
+          "descricaoTotalizacao": "Eleito por média",
+          "ds_MOTIVO_OUTROS": null,
+          "eleicao": {
+            "ano": 2022,
+            "codSituacaoEleicao": null,
+            "codigo": null,
+            "dataEleicao": null,
+            "descricaoEleicao": "2022",
+            "descricaoSituacaoEleicao": null,
+            "id": 2040602022,
+            "localidadeSgUe": null,
+            "nomeEleicao": null,
+            "siglaUF": null,
+            "tipoAbrangencia": null,
+            "tipoEleicao": null,
+            "turno": null
+          },
+          "eleicoesAnteriores": [
+            {
+              "cargo": "Deputado Federal",
+              "id": "170001609112",
+              "idEleicao": "2040602022",
+              "local": "PERNAMBUCO",
+              "nomeCandidato": "LUCIANO CALDAS BIVAR",
+              "nomeUrna": "LUCIANO BIVAR",
+              "nrAno": 2022,
+              "partido": "UNIÃO",
+              "sgUe": "PE",
+              "situacaoTotalizacao": "Eleito por média",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2022/2040602022/PE/170001609112"
+            },
+            {
+              "cargo": "Deputado Federal",
+              "id": "170000617081",
+              "idEleicao": "2022802018",
+              "local": "PERNAMBUCO",
+              "nomeCandidato": "LUCIANO CALDAS BIVAR",
+              "nomeUrna": "LUCIANO BIVAR",
+              "nrAno": 2018,
+              "partido": "PSL",
+              "sgUe": "PE",
+              "situacaoTotalizacao": "Eleito por QP",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2018/2022802018/PE/170000617081"
+            },
+            {
+              "cargo": "Deputado Federal",
+              "id": "170000000521",
+              "idEleicao": "680",
+              "local": "PERNAMBUCO",
+              "nomeCandidato": "LUCIANO CALDAS BIVAR",
+              "nomeUrna": "LUCIANO BIVAR",
+              "nrAno": 2014,
+              "partido": "PSL",
+              "sgUe": "PE",
+              "situacaoTotalizacao": "Suplente",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2014/680/PE/170000000521"
+            },
+            {
+              "cargo": "Presidente",
+              "id": "1",
+              "idEleicao": "14423",
+              "local": "BRASIL",
+              "nomeCandidato": "LUCIANO CALDAS BIVAR",
+              "nomeUrna": "LUCIANO BIVAR",
+              "nrAno": 2006,
+              "partido": "PSL",
+              "sgUe": "BR",
+              "situacaoTotalizacao": "Não eleito",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2006/14423/BR/1"
+            }
+          ],
+          "emails": null,
+          "fotoDataUltimaAtualizacao": null,
+          "fotoUrl": "https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/img/2040602022/170001609112/PE",
+          "fotoUrlPublicavel": true,
+          "gastoCampanha": 0.0,
+          "gastoCampanha1T": 3176572.53,
+          "gastoCampanha2T": null,
+          "grauInstrucao": "Superior completo",
+          "id": 170001609112,
+          "idCandidatoSuperior": 0,
+          "infoComplementar": {
+            "dsTipoEtniaIndigena": null,
+            "generoPublicavel": false,
+            "identidadeGenero": null,
+            "nmEncarregadoDados": null,
+            "orientacaoSexual": null,
+            "orientacaoSexualPublicavel": false,
+            "quilombola": null,
+            "tpEncarregadoDados": null,
+            "txCanalComunicacao": null
+          },
+          "isCandFechado": true,
+          "isCandidatoInapto": false,
+          "legenda": null,
+          "localCandidatura": "PERNAMBUCO",
+          "motivoSituacao": null,
+          "motivos": null,
+          "nacionalidade": "Brasileira nata",
+          "nomeColigacao": "UNIÃO",
+          "nomeCompleto": "LUCIANO CALDAS BIVAR",
+          "nomeMunicipioNascimento": "RECIFE",
+          "nomeUrna": "LUCIANO BIVAR",
+          "numero": 4444,
+          "numeroProcesso": "06008384220226170000",
+          "numeroProcessoDrap": "06008185120226170000",
+          "numeroProcessoDrapEncrypt": "fa83b46292d81b2a1fd511a3dbbff679679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProcessoEncrypt": "7b673436e44fb3a6853813e537e6c44d679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProcessoPrestContas": "06026208420226170000",
+          "numeroProcessoPrestContasEncrypt": "08a22f12819a9dc8b402c4893689c86b679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProtocolo": null,
+          "ocupacao": "Empresário",
+          "partido": {
+            "nome": "UNIÃO BRASIL",
+            "numero": 44,
+            "sigla": "UNIÃO",
+            "sqPrestadorConta": null
+          },
+          "processosCassacao": [],
+          "processosDesconstituicao": [],
+          "sgUfNascimento": "PE",
+          "sites": [
+            "https://mobile.twitter.com/bivaroficial",
+            "https://www.facebook.com/Bivaroficial",
+            "https://www.instagram.com/bivaroficial/"
+          ],
+          "st_DIVULGA": true,
+          "st_DIVULGA_ARQUIVOS": true,
+          "st_DIVULGA_BENS": true,
+          "st_MOTIVO_ABUSO_PODER": false,
+          "st_MOTIVO_AUSENCIA_REQUISITO": false,
+          "st_MOTIVO_COMPRA_VOTO": false,
+          "st_MOTIVO_CONDUTA_VEDADA": false,
+          "st_MOTIVO_FICHA_LIMPA": false,
+          "st_MOTIVO_GASTO_ILICITO": false,
+          "st_MOTIVO_IND_PARTIDO": false,
+          "st_REELEICAO": true,
+          "st_SUBSTITUIDO": false,
+          "substituto": null,
+          "tituloEleitor": "005740680817",
+          "totalDeBens": 18621585.46,
+          "ufCandidatura": "PE",
+          "ufSuperiorCandidatura": "BR",
+          "vices": null
+        }
+      },
+      "tse_election_id": "2040602022",
+      "tse_sq": "170001609112",
+      "tse_uf": "PE",
+      "tse_year": 2022,
+      "uf": "PE",
+      "wealth_buckets": {
+        "Ações / participações": 18295726.62,
+        "Depósito no exterior": 85503.88,
+        "Dinheiro em espécie": 100000.0,
+        "Outros": 0.0,
+        "Poupança / renda fixa / contas": 140354.96
+      },
+      "wealth_capital": 18381230.5,
+      "wealth_total": 18621585.46
+    },
+    {
+      "birth_date": "1985-11-08",
+      "camara_id": 156190,
+      "name": "Marcel van Hattem",
+      "occupation": "Cientista Político",
+      "party": "NOVO",
+      "profile": {
+        "camara": {
+          "cpf": "00731302060",
+          "dataFalecimento": null,
+          "dataNascimento": "1985-11-08",
+          "escolaridade": "Mestrado",
+          "id": 156190,
+          "municipioNascimento": "São Leopoldo",
+          "nomeCivil": "MARCEL VAN HATTEM",
+          "redeSocial": [
+            "https://twitter.com/MARCELVANHATTEM",
+            "https://www.facebook.com/MARCELVH",
+            "https://www.instagram.com/MARCELVANHATTEM",
+            "https://youtube.com/channel/UCAGHY76tgzPiiXpJtM1sVCg"
+          ],
+          "sexo": "M",
+          "ufNascimento": "RS",
+          "ultimoStatus": {
+            "condicaoEleitoral": "Titular",
+            "data": "2023-02-01",
+            "descricaoStatus": null,
+            "email": null,
+            "gabinete": {
+              "andar": "9",
+              "email": "dep.marcelvanhattem@camara.leg.br",
+              "nome": "958",
+              "predio": "4",
+              "sala": "958",
+              "telefone": "3215-5958"
+            },
+            "id": 156190,
+            "idLegislatura": 57,
+            "nome": "Marcel van Hattem",
+            "nomeEleitoral": "Marcel van Hattem",
+            "siglaPartido": "NOVO",
+            "siglaUf": "RS",
+            "situacao": "Exercício",
+            "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/156190",
+            "uriPartido": null,
+            "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/156190.jpg"
+          },
+          "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/156190",
+          "urlWebsite": null
+        },
+        "tse": {
+          "arquivos": [
+            {
+              "codTipo": "14",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 210011761037,
+              "nome": "pje-61eec2eb-Certidão criminal da Justiça Estadual de 2º grau.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/RS/546/candidatos/210001597011/"
+            },
+            {
+              "codTipo": "15",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 210010851871,
+              "nome": "15_1658502923577.PDF",
+              "tipo": "PDF",
+              "url": "candidaturas/oficial/2022/BR/RS/546/candidatos/883019/"
+            },
+            {
+              "codTipo": "14",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 210010851870,
+              "nome": "14_1658502922818.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/RS/546/candidatos/883019/"
+            },
+            {
+              "codTipo": "13",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 210010851869,
+              "nome": "13_1658502922092.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/RS/546/candidatos/883019/"
+            },
+            {
+              "codTipo": "12",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 210010851868,
+              "nome": "12_1658502921489.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/RS/546/candidatos/883019/"
+            },
+            {
+              "codTipo": "11",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 210010851867,
+              "nome": "11_1658502920853.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/RS/546/candidatos/883019/"
+            }
+          ],
+          "bens": [
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\tBanco do Brasil Automático Mais",
+              "descricaoDeTipoDeBem": "Aplicação de renda fixa (CDB, RDB e outros)",
+              "ordem": 5,
+              "valor": 40665.78
+            },
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\tBanco Inter",
+              "descricaoDeTipoDeBem": "Aplicação de renda fixa (CDB, RDB e outros)",
+              "ordem": 6,
+              "valor": 7000.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\tFiat Linea 1.8",
+              "descricaoDeTipoDeBem": "Veículo automotor terrestre: caminhão, automóvel, moto, etc.",
+              "ordem": 3,
+              "valor": 41000.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\t20% do lote 17, em Morro Reuter. Matrícula n. 8957 do Registro de Imóveis de Dois Irmãos.",
+              "descricaoDeTipoDeBem": "Terreno",
+              "ordem": 2,
+              "valor": 3000.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\tConta corrente no ABN AMRO de Roterdam (Holanda). Valor total em Euros 1.088,12 (R$ 6.875,50)",
+              "descricaoDeTipoDeBem": "Depósito bancário em conta corrente no exterior",
+              "ordem": 8,
+              "valor": 6875.5
+            },
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\t20% do lote 18, em Morro Reuter. Matrícula n. 7026 do Registro de Imóveis de Dois Irmãos.",
+              "descricaoDeTipoDeBem": "Terreno",
+              "ordem": 1,
+              "valor": 33100.99
+            },
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\tFord Focus 2.0 ano 2016 modelo 2017",
+              "descricaoDeTipoDeBem": "Veículo automotor terrestre: caminhão, automóvel, moto, etc.",
+              "ordem": 4,
+              "valor": 55900.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-07-27",
+              "descricao": "\tConta corrente no Banco Inter",
+              "descricaoDeTipoDeBem": "Depósito bancário em conta corrente no País",
+              "ordem": 7,
+              "valor": 971.69
+            }
+          ],
+          "candidatoApto": true,
+          "cargo": {
+            "codSuperior": 0,
+            "codigo": 6,
+            "contagem": 0,
+            "nome": "Deputado Federal",
+            "sigla": null,
+            "titular": true
+          },
+          "cdSituacaoCassacao": null,
+          "cdSituacaoDiploma": null,
+          "cnpjcampanha": "47323114000136",
+          "codigoSituacaoCandidato": 2,
+          "codigoSituacaoCandidatoSuperior": 12,
+          "codigoSituacaoPartido": "D",
+          "composicaoColigacao": "**",
+          "cpf": null,
+          "dataDeNascimento": "1985-11-08",
+          "dataUltimaAtualizacao": "2022-11-24 12:25",
+          "descricaoCorRaca": "BRANCA",
+          "descricaoEstadoCivil": "Solteiro(a)",
+          "descricaoNaturalidade": "RS-SÃO LEOPOLDO",
+          "descricaoSexo": "MASC.",
+          "descricaoSituacao": "Deferido",
+          "descricaoSituacaoCandidato": "Consta da urna",
+          "descricaoSituacaoPartido": "Deferido",
+          "descricaoTipoDrap": "Partido Isolado",
+          "descricaoTotalizacao": "Eleito por QP",
+          "ds_MOTIVO_OUTROS": null,
+          "eleicao": {
+            "ano": 2022,
+            "codSituacaoEleicao": null,
+            "codigo": null,
+            "dataEleicao": null,
+            "descricaoEleicao": "2022",
+            "descricaoSituacaoEleicao": null,
+            "id": 2040602022,
+            "localidadeSgUe": null,
+            "nomeEleicao": null,
+            "siglaUF": null,
+            "tipoAbrangencia": null,
+            "tipoEleicao": null,
+            "turno": null
+          },
+          "eleicoesAnteriores": [
+            {
+              "cargo": "Deputado Federal",
+              "id": "210001597011",
+              "idEleicao": "2040602022",
+              "local": "RIO GRANDE DO SUL",
+              "nomeCandidato": "MARCEL VAN HATTEM",
+              "nomeUrna": "MARCEL VAN HATTEM",
+              "nrAno": 2022,
+              "partido": "NOVO",
+              "sgUe": "RS",
+              "situacaoTotalizacao": "Eleito por QP",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2022/2040602022/RS/210001597011"
+            },
+            {
+              "cargo": "Deputado Federal",
+              "id": "210000602609",
+              "idEleicao": "2022802018",
+              "local": "RIO GRANDE DO SUL",
+              "nomeCandidato": "MARCEL VAN HATTEM",
+              "nomeUrna": "MARCEL VAN HATTEM",
+              "nrAno": 2018,
+              "partido": "NOVO",
+              "sgUe": "RS",
+              "situacaoTotalizacao": "Eleito por QP",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2018/2022802018/RS/210000602609"
+            },
+            {
+              "cargo": "Deputado Estadual",
+              "id": "210000000700",
+              "idEleicao": "680",
+              "local": "RIO GRANDE DO SUL",
+              "nomeCandidato": "MARCEL VAN HATTEM",
+              "nomeUrna": "MARCEL VAN HATTEM",
+              "nrAno": 2014,
+              "partido": "PP",
+              "sgUe": "RS",
+              "situacaoTotalizacao": "Suplente",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2014/680/RS/210000000700"
+            },
+            {
+              "cargo": "Deputado Estadual",
+              "id": "210000001068",
+              "idEleicao": "14417",
+              "local": "RIO GRANDE DO SUL",
+              "nomeCandidato": "MARCEL VAN HATTEM",
+              "nomeUrna": "MARCEL VAN HATTEM",
+              "nrAno": 2010,
+              "partido": "PP",
+              "sgUe": "RS",
+              "situacaoTotalizacao": "Suplente",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2010/14417/RS/210000001068"
+            },
+            {
+              "cargo": "Deputado Estadual",
+              "id": "10892",
+              "idEleicao": "14423",
+              "local": "RIO GRANDE DO SUL",
+              "nomeCandidato": "MARCEL VANHATTEM",
+              "nomeUrna": "MARCEL VAN HATTEN",
+              "nrAno": 2006,
+              "partido": "PP",
+              "sgUe": "RS",
+              "situacaoTotalizacao": "Concorrendo",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2006/14423/RS/10892"
+            },
+            {
+              "cargo": "Vereador",
+              "id": "64",
+              "idEleicao": "14431",
+              "local": "DOIS IRMÃOS",
+              "nomeCandidato": "MARCEL VAN HATTEM",
+              "nomeUrna": "MARCEL VAN HATTEM",
+              "nrAno": 2004,
+              "partido": "PP",
+              "sgUe": "86258",
+              "situacaoTotalizacao": "Concorrendo",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2004/14431/86258/64"
+            }
+          ],
+          "emails": null,
+          "fotoDataUltimaAtualizacao": null,
+          "fotoUrl": "https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/img/2040602022/210001597011/RS",
+          "fotoUrlPublicavel": true,
+          "gastoCampanha": 0.0,
+          "gastoCampanha1T": 3176572.53,
+          "gastoCampanha2T": null,
+          "grauInstrucao": "Superior completo",
+          "id": 210001597011,
+          "idCandidatoSuperior": 0,
+          "infoComplementar": {
+            "dsTipoEtniaIndigena": null,
+            "generoPublicavel": false,
+            "identidadeGenero": null,
+            "nmEncarregadoDados": null,
+            "orientacaoSexual": null,
+            "orientacaoSexualPublicavel": false,
+            "quilombola": null,
+            "tpEncarregadoDados": null,
+            "txCanalComunicacao": null
+          },
+          "isCandFechado": true,
+          "isCandidatoInapto": false,
+          "legenda": null,
+          "localCandidatura": "RIO GRANDE DO SUL",
+          "motivoSituacao": null,
+          "motivos": null,
+          "nacionalidade": "Brasileira nata",
+          "nomeColigacao": "NOVO",
+          "nomeCompleto": "MARCEL VAN HATTEM",
+          "nomeMunicipioNascimento": "SÃO LEOPOLDO",
+          "nomeUrna": "MARCEL VAN HATTEM",
+          "numero": 3030,
+          "numeroProcesso": "06004555320226210000",
+          "numeroProcessoDrap": "06004503120226210000",
+          "numeroProcessoDrapEncrypt": "a430f8c3adb0af76221a61a00937c2e9679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProcessoEncrypt": "16e5272f284876396e5001034a2b1dd0679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProcessoPrestContas": "06027168820226210000",
+          "numeroProcessoPrestContasEncrypt": "0e1b28bb31d06f87c05823a003de6d4d679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProtocolo": null,
+          "ocupacao": "Cientista Político",
+          "partido": {
+            "nome": "Partido Novo",
+            "numero": 30,
+            "sigla": "NOVO",
+            "sqPrestadorConta": null
+          },
+          "processosCassacao": [],
+          "processosDesconstituicao": [],
+          "sgUfNascimento": "RS",
+          "sites": [
+            "https://www.linkedin.com/marcelvanhattem",
+            "https://www.twitter.com/marcelvanhattem",
+            "http://www.marcelvanhattem.com.br",
+            "https://instagram.com/marcelvanhattem",
+            "https://youtube.com/marcelvanhattemoficial",
+            "https://www.facebook.com/marcelvh"
+          ],
+          "st_DIVULGA": true,
+          "st_DIVULGA_ARQUIVOS": true,
+          "st_DIVULGA_BENS": true,
+          "st_MOTIVO_ABUSO_PODER": false,
+          "st_MOTIVO_AUSENCIA_REQUISITO": false,
+          "st_MOTIVO_COMPRA_VOTO": false,
+          "st_MOTIVO_CONDUTA_VEDADA": false,
+          "st_MOTIVO_FICHA_LIMPA": false,
+          "st_MOTIVO_GASTO_ILICITO": false,
+          "st_MOTIVO_IND_PARTIDO": false,
+          "st_REELEICAO": true,
+          "st_SUBSTITUIDO": false,
+          "substituto": null,
+          "tituloEleitor": "087634350400",
+          "totalDeBens": 188513.96,
+          "ufCandidatura": "RS",
+          "ufSuperiorCandidatura": "BR",
+          "vices": null
+        }
+      },
+      "tse_election_id": "2040602022",
+      "tse_sq": "210001597011",
+      "tse_uf": "RS",
+      "tse_year": 2022,
+      "uf": "RS",
+      "wealth_buckets": {
+        "Ações / participações": 0.0,
+        "Depósito no exterior": 6875.5,
+        "Dinheiro em espécie": 0.0,
+        "Outros": 133000.99,
+        "Poupança / renda fixa / contas": 48637.47
+      },
+      "wealth_capital": 6875.5,
+      "wealth_total": 188513.96
+    },
+    {
+      "birth_date": "1984-05-05",
+      "camara_id": 204515,
+      "name": "André Janones",
+      "occupation": "Deputado",
+      "party": "REDE",
+      "profile": {
+        "camara": {
+          "cpf": "06630008669",
+          "dataFalecimento": null,
+          "dataNascimento": "1984-05-05",
+          "escolaridade": "Superior",
+          "id": 204515,
+          "municipioNascimento": "Ituiutaba",
+          "nomeCivil": "ANDRE LUIS GASPAR JANONES",
+          "redeSocial": [
+            "https://twitter.com/AndreJanonesAdv",
+            "https://www.facebook.com/andrejanones",
+            "https://www.instagram.com/andrejanones",
+            "https://youtube.com/AndreJanonesAdv"
+          ],
+          "sexo": "M",
+          "ufNascimento": "MG",
+          "ultimoStatus": {
+            "condicaoEleitoral": "Titular",
+            "data": "2025-10-16",
+            "descricaoStatus": "",
+            "email": null,
+            "gabinete": {
+              "andar": null,
+              "email": "dep.andrejanones@camara.leg.br",
+              "nome": "687",
+              "predio": "3",
+              "sala": "687",
+              "telefone": "3215-5687"
+            },
+            "id": 204515,
+            "idLegislatura": 57,
+            "nome": "André Janones",
+            "nomeEleitoral": "André Janones",
+            "siglaPartido": "REDE",
+            "siglaUf": "MG",
+            "situacao": "Exercício",
+            "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204515",
+            "uriPartido": null,
+            "urlFoto": "https://www.camara.leg.br/internet/deputado/bandep/204515.jpg"
+          },
+          "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/204515",
+          "urlWebsite": null
+        },
+        "tse": {
+          "arquivos": [
+            {
+              "codTipo": "11",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 130011832364,
+              "nome": "pje-d60a2d71-Certidão criminal da Justiça Federal de 1º grau.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/MG/546/candidatos/130001608227/"
+            },
+            {
+              "codTipo": "13",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 130011832325,
+              "nome": "pje-b4e6e175-Certidão criminal da Justiça Estadual de 1º grau.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/MG/546/candidatos/130001608227/"
+            },
+            {
+              "codTipo": "12",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 130011832287,
+              "nome": "pje-16c87428-Certidão criminal da Justiça Federal de 2º grau.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/MG/546/candidatos/130001608227/"
+            },
+            {
+              "codTipo": "15",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 130010900369,
+              "nome": "STJ.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/MG/546/candidatos/900153/"
+            },
+            {
+              "codTipo": "15",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 130010900368,
+              "nome": "STF.PDF",
+              "tipo": "PDF",
+              "url": "candidaturas/oficial/2022/BR/MG/546/candidatos/900153/"
+            },
+            {
+              "codTipo": "14",
+              "fileByteArray": null,
+              "fileInputStream": null,
+              "fullFilePath": null,
+              "idArquivo": 130010900366,
+              "nome": "14_1659743349079.pdf",
+              "tipo": "pdf",
+              "url": "candidaturas/oficial/2022/BR/MG/546/candidatos/900153/"
+            }
+          ],
+          "bens": [
+            {
+              "dataUltimaAtualizacao": "2022-08-07",
+              "descricao": "SALDO EM CONTA CORRENTE JUNTO A CEF",
+              "descricaoDeTipoDeBem": "Depósito bancário em conta corrente no País",
+              "ordem": 2,
+              "valor": 207228.45
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-07",
+              "descricao": "TERRENO LOCALIZADO EM ITUIUTABA/MG",
+              "descricaoDeTipoDeBem": "Terreno",
+              "ordem": 1,
+              "valor": 80000.0
+            },
+            {
+              "dataUltimaAtualizacao": "2022-08-07",
+              "descricao": "SALDO EM CONTA CORRENTE JUNTO A CEF",
+              "descricaoDeTipoDeBem": "Depósito bancário em conta corrente no País",
+              "ordem": 3,
+              "valor": 6558.64
+            }
+          ],
+          "candidatoApto": true,
+          "cargo": {
+            "codSuperior": 0,
+            "codigo": 6,
+            "contagem": 0,
+            "nome": "Deputado Federal",
+            "sigla": null,
+            "titular": true
+          },
+          "cdSituacaoCassacao": null,
+          "cdSituacaoDiploma": null,
+          "cnpjcampanha": "47453930000164",
+          "codigoSituacaoCandidato": 2,
+          "codigoSituacaoCandidatoSuperior": 12,
+          "codigoSituacaoPartido": "D",
+          "composicaoColigacao": "**",
+          "cpf": null,
+          "dataDeNascimento": "1984-05-05",
+          "dataUltimaAtualizacao": "2023-10-25 19:07",
+          "descricaoCorRaca": "BRANCA",
+          "descricaoEstadoCivil": "Solteiro(a)",
+          "descricaoNaturalidade": "MG-ITUIUTABA",
+          "descricaoSexo": "MASC.",
+          "descricaoSituacao": "Deferido",
+          "descricaoSituacaoCandidato": "Consta da urna",
+          "descricaoSituacaoPartido": "Deferido",
+          "descricaoTipoDrap": "Partido Isolado",
+          "descricaoTotalizacao": "Eleito por QP",
+          "ds_MOTIVO_OUTROS": null,
+          "eleicao": {
+            "ano": 2022,
+            "codSituacaoEleicao": null,
+            "codigo": null,
+            "dataEleicao": null,
+            "descricaoEleicao": "2022",
+            "descricaoSituacaoEleicao": null,
+            "id": 2040602022,
+            "localidadeSgUe": null,
+            "nomeEleicao": null,
+            "siglaUF": null,
+            "tipoAbrangencia": null,
+            "tipoEleicao": null,
+            "turno": null
+          },
+          "eleicoesAnteriores": [
+            {
+              "cargo": "Deputado Federal",
+              "id": "130001608227",
+              "idEleicao": "2040602022",
+              "local": "MINAS GERAIS",
+              "nomeCandidato": "ANDRE LUIS GASPAR JANONES",
+              "nomeUrna": "ANDRÉ JANONES",
+              "nrAno": 2022,
+              "partido": "AVANTE",
+              "sgUe": "MG",
+              "situacaoTotalizacao": "Eleito por QP",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2022/2040602022/MG/130001608227"
+            },
+            {
+              "cargo": "Deputado Federal",
+              "id": "130000606459",
+              "idEleicao": "2022802018",
+              "local": "MINAS GERAIS",
+              "nomeCandidato": "ANDRE LUIS GASPAR JANONES",
+              "nomeUrna": "ANDRE JANONES",
+              "nrAno": 2018,
+              "partido": "AVANTE",
+              "sgUe": "MG",
+              "situacaoTotalizacao": "Eleito por QP",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2018/2022802018/MG/130000606459"
+            },
+            {
+              "cargo": "Prefeito",
+              "id": "130000055126",
+              "idEleicao": "2",
+              "local": "ITUIUTABA",
+              "nomeCandidato": "ANDRÉ LUÍS GASPAR JANONES",
+              "nomeUrna": "ANDRE JANONES",
+              "nrAno": 2016,
+              "partido": "PSC",
+              "sgUe": "46833",
+              "situacaoTotalizacao": "Não eleito",
+              "txLink": "https://divulgacandcontas.tse.jus.br/divulga/#/candidato/2016/2/46833/130000055126"
+            }
+          ],
+          "emails": null,
+          "fotoDataUltimaAtualizacao": null,
+          "fotoUrl": "https://divulgacandcontas.tse.jus.br/divulga/rest/arquivo/img/2040602022/130001608227/MG",
+          "fotoUrlPublicavel": true,
+          "gastoCampanha": 0.0,
+          "gastoCampanha1T": 3176572.53,
+          "gastoCampanha2T": null,
+          "grauInstrucao": "Superior completo",
+          "id": 130001608227,
+          "idCandidatoSuperior": 0,
+          "infoComplementar": {
+            "dsTipoEtniaIndigena": null,
+            "generoPublicavel": false,
+            "identidadeGenero": null,
+            "nmEncarregadoDados": null,
+            "orientacaoSexual": null,
+            "orientacaoSexualPublicavel": false,
+            "quilombola": null,
+            "tpEncarregadoDados": null,
+            "txCanalComunicacao": null
+          },
+          "isCandFechado": true,
+          "isCandidatoInapto": false,
+          "legenda": null,
+          "localCandidatura": "MINAS GERAIS",
+          "motivoSituacao": null,
+          "motivos": null,
+          "nacionalidade": "Brasileira nata",
+          "nomeColigacao": "AVANTE",
+          "nomeCompleto": "ANDRE LUIS GASPAR JANONES",
+          "nomeMunicipioNascimento": "ITUIUTABA",
+          "nomeUrna": "ANDRÉ JANONES",
+          "numero": 7040,
+          "numeroProcesso": "06015279720226130000",
+          "numeroProcessoDrap": "06007042620226130000",
+          "numeroProcessoDrapEncrypt": "0ac427294486f8ccfac5e8da8c5142d5679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProcessoEncrypt": "b2c7ba9c514c746210c2e6785155422b679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProcessoPrestContas": "06047973220226130000",
+          "numeroProcessoPrestContasEncrypt": "4922b3df114fedeac3e9ce2910a5d92e679dcb29dbf5677ad0b254ce0a7385c7204925651d8bfeb5",
+          "numeroProtocolo": null,
+          "ocupacao": "Deputado",
+          "partido": {
+            "nome": "AVANTE",
+            "numero": 70,
+            "sigla": "AVANTE",
+            "sqPrestadorConta": null
+          },
+          "processosCassacao": [],
+          "processosDesconstituicao": [],
+          "sgUfNascimento": "MG",
+          "sites": [
+            "https://www.instagram.com/andrejanones/",
+            "https://www.youtube.com/c/Andr%C3%A9JanonesBR",
+            "https://www.facebook.com/AndreJanones",
+            "https://twitter.com/andrejanonesadv",
+            "https://m.kwai.com/user/3xj6jvwqi8qb22s?kpn=KWAI&share_device_id=3E595415-496F-4",
+            "https://www.tiktok.com/@andrejanones?_t=8UafdfP5hv4&_r=1"
+          ],
+          "st_DIVULGA": true,
+          "st_DIVULGA_ARQUIVOS": true,
+          "st_DIVULGA_BENS": true,
+          "st_MOTIVO_ABUSO_PODER": false,
+          "st_MOTIVO_AUSENCIA_REQUISITO": false,
+          "st_MOTIVO_COMPRA_VOTO": false,
+          "st_MOTIVO_CONDUTA_VEDADA": false,
+          "st_MOTIVO_FICHA_LIMPA": false,
+          "st_MOTIVO_GASTO_ILICITO": false,
+          "st_MOTIVO_IND_PARTIDO": false,
+          "st_REELEICAO": true,
+          "st_SUBSTITUIDO": false,
+          "substituto": null,
+          "tituloEleitor": "147070490205",
+          "totalDeBens": 293787.09,
+          "ufCandidatura": "MG",
+          "ufSuperiorCandidatura": "BR",
+          "vices": null
+        }
+      },
+      "tse_election_id": "2040602022",
+      "tse_sq": "130001608227",
+      "tse_uf": "MG",
+      "tse_year": 2022,
+      "uf": "MG",
+      "wealth_buckets": {
+        "Ações / participações": 0.0,
+        "Depósito no exterior": 0.0,
+        "Dinheiro em espécie": 0.0,
+        "Outros": 80000.0,
+        "Poupança / renda fixa / contas": 213787.09000000003
+      },
+      "wealth_capital": 0.0,
+      "wealth_total": 293787.09
+    }
+  ],
+  "scores": [
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "dividendos",
+      "nominal_count": 0,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "sem votação nominal",
+      "vote_status": "sem-votacao-nominal"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "fundos-exclusivos",
+      "nominal_count": 8,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2438459",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2438459/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2438459-77"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "igf-patrimonio",
+      "nominal_count": 1,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2487436",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2487436/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 1,
+        "gov_comparable": 1,
+        "nominal_vote_ids": [
+          "2487436-101",
+          "2487436-169"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2487436-169",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "imposto-minimo-super-ricos",
+      "nominal_count": 2,
+      "present_count": 1,
+      "score_value": 1.0,
+      "self_interest_value": -1.0,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416790",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416790/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2416790-24"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "mpv-1202-2023-trib",
+      "nominal_count": 1,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "offshore",
+      "nominal_count": 8,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2351506",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2351506/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2351506-102",
+          "2351506-104",
+          "2351506-108",
+          "2351506-112",
+          "2351506-115",
+          "2351506-122",
+          "2351506-34",
+          "2351506-95"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 6,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2351506-102",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2351506-104",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-108",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-115",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-122",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-95",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pec-5-2023-trib",
+      "nominal_count": 8,
+      "present_count": 6,
+      "score_value": 1.0,
+      "self_interest_value": -1.0,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2454495",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2454495/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 3,
+        "gov_comparable": 4,
+        "nominal_vote_ids": [
+          "2454495-142",
+          "2454495-144",
+          "2454495-151",
+          "2454495-154",
+          "2454495-166",
+          "2454495-171",
+          "2454495-174",
+          "2536848-6"
+        ],
+        "opp_aligned": 2,
+        "opp_comparable": 4,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2454495-142",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2454495-144",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2454495-151",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2454495-154",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2454495-166",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pec-66-2023-trib",
+      "nominal_count": 8,
+      "present_count": 5,
+      "score_value": 1.0,
+      "self_interest_value": -1.0,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2422905",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2422905/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2422905-68",
+          "2422905-75"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2422905-68",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pec-72-2023-trib",
+      "nominal_count": 2,
+      "present_count": 1,
+      "score_value": 1.0,
+      "self_interest_value": -1.0,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2492307",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2492307/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2492307-32",
+          "2492307-38",
+          "2494086-7"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-2088-2023-trib",
+      "nominal_count": 3,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2374540",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2374540/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2374540-41",
+          "2571484-12",
+          "2571484-9"
+        ],
+        "opp_aligned": 2,
+        "opp_comparable": 2,
+        "passage_vote": null,
+        "recorded_votes": [
+          {
+            "roll_call_id": "2571484-12",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2571484-9",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-3640-2023-trib",
+      "nominal_count": 3,
+      "present_count": 2,
+      "score_value": -1.0,
+      "self_interest_value": 1.0,
+      "stance": "Não",
+      "vote_label": "NÃO",
+      "vote_status": "nao"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-4173-2023-trib",
+      "nominal_count": 8,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2409046",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2409046/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 1,
+        "gov_comparable": 1,
+        "nominal_vote_ids": [
+          "2409114-8"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2409114-8",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-5610-2023-trib",
+      "nominal_count": 1,
+      "present_count": 1,
+      "score_value": 1.0,
+      "self_interest_value": -1.0,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2467306",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2467306/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2467306-30",
+          "2467306-39",
+          "2467823-9"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-6012-2023-trib",
+      "nominal_count": 3,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2543171",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2543171/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 2,
+        "gov_comparable": 2,
+        "nominal_vote_ids": [
+          "2543171-41",
+          "2543171-49",
+          "2552333-8"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 2,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2543171-41",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2543171-49",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-6139-2023-trib",
+      "nominal_count": 3,
+      "present_count": 2,
+      "score_value": 1.0,
+      "self_interest_value": -1.0,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416729",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416729/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2416729-28"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-6233-2023-trib",
+      "nominal_count": 1,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416733",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416733/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2416733-28",
+          "2416733-37",
+          "2416733-42",
+          "2416733-46"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "pl-6235-2023-trib",
+      "nominal_count": 4,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2480979",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2480979/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 1,
+        "gov_comparable": 1,
+        "nominal_vote_ids": [
+          "2480979-91",
+          "2480979-96"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2480979-96",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "plp-234-2024-trib",
+      "nominal_count": 2,
+      "present_count": 1,
+      "score_value": 1.0,
+      "self_interest_value": -1.0,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2481721",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2481721/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2481721-32"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "plp-92-2024-trib",
+      "nominal_count": 1,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 74478,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não",
+          "Sim",
+          "Não",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Não",
+          "Sim",
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 7,
+        "gov_comparable": 14,
+        "nominal_vote_ids": [
+          "2196833-307",
+          "2196833-323",
+          "2196833-326",
+          "2196833-328",
+          "2196833-331",
+          "2196833-349",
+          "2196833-353",
+          "2196833-356",
+          "2196833-359",
+          "2196833-362",
+          "2196833-365",
+          "2196833-373",
+          "2196833-380",
+          "2196833-386",
+          "2196833-390",
+          "2196833-392",
+          "2196833-395",
+          "2372099-6"
+        ],
+        "opp_aligned": 7,
+        "opp_comparable": 13,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2196833-326",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-328",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-331",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-349",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-353",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-356",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-359",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-362",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-365",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-373",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-386",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-390",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-395",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2372099-6",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/PE/2040602022/candidato/170001609112"
+      },
+      "keyword_slug": "tributacao-do-consumo",
+      "nominal_count": 18,
+      "present_count": 14,
+      "score_value": 0.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 156190,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/RS/2040602022/candidato/210001597011"
+      },
+      "keyword_slug": "dividendos",
+      "nominal_count": 0,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "sem votação nominal",
+      "vote_status": "sem-votacao-nominal"
+    },
+    {
+      "camara_id": 156190,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Sim",
+          "Sim",
+          "Não",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 8,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 8,
+        "opp_comparable": 8,
+        "passage_vote": "Não",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2383287-23",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-30",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-41",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-43",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-47",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-50",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-53",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-61",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/RS/2040602022/candidato/210001597011"
+      },
+      "keyword_slug": "fundos-exclusivos",
+      "nominal_count": 8,
+      "present_count": 8,
+      "score_value": -1.0,
+      "self_interest_value": 1.0,
+      "stance": "Não",
+      "vote_label": "NÃO",
+      "vote_status": "nao"
+    },
+    {
+      "camara_id": 156190,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Sim",
+          "Sim",
+          "Não",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 8,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 8,
+        "opp_comparable": 8,
+        "passage_vote": "Não",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2383287-23",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-30",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-41",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-43",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-47",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-50",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-53",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-61",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/RS/2040602022/candidato/210001597011"
+      },
+      "keyword_slug": "offshore",
+      "nominal_count": 8,
+      "present_count": 8,
+      "score_value": -1.0,
+      "self_interest_value": 1.0,
+      "stance": "Não",
+      "vote_label": "NÃO",
+      "vote_status": "nao"
+    },
+    {
+      "camara_id": 156190,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Sim",
+          "Sim",
+          "Não",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 8,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 8,
+        "opp_comparable": 8,
+        "passage_vote": "Não",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2383287-23",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-30",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-41",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-43",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-47",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-50",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-53",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-61",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/RS/2040602022/candidato/210001597011"
+      },
+      "keyword_slug": "pl-4173-2023-trib",
+      "nominal_count": 8,
+      "present_count": 8,
+      "score_value": -1.0,
+      "self_interest_value": 1.0,
+      "stance": "Não",
+      "vote_label": "NÃO",
+      "vote_status": "nao"
+    },
+    {
+      "camara_id": 156190,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não",
+          "Sim",
+          "Não",
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 6,
+        "gov_comparable": 18,
+        "nominal_vote_ids": [
+          "2196833-307",
+          "2196833-323",
+          "2196833-326",
+          "2196833-328",
+          "2196833-331",
+          "2196833-349",
+          "2196833-353",
+          "2196833-356",
+          "2196833-359",
+          "2196833-362",
+          "2196833-365",
+          "2196833-373",
+          "2196833-380",
+          "2196833-386",
+          "2196833-390",
+          "2196833-392",
+          "2196833-395",
+          "2372099-6"
+        ],
+        "opp_aligned": 12,
+        "opp_comparable": 16,
+        "passage_vote": "Não",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2196833-307",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-323",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-326",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-328",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-331",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-349",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-353",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-356",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-359",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-362",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-365",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-373",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-380",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-386",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-390",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-392",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-395",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2372099-6",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/RS/2040602022/candidato/210001597011"
+      },
+      "keyword_slug": "tributacao-do-consumo",
+      "nominal_count": 18,
+      "present_count": 18,
+      "score_value": 0.0,
+      "self_interest_value": null,
+      "stance": "Não",
+      "vote_label": "NÃO",
+      "vote_status": "nao"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2288389/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "dividendos",
+      "nominal_count": 0,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "sem votação nominal",
+      "vote_status": "sem-votacao-nominal"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Não",
+          "Não",
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 8,
+        "gov_comparable": 8,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 8,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2383287-23",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-30",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-41",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-43",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-47",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-50",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-53",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-61",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "fundos-exclusivos",
+      "nominal_count": 8,
+      "present_count": 8,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2438459",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2438459/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2438459-77"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 1,
+        "passage_vote": null,
+        "recorded_votes": [
+          {
+            "roll_call_id": "2438459-77",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "igf-patrimonio",
+      "nominal_count": 1,
+      "present_count": 1,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2487436",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2487436/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2487436-101",
+          "2487436-169"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "imposto-minimo-super-ricos",
+      "nominal_count": 2,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416790",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416790/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 1,
+        "gov_comparable": 1,
+        "nominal_vote_ids": [
+          "2416790-24"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [
+          {
+            "roll_call_id": "2416790-24",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "mpv-1202-2023-trib",
+      "nominal_count": 1,
+      "present_count": 1,
+      "score_value": -1.0,
+      "self_interest_value": null,
+      "stance": "Não",
+      "vote_label": "NÃO",
+      "vote_status": "nao"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Não",
+          "Não",
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 8,
+        "gov_comparable": 8,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 8,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2383287-23",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-30",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-41",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-43",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-47",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-50",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-53",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-61",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "offshore",
+      "nominal_count": 8,
+      "present_count": 8,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não",
+          "Não",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2351506",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2351506/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2351506-102",
+          "2351506-104",
+          "2351506-108",
+          "2351506-112",
+          "2351506-115",
+          "2351506-122",
+          "2351506-34",
+          "2351506-95"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 7,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2351506-102",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2351506-104",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-108",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-112",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-115",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-122",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2351506-95",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pec-5-2023-trib",
+      "nominal_count": 8,
+      "present_count": 7,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2454495",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2454495/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2454495-142",
+          "2454495-144",
+          "2454495-151",
+          "2454495-154",
+          "2454495-166",
+          "2454495-171",
+          "2454495-174",
+          "2536848-6"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pec-66-2023-trib",
+      "nominal_count": 8,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2422905",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2422905/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2422905-68",
+          "2422905-75"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2422905-68",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2422905-75",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pec-72-2023-trib",
+      "nominal_count": 2,
+      "present_count": 2,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2492307",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2492307/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 3,
+        "gov_comparable": 3,
+        "nominal_vote_ids": [
+          "2492307-32",
+          "2492307-38",
+          "2494086-7"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 2,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2492307-32",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2492307-38",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2494086-7",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-2088-2023-trib",
+      "nominal_count": 3,
+      "present_count": 3,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2374540",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2374540/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2374540-41",
+          "2571484-12",
+          "2571484-9"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": null,
+        "recorded_votes": [
+          {
+            "roll_call_id": "2571484-12",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-3640-2023-trib",
+      "nominal_count": 3,
+      "present_count": 1,
+      "score_value": -1.0,
+      "self_interest_value": null,
+      "stance": "Não",
+      "vote_label": "NÃO",
+      "vote_status": "nao"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Não",
+          "Não",
+          "Sim",
+          "Não",
+          "Não",
+          "Não",
+          "Não"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2383287/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 8,
+        "gov_comparable": 8,
+        "nominal_vote_ids": [
+          "2383287-23",
+          "2383287-30",
+          "2383287-41",
+          "2383287-43",
+          "2383287-47",
+          "2383287-50",
+          "2383287-53",
+          "2383287-61"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 8,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2383287-23",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-30",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-41",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-43",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2383287-47",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-50",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-53",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2383287-61",
+            "vote_type": "Não"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-4173-2023-trib",
+      "nominal_count": 8,
+      "present_count": 8,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2409046",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2409046/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 1,
+        "gov_comparable": 1,
+        "nominal_vote_ids": [
+          "2409114-8"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2409114-8",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-5610-2023-trib",
+      "nominal_count": 1,
+      "present_count": 1,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2467306",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2467306/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 3,
+        "gov_comparable": 3,
+        "nominal_vote_ids": [
+          "2467306-30",
+          "2467306-39",
+          "2467823-9"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 2,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2467306-30",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2467306-39",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2467823-9",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-6012-2023-trib",
+      "nominal_count": 3,
+      "present_count": 3,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2543171",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2543171/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 2,
+        "gov_comparable": 2,
+        "nominal_vote_ids": [
+          "2543171-41",
+          "2543171-49",
+          "2552333-8"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 2,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2543171-41",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2543171-49",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-6139-2023-trib",
+      "nominal_count": 3,
+      "present_count": 2,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416729",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416729/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 1,
+        "gov_comparable": 1,
+        "nominal_vote_ids": [
+          "2416729-28"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 1,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2416729-28",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-6233-2023-trib",
+      "nominal_count": 1,
+      "present_count": 1,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Não",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416733",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2416733/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 4,
+        "gov_comparable": 4,
+        "nominal_vote_ids": [
+          "2416733-28",
+          "2416733-37",
+          "2416733-42",
+          "2416733-46"
+        ],
+        "opp_aligned": 1,
+        "opp_comparable": 2,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2416733-28",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2416733-37",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2416733-42",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2416733-46",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "pl-6235-2023-trib",
+      "nominal_count": 4,
+      "present_count": 4,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2480979",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2480979/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 2,
+        "gov_comparable": 2,
+        "nominal_vote_ids": [
+          "2480979-91",
+          "2480979-96"
+        ],
+        "opp_aligned": 2,
+        "opp_comparable": 2,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2480979-91",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2480979-96",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "plp-234-2024-trib",
+      "nominal_count": 2,
+      "present_count": 2,
+      "score_value": 1.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 0.0,
+      "evidence": {
+        "all_recorded_vote_types": [],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2481721",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2481721/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 0,
+        "gov_comparable": 0,
+        "nominal_vote_ids": [
+          "2481721-32"
+        ],
+        "opp_aligned": 0,
+        "opp_comparable": 0,
+        "passage_vote": null,
+        "recorded_votes": [],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "plp-92-2024-trib",
+      "nominal_count": 1,
+      "present_count": 0,
+      "score_value": null,
+      "self_interest_value": null,
+      "stance": null,
+      "vote_label": "AUSENTE",
+      "vote_status": "ausente"
+    },
+    {
+      "camara_id": 204515,
+      "coverage_value": 1.0,
+      "evidence": {
+        "all_recorded_vote_types": [
+          "Não",
+          "Não",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim",
+          "Sim"
+        ],
+        "camara_law_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833",
+        "camara_votes_url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2196833/votacoes",
+        "fetch_error": null,
+        "gov_aligned": 18,
+        "gov_comparable": 18,
+        "nominal_vote_ids": [
+          "2196833-307",
+          "2196833-323",
+          "2196833-326",
+          "2196833-328",
+          "2196833-331",
+          "2196833-349",
+          "2196833-353",
+          "2196833-356",
+          "2196833-359",
+          "2196833-362",
+          "2196833-365",
+          "2196833-373",
+          "2196833-380",
+          "2196833-386",
+          "2196833-390",
+          "2196833-392",
+          "2196833-395",
+          "2372099-6"
+        ],
+        "opp_aligned": 3,
+        "opp_comparable": 16,
+        "passage_vote": "Sim",
+        "recorded_votes": [
+          {
+            "roll_call_id": "2196833-307",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-323",
+            "vote_type": "Não"
+          },
+          {
+            "roll_call_id": "2196833-326",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-328",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-331",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-349",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-353",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-356",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-359",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-362",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-365",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-373",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-380",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-386",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-390",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-392",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2196833-395",
+            "vote_type": "Sim"
+          },
+          {
+            "roll_call_id": "2372099-6",
+            "vote_type": "Sim"
+          }
+        ],
+        "tse_candidate_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001608227"
+      },
+      "keyword_slug": "tributacao-do-consumo",
+      "nominal_count": 18,
+      "present_count": 18,
+      "score_value": 0.0,
+      "self_interest_value": null,
+      "stance": "Sim",
+      "vote_label": "SIM",
+      "vote_status": "sim"
+    }
+  ],
+  "topics": [
+    {
+      "cod_temas": [
+        70,
+        40,
+        68
+      ],
+      "description": "Projetos que afetam renda de capital, dividendos, fundos exclusivos e ativos no exterior.",
+      "slug": "tributacao-da-riqueza",
+      "sort_order": 10,
+      "title": "Tributação da riqueza"
+    },
+    {
+      "cod_temas": [
+        70,
+        40
+      ],
+      "description": "Projetos tributários amplos usados como contexto, mesmo quando não medem riqueza diretamente.",
+      "slug": "reforma-tributaria",
+      "sort_order": 20,
+      "title": "Reforma tributária"
+    }
+  ]
+}

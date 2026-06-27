@@ -71,6 +71,31 @@ needs human judgment; everything after is automatic.
 the government line = live **Câmara** API. Wealth = live **TSE** API. So the *only* manual work to
 expose a new topic is **steps 1–2** (pick the themes, add one seed entry); steps 3–5 are mechanical.
 
+## Persisting data (snapshot)
+
+The MySQL database is **not** in git, so the discovered laws and the scored-candidate results
+would be lost on a fresh DB. [`app/snapshot.py`](app/snapshot.py) versions them under
+[`data/`](data/):
+
+| File | Kind | Holds |
+|---|---|---|
+| `data/laws.json` | config | every topic + law + keyword (the full law set, curated *and* discovered) |
+| `data/candidates.json` | config | the roster of scored candidates (camara_id + identity) |
+| `data/snapshot.json` | result | the above **plus** the politics + computed scores (the baked scorecards) |
+
+Scores are keyed by stable identifiers (`camara_id`, keyword `slug`) — never the DB's
+auto-increment ids — so a load reproduces the same results even on an empty database.
+
+```bash
+python app/snapshot.py export                 # DB  -> data/*.json   (commit the result)
+python app/snapshot.py load                    # snapshot.json -> DB  (config + baked results)
+python app/snapshot.py load --config-only      # laws + candidates only, then re-ingest/score yourself
+```
+
+Re-run `export` and commit `data/` whenever you add laws or score new candidates. The vote cache
+(`roll_calls`/`votes`, ~37k rows) is **not** snapshotted — it is rebuildable from the Câmara API via
+`ingest`, and the baked scores don't need it.
+
 ## Document map
 
 ### Root
