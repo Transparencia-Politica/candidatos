@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Candidato — Scorecards</title>
-<link rel="stylesheet" href="shared/theme.css?v=ddb0079d33">
+<link rel="stylesheet" href="shared/theme.css?v=23ba2d60bc">
 <script>
   // Set theme before first paint to avoid a flash of the wrong theme.
   (function(){
@@ -47,7 +47,7 @@
   <footer id="sources"></footer>
 </div>
 
-<script src="shared/scorecard.js?v=ddb0079d33"></script>
+<script src="shared/scorecard.js?v=23ba2d60bc"></script>
 <script>
 // Static GitHub Pages shell. Loads the baked snapshot once, then filters it entirely client-side
 // (filterRoster) and renders the full scorecard from the same data on click — no backend.
@@ -59,7 +59,7 @@ const cardByKey = new Map();      // key -> full scorecard (for the detail view)
 const filters = {
   query: '', house: 'all', parties: [], ufs: [],
   wealthMin: null, wealthMax: null, showUnknownWealth: true,
-  govMin: null, voteLaw: '', voteValue: '', sort: 'name',
+  govMin: null, voteLaw: '', voteValue: '', opinionMin: null, opinionMax: null, sort: 'name',
 };
 
 /* ---------------- views ---------------- */
@@ -113,12 +113,15 @@ function wireFilters(){
   el('f-gov').addEventListener('input', e => { filters.govMin = numOrNull(e.target.value); renderGrid(); });
   el('f-law').addEventListener('change', e => { filters.voteLaw = e.target.value; renderGrid(); });
   el('f-vote').addEventListener('change', e => { filters.voteValue = e.target.value; renderGrid(); });
+  el('f-opmin').addEventListener('input', e => { filters.opinionMin = numOrNull(e.target.value); renderGrid(); });
+  el('f-opmax').addEventListener('input', e => { filters.opinionMax = numOrNull(e.target.value); renderGrid(); });
   el('f-clear').addEventListener('click', () => {
     Object.assign(filters, { query:'', house:'all', parties:[], ufs:[], wealthMin:null, wealthMax:null,
-      showUnknownWealth:true, govMin:null, voteLaw:'', voteValue:'', sort:'name' });
+      showUnknownWealth:true, govMin:null, voteLaw:'', voteValue:'', opinionMin:null, opinionMax:null, sort:'name' });
     // reset controls
     el('f-query').value=''; el('f-sort').value='name'; el('f-wmin').value=''; el('f-wmax').value='';
     el('f-gov').value=''; el('f-law').value=''; el('f-vote').value=''; el('f-unknown').checked=true;
+    el('f-opmin').value=''; el('f-opmax').value='';
     for(const x of el('f-house').children) x.classList.toggle('on', x.dataset.house==='all');
     for(const c of document.querySelectorAll('.fchip.on')) c.classList.remove('on');
     renderGrid();
@@ -130,7 +133,7 @@ async function run(){
   try{
     // Cache-bust the snapshot too: GitHub Pages caches it, so a returning visitor can otherwise
     // get a stale roster (e.g. an old 3-candidate snapshot). Bump ?v= whenever the data is re-baked.
-    const res = await fetch('./data/scorecards.json?v=ddb0079d33');
+    const res = await fetch('./data/scorecards.json?v=23ba2d60bc');
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
     const cards = payload.scorecards || [];

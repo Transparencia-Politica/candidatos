@@ -331,6 +331,11 @@ function filterRoster(entries, f){
     }
     if(f.govMin != null && (e.gov == null || e.gov < f.govMin)) return false;
     if(f.voteLaw && f.voteValue && (e.votes[f.voteLaw] || '') !== f.voteValue) return false;
+    if(f.opinionMin != null || f.opinionMax != null){
+      if(!e.opinion) return false;                 // no score → can't be in a % range
+      if(f.opinionMin != null && e.opinion.pct < f.opinionMin) return false;
+      if(f.opinionMax != null && e.opinion.pct > f.opinionMax) return false;
+    }
     return true;
   });
   const w = e => e.wealth_known ? e.wealth_total : null;
@@ -372,6 +377,12 @@ function filterControlsHtml(facets){
       <input id="f-wmin" class="fnum" type="number" inputmode="numeric" placeholder="mín R$">
       <input id="f-wmax" class="fnum" type="number" inputmode="numeric" placeholder="máx R$">
       <label class="fcheck"><input id="f-unknown" type="checkbox" checked> incluir desconhecido</label>
+    </div>
+    <div class="frow">
+      <span class="flabel">Apoio %</span>
+      <input id="f-opmin" class="fnum" type="number" inputmode="numeric" min="0" max="100" placeholder="mín %">
+      <input id="f-opmax" class="fnum" type="number" inputmode="numeric" min="0" max="100" placeholder="máx %">
+      <span class="muted" style="font-size:12px">0 = protege patrimônio · 100 = apoia população</span>
     </div>
     <div class="frow">
       <span class="flabel">Voto</span>
