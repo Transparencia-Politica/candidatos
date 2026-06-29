@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Candidato — Scorecards</title>
-<link rel="stylesheet" href="shared/theme.css?v=6b8e2007ef">
+<link rel="stylesheet" href="shared/theme.css?v=c340c5006a">
 <script>
   // Set theme before first paint to avoid a flash of the wrong theme.
   (function(){
@@ -47,7 +47,7 @@
   <footer id="sources"></footer>
 </div>
 
-<script src="shared/scorecard.js?v=6b8e2007ef"></script>
+<script src="shared/scorecard.js?v=c340c5006a"></script>
 <script>
 // Static GitHub Pages shell. Loads the baked snapshot once, then filters it entirely client-side
 // (filterRoster) and renders the full scorecard from the same data on click — no backend.
@@ -133,7 +133,7 @@ async function run(){
   try{
     // Cache-bust the snapshot too: GitHub Pages caches it, so a returning visitor can otherwise
     // get a stale roster (e.g. an old 3-candidate snapshot). Bump ?v= whenever the data is re-baked.
-    const res = await fetch('./data/scorecards.json?v=6b8e2007ef');
+    const res = await fetch('./data/scorecards.json?v=c340c5006a');
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
     const cards = payload.scorecards || [];

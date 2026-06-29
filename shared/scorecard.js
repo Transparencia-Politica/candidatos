@@ -53,11 +53,13 @@ function metricsHtml(card){
     [pct(s.coverage_pct), 'cobertura de leis relevantes'],
     [pct(s.key_attendance_pct), 'presença no projeto-chave'],
     [!known || s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio'],
-    [s.gov_alignment_pct === null || s.gov_alignment_pct === undefined ? '—' : pct(s.gov_alignment_pct), 'alinhado ao Governo'],
-    [s.opp_alignment_pct === null || s.opp_alignment_pct === undefined ? '—' : pct(s.opp_alignment_pct), 'alinhado à Oposição']
+    [s.gov_alignment_pct === null || s.gov_alignment_pct === undefined ? '—' : pct(s.gov_alignment_pct), 'alinhado ao Governo',
+      'Em cada votação, o líder do Governo orienta como a base deve votar — o "voto do Governo". Este é o % de votos em que o(a) parlamentar seguiu essa orientação.'],
+    [s.opp_alignment_pct === null || s.opp_alignment_pct === undefined ? '—' : pct(s.opp_alignment_pct), 'alinhado à Oposição',
+      'O mesmo para a Oposição: o % de votos em que o(a) parlamentar seguiu a orientação de voto dos líderes de oposição.']
   ];
   return `<section class="metrics">${
-    metrics.map(([n,l]) => `<div class="metric"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('')
+    metrics.map(([n,l,tip]) => `<div class="metric"><div class="n">${n}</div><div class="l">${l}${tip ? ' ' + filterInfo(tip) : ''}</div></div>`).join('')
   }</section>`;
 }
 
@@ -347,8 +349,11 @@ function filterRoster(entries, f){
 
 // Render the filter panel. State lives in the page shell; this only emits markup with stable ids.
 // A small ⓘ with a hover/focus tooltip — used to explain each filter.
+// Escape & and " so quotes inside the text don't break the data-tip/aria-label attributes
+// (CSS content:attr() decodes the entities back, so the tooltip shows the real characters).
 function filterInfo(text){
-  return `<span class="finfo" tabindex="0" role="img" aria-label="${text}" data-tip="${text}">ⓘ</span>`;
+  const safe = String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  return `<span class="finfo" tabindex="0" role="img" aria-label="${safe}" data-tip="${safe}">ⓘ</span>`;
 }
 
 function filterControlsHtml(facets){
@@ -400,7 +405,7 @@ function filterControlsHtml(facets){
         <option value="NAO">votou NÃO</option>
         <option value="AUSENTE">AUSENTE</option>
       </select>
-      <span class="flabel">Gov. mín %</span>${fi('Mostra só quem tem ao menos esse % de alinhamento com a orientação de voto do Governo.')}
+      <span class="flabel">Gov. mín %</span>${fi('Em cada votação, o líder do Governo orienta como a base deve votar — é o "voto do Governo". O alinhamento é o % de votos em que o(a) parlamentar seguiu essa orientação. Este filtro mostra só quem fica no mínimo escolhido ou acima.')}
       <input id="f-gov" class="fnum" type="number" inputmode="numeric" placeholder="0–100">
       <button id="f-clear" type="button" class="secondary">Limpar filtros</button>
     </div>
