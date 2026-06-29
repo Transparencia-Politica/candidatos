@@ -346,46 +346,53 @@ function filterRoster(entries, f){
 }
 
 // Render the filter panel. State lives in the page shell; this only emits markup with stable ids.
+// A small ⓘ with a hover/focus tooltip — used to explain each filter.
+function filterInfo(text){
+  return `<span class="finfo" tabindex="0" role="img" aria-label="${text}" data-tip="${text}">ⓘ</span>`;
+}
+
 function filterControlsHtml(facets){
   const chip = (cls, attr, val, label) => `<button type="button" class="fchip" data-${attr}="${val}">${label}</button>`;
   const opts = (arr, ph) => `<option value="">${ph}</option>` + arr.map(x => `<option value="${x}">${x}</option>`).join('');
+  const fi = filterInfo;
   return `<div class="filters">
     <div class="frow">
       <input id="f-query" class="search-input" placeholder="Buscar por nome…" autocomplete="off">
+      ${fi('Filtra a lista pelo nome do(a) parlamentar. Ignora acentos e maiúsculas/minúsculas.')}
       <span id="f-count" class="fcount"></span>
     </div>
     <div class="frow">
-      <span class="flabel">Casa</span>
+      <span class="flabel">Casa</span>${fi('Câmara mostra os(as) deputados(as); Senado, os(as) senadores(as); Todas, os dois.')}
       <span class="fseg" id="f-house">
         <button type="button" data-house="all" class="on">Todas</button>
         <button type="button" data-house="camara">Câmara</button>
         <button type="button" data-house="senado">Senado</button>
       </span>
-      <span class="flabel">Ordenar</span>
+      <span class="flabel">Ordenar</span>${fi('Ordena por nome ou pelo patrimônio declarado. Quem não tem patrimônio conhecido vai para o fim.')}
       <select id="f-sort" class="fsel">
         <option value="name">Nome (A→Z)</option>
         <option value="wealth-desc">Patrimônio (maior→menor)</option>
         <option value="wealth-asc">Patrimônio (menor→maior)</option>
       </select>
     </div>
-    <div class="frow"><span class="flabel">Partido</span><span class="fchips" id="f-parties">${
+    <div class="frow"><span class="flabel">Partido</span>${fi('Mostra só parlamentares dos partidos marcados. Clique para marcar vários.')}<span class="fchips" id="f-parties">${
       facets.parties.map(p => chip('party','party',p,p)).join('')}</span></div>
-    <div class="frow"><span class="flabel">UF</span><span class="fchips" id="f-ufs">${
+    <div class="frow"><span class="flabel">UF</span>${fi('Mostra só parlamentares dos estados (UF) marcados. Clique para marcar vários.')}<span class="fchips" id="f-ufs">${
       facets.ufs.map(u => chip('uf','uf',u,u)).join('')}</span></div>
     <div class="frow">
-      <span class="flabel">Patrimônio</span>
+      <span class="flabel">Patrimônio</span>${fi('Faixa de patrimônio declarado no TSE (R$). "Incluir desconhecido" mantém quem não teve a declaração localizada (mostrado como —).')}
       <input id="f-wmin" class="fnum" type="number" inputmode="numeric" placeholder="mín R$">
       <input id="f-wmax" class="fnum" type="number" inputmode="numeric" placeholder="máx R$">
       <label class="fcheck"><input id="f-unknown" type="checkbox" checked> incluir desconhecido</label>
     </div>
     <div class="frow">
-      <span class="flabel">Apoio %</span>
+      <span class="flabel">Apoio %</span>${fi('Faixa do score de apoio à população: 0 = protege o patrimônio, 100 = apoia a população. Quem não tem score fica de fora.')}
       <input id="f-opmin" class="fnum" type="number" inputmode="numeric" min="0" max="100" placeholder="mín %">
       <input id="f-opmax" class="fnum" type="number" inputmode="numeric" min="0" max="100" placeholder="máx %">
       <span class="muted" style="font-size:12px">0 = protege patrimônio · 100 = apoia população</span>
     </div>
     <div class="frow">
-      <span class="flabel">Voto</span>
+      <span class="flabel">Voto</span>${fi('Filtra por como votou numa lei específica: SIM, NÃO ou AUSENTE naquela votação.')}
       <select id="f-law" class="fsel">${opts(facets.laws, 'qualquer lei')}</select>
       <select id="f-vote" class="fsel">
         <option value="">qualquer voto</option>
@@ -393,7 +400,7 @@ function filterControlsHtml(facets){
         <option value="NAO">votou NÃO</option>
         <option value="AUSENTE">AUSENTE</option>
       </select>
-      <span class="flabel">Gov. mín %</span>
+      <span class="flabel">Gov. mín %</span>${fi('Mostra só quem tem ao menos esse % de alinhamento com a orientação de voto do Governo.')}
       <input id="f-gov" class="fnum" type="number" inputmode="numeric" placeholder="0–100">
       <button id="f-clear" type="button" class="secondary">Limpar filtros</button>
     </div>
