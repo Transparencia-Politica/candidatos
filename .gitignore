@@ -7,4 +7,4 @@ __pycache__/
 
 # Test artifacts
 .playwright-mcp/
-pages-filters.png
+/*.png

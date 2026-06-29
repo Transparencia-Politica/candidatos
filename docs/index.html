@@ -30,9 +30,10 @@
     </div>
   </header>
 
-  <!-- Busca: filter panel + results grid -->
+  <!-- Busca: filter panel + opinion legend + results grid -->
   <section id="pane-busca">
     <div class="panel"><div id="filters-host"></div></div>
+    <div id="legend-host"></div>
     <div id="grid-host"></div>
   </section>
 
@@ -137,6 +138,7 @@ async function run(){
     }
     entries = cards.map(c => { const e = rosterEntry(c); cardByKey.set(e.key, c); return e; });
     el('filters-host').innerHTML = filterControlsHtml(rosterFacets(entries));
+    el('legend-host').innerHTML = opinionLegendHtml();
     wireFilters();
     renderGrid();
     el('back').addEventListener('click', showBusca);

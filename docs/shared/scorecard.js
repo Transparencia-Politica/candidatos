@@ -122,10 +122,78 @@ const METHOD_HTML = `<section class="panel">
   evidência separadamente para evitar transformar dado faltante em intenção.</div>
 </section>`;
 
-// Full scorecard body for one candidate (identity + metrics + wealth + votes + method).
+/* ---- "Opinion" score: protege o patrimônio ◄──► apoia a população ----
+   Our DEFAULT lens. For each wealth-distribution law the person was present on, the stored
+   score_value is already +1 (voted with the people / progressive taxation) or -1 (voted to
+   protect wealth). The % is the plain average of those votes — only votes move the number.
+   Personal wealth shapes only the descriptive label (a future settings panel can swap the lens). */
+const WEALTH_HIGH = 1000000;  // R$ — "high personal wealth" threshold for the self-interest label
+
+function opinionScore(card){
+  let sum = 0, n = 0;
+  for(const t of (card.topics || [])) for(const law of (t.laws || [])){
+    const s = law.score;
+    if(!s || s.score_value == null) continue;   // absent, unscored, or non-directional (PEC 45 = 0)
+    sum += s.score_value; n++;
+  }
+  if(!n) return null;                            // not enough decisive votes to read
+  const alignment = sum / n;                     // [-1, +1]
+  const pct = Math.round((alignment + 1) / 2 * 100);  // 0 = protege patrimônio, 100 = apoia população
+  const p = card.politic || {};
+  const wealthy = wealthKnown(p) && Number(p.wealth_total) >= WEALTH_HIGH;
+  let label, tone;
+  if(pct >= 60){ tone = 'sim'; label = 'Vota pela população'; }
+  else if(pct <= 40){ tone = 'nao'; label = wealthy ? 'Protege o próprio patrimônio' : 'Vota contra a redistribuição'; }
+  else { tone = 'mix'; label = 'Voto misto'; }
+  return { pct, alignment, n, label, tone, wealthy };
+}
+
+// The ⓘ explainer — pure <details> so it works in both shells with no JS wiring.
+function opinionInfo(){
+  return `<details class="opinfo"><summary title="Como medimos">ⓘ</summary>
+    <div class="opinfo-body"><b>Como medimos.</b> Para cada lei sobre distribuição de patrimônio em
+    que o(a) parlamentar <b>esteve presente</b>, um voto a favor da tributação progressiva conta
+    <b>+1</b> (apoia a população) e um voto contra conta <b>−1</b> (protege o patrimônio). A % é a
+    média desses votos — <b>só os votos movem o número</b>. O <b>patrimônio pessoal</b> muda apenas
+    o rótulo: quem vota para proteger o patrimônio <b>e</b> tem alta renda aparece como “protege o
+    próprio patrimônio”. É <b>uma lente</b>, não um veredito — a matemática está aberta. Em breve
+    você poderá configurar a sua própria.</div></details>`;
+}
+
+// Slim opinion row for the profile: label + % + meter + ⓘ.
+function opinionHtml(card){
+  const o = opinionScore(card);
+  if(!o){
+    return `<section class="panel opinion-panel"><div class="opinion-head">
+      <span class="muted">Apoio à população: sem votos suficientes para medir.</span>${opinionInfo()}
+      </div></section>`;
+  }
+  return `<section class="panel opinion-panel">
+    <div class="opinion-head">
+      <span class="opinion-pct op-${o.tone}">${o.pct}%</span>
+      <div><div class="opinion-label">${o.label}</div>
+        <div class="muted">apoio à população · ${o.n} voto(s) decisivo(s)</div></div>
+      ${opinionInfo()}
+    </div>
+    <div class="opmeter"><i class="op-${o.tone}" style="width:${o.pct}%"></i></div>
+    <div class="opmeter-ends"><span>protege o patrimônio</span><span>apoia a população</span></div>
+  </section>`;
+}
+
+// Slim legend explaining what the % means at each end — sits above the roster grid.
+function opinionLegendHtml(){
+  return `<div class="opinion-legend">
+    <span class="oleg-bar" aria-hidden="true"></span>
+    <span class="oleg-text">A <b>%</b> mede o <b>apoio à população</b> nas leis de distribuição de
+      patrimônio — <b class="op-nao-ink">0% = protege o patrimônio</b> (votou contra a tributação
+      progressiva) · <b class="op-sim-ink">100% = apoia a população</b> (votou a favor).</span>
+  </div>`;
+}
+
+// Full scorecard body for one candidate (identity + opinion + metrics + wealth + votes + method).
 function cardBodyHtml(card){
   return `<section class="panel">${identityHtml(card)}</section>`
-    + metricsHtml(card) + wealthHtml(card) + votesHtml(card) + METHOD_HTML;
+    + opinionHtml(card) + metricsHtml(card) + wealthHtml(card) + votesHtml(card) + METHOD_HTML;
 }
 
 // Profile body for a non-legislator (President/governor) from a curated TSE profile. These have
@@ -177,8 +245,11 @@ function candidateCardHtml(c, i){
     ? '<span class="chip c-mix">Senado</span>'
     : '<span class="chip c-sim">Câmara</span>';
   const delay = i ? ` style="animation-delay:${Math.min(i, 14) * 28}ms"` : '';
+  // Slim opinion badge — only when the entry carries it (Pages snapshot); the live app's
+  // lightweight /api/politics roster has no scores, so its tiles stay unchanged.
+  const op = c.opinion ? `<span class="opinion-tag op-${c.opinion.tone}" title="${c.opinion.label} — ${c.opinion.pct}% de apoio à população (0% protege o patrimônio · 100% apoia a população)">${c.opinion.pct}%<span class="op-i">ⓘ</span></span>` : '';
   return `<button class="ccard" type="button" data-key="${candidateKey(c)}"${delay}>
-    <span class="ccard-top"><span class="avatar avatar-sm">${(c.name || '?').slice(0, 1)}</span>${house}</span>
+    <span class="ccard-top"><span class="avatar avatar-sm">${(c.name || '?').slice(0, 1)}</span>${house}${op}</span>
     <b class="ccard-name">${c.name}</b>
     <span class="muted ccard-meta">${c.party || '—'} · ${c.uf || '—'}</span>
     <span class="ccard-wealth${known ? '' : ' unknown'}">${wealth}</span>
@@ -225,6 +296,7 @@ function rosterEntry(card){
     wealth_total: Number(p.wealth_total) || 0,
     wealth_known: p.tse_sq != null && p.tse_sq !== '',
     gov: s.gov_alignment_pct, opp: s.opp_alignment_pct,
+    opinion: opinionScore(card),   // {pct, tone, label} | null — drives the slim tile badge
     votes, _name: normName(p.name),
   };
 }
