@@ -22,7 +22,27 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # served at /shared/* — the source of truth that docs/shared/ is copied from.
 SHARED_DIR = os.path.join(os.path.dirname(HERE), "shared")
 SHARED_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8"}
+# Curated profiles for non-legislators (President, governors) who can't be scored from
+# roll-calls. They don't live in MySQL — search reads them straight from this TSE-sourced file.
+EXEC_PROFILES = os.path.join(os.path.dirname(HERE), "research", "perfis-precandidatos-2026.data.json")
 db.init_db().close()
+
+
+def search_executives(name):
+    """Match curated executive (TSE) profiles by normalized-name substring. Best-effort: a
+    missing/broken file yields no matches rather than an error."""
+    try:
+        with open(EXEC_PROFILES, encoding="utf-8") as f:
+            profiles = json.load(f)
+    except (FileNotFoundError, ValueError):
+        return []
+    q = score_candidate.normalize_name(name)
+    hits = []
+    for p in profiles.values():
+        names = [score_candidate.normalize_name(p.get(k)) for k in ("display", "nome_completo", "nome_urna")]
+        if any(n and (q in n or n in q) for n in names):
+            hits.append(p)
+    return hits
 
 
 def with_db(callback):
@@ -76,6 +96,12 @@ class H(http.server.BaseHTTPRequestHandler):
                 return self._send(200, json.dumps({"candidates": candidates}, ensure_ascii=False))
             except Exception as e:
                 return self._send(502, json.dumps({"error": str(e)}, ensure_ascii=False))
+        if p.path == "/api/executives/search":
+            query = urllib.parse.parse_qs(p.query)
+            name = (query.get("q", [""])[0] or "").strip()
+            if len(name) < 2:
+                return self._send(400, json.dumps({"error": "query must have at least 2 characters"}))
+            return self._send(200, json.dumps({"executives": search_executives(name)}, ensure_ascii=False))
         if p.path == "/api/topics":
             payload = with_db(lambda conn: {"topics": db.list_topics(conn)})
             return self._send(200, json.dumps(payload, ensure_ascii=False))

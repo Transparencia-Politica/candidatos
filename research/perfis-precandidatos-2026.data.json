@@ -1,0 +1,134 @@
+{
+  "lula": {
+    "key": "lula",
+    "display": "Luiz Inácio Lula da Silva",
+    "party_2026": "PT",
+    "office_2026": "Presidente (pré-candidato 2026)",
+    "source_election": {
+      "year": 2022,
+      "uf": "BR",
+      "cargo_label": "Presidente",
+      "election_id": "2040602022",
+      "sq": "280001607829"
+    },
+    "nome_completo": "LUIZ INÁCIO LULA DA SILVA",
+    "nome_urna": "LULA",
+    "data_nascimento": "1945-10-06",
+    "ocupacao": "Torneiro Mecânico",
+    "grau_instrucao": "Ensino Fundamental completo",
+    "estado_civil": "Casado(a)",
+    "uf_nascimento": "PE",
+    "municipio_nascimento": "GARANHUNS",
+    "coligacao": "COLIGAÇÃO BRASIL DA ESPERANÇA",
+    "foto_url": true,
+    "wealth_total": 7423725.78,
+    "n_bens": 23,
+    "wealth_buckets": {
+      "Ações / participações": 49333.17,
+      "Depósito no exterior": 0.0,
+      "Dinheiro em espécie": 0.0,
+      "Poupança / renda fixa / contas": 211326.26,
+      "Outros": 7163066.35
+    },
+    "source_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/BR/2040602022/candidato/280001607829"
+  },
+  "caiado": {
+    "key": "caiado",
+    "display": "Ronaldo Caiado",
+    "party_2026": "PSD/União",
+    "office_2026": "Presidente (pré-candidato 2026)",
+    "source_election": {
+      "year": 2022,
+      "uf": "GO",
+      "cargo_label": "Governador (GO)",
+      "election_id": "2040602022",
+      "sq": "90001646326"
+    },
+    "nome_completo": "RONALDO RAMOS CAIADO",
+    "nome_urna": "RONALDO CAIADO",
+    "data_nascimento": "1949-09-25",
+    "ocupacao": "Médico",
+    "grau_instrucao": "Superior completo",
+    "estado_civil": "Casado(a)",
+    "uf_nascimento": "GO",
+    "municipio_nascimento": "ANÁPOLIS",
+    "coligacao": "Pra Seguir em Frente",
+    "foto_url": true,
+    "wealth_total": 24874436.19,
+    "n_bens": 53,
+    "wealth_buckets": {
+      "Ações / participações": 883475.34,
+      "Depósito no exterior": 0.0,
+      "Dinheiro em espécie": 0.0,
+      "Poupança / renda fixa / contas": 71679.88,
+      "Outros": 23919280.97
+    },
+    "source_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/GO/2040602022/candidato/90001646326"
+  },
+  "zema": {
+    "key": "zema",
+    "display": "Romeu Zema",
+    "party_2026": "Novo",
+    "office_2026": "Presidente (pré-candidato 2026)",
+    "source_election": {
+      "year": 2022,
+      "uf": "MG",
+      "cargo_label": "Governador (MG)",
+      "election_id": "2040602022",
+      "sq": "130001701690"
+    },
+    "nome_completo": "ROMEU ZEMA NETO",
+    "nome_urna": "ZEMA",
+    "data_nascimento": "1964-10-28",
+    "ocupacao": "Governador",
+    "grau_instrucao": "Superior completo",
+    "estado_civil": "Divorciado(a)",
+    "uf_nascimento": "MG",
+    "municipio_nascimento": "ARAXÁ",
+    "coligacao": "MINAS NOS TRILHOS ",
+    "foto_url": true,
+    "wealth_total": 129795313.7,
+    "n_bens": 16,
+    "wealth_buckets": {
+      "Ações / participações": 92942274.81,
+      "Depósito no exterior": 0.0,
+      "Dinheiro em espécie": 0.0,
+      "Poupança / renda fixa / contas": 1386332.58,
+      "Outros": 35466706.31
+    },
+    "source_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/MG/2040602022/candidato/130001701690"
+  },
+  "samara": {
+    "key": "samara",
+    "display": "Samara Martins",
+    "party_2026": "UP",
+    "office_2026": "Presidente (pré-candidato 2026)",
+    "source_election": {
+      "year": 2022,
+      "uf": "BR",
+      "cargo_label": "Vice-presidente",
+      "election_id": "2040602022",
+      "sq": "280001602703"
+    },
+    "nome_completo": "SAMARA MARTINS DA SILVA",
+    "nome_urna": "SAMARA MARTINS",
+    "data_nascimento": "1987-08-31",
+    "ocupacao": "Odontólogo",
+    "grau_instrucao": "Superior completo",
+    "estado_civil": "Casado(a)",
+    "uf_nascimento": "MG",
+    "municipio_nascimento": "BELO HORIZONTE",
+    "coligacao": "UP",
+    "foto_url": true,
+    "wealth_total": 3364.55,
+    "n_bens": 3,
+    "wealth_buckets": {
+      "Ações / participações": 0.0,
+      "Depósito no exterior": 0.0,
+      "Dinheiro em espécie": 0.0,
+      "Poupança / renda fixa / contas": 3364.55,
+      "Outros": 0.0
+    },
+    "source_url": "https://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2022/BR/2040602022/candidato/280001602703"
+  }
+}

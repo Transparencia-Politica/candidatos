@@ -103,15 +103,37 @@ function renderGrid(){
 }
 
 // Remote search results (deputies not yet in the bank) shown as clickable chips in the Busca tab.
-function renderSearchResults(candidates){
-  if(!candidates.length){ el('search-results').innerHTML = ''; return; }
-  el('search-results').innerHTML = candidates.map(c =>
+let execProfiles = {};  // exec-key -> curated TSE profile, for the click handler below
+function renderSearchResults(candidates, executives){
+  candidates = candidates || []; executives = executives || [];
+  if(!candidates.length && !executives.length){ el('search-results').innerHTML = ''; return; }
+  execProfiles = {};
+  // Executives (President/governor) first — they're the non-legislators you'd otherwise never find.
+  const exHtml = executives.map((p, i) => {
+    execProfiles['x' + i] = p;
+    return `<button class="candidate" type="button" data-exec-key="x${i}">
+      <b>${p.display}</b><span>${p.party_2026 || '—'} · ${p.office_2026 || 'Executivo'} · ver perfil</span>
+    </button>`;
+  }).join('');
+  const depHtml = candidates.map(c =>
     `<button class="candidate" type="button" data-camara-id="${c.camara_id}">
       <b>${c.name}</b><span>${c.party || '—'} · ${c.uf || '—'} · Câmara ${c.camara_id} · calcular</span>
     </button>`).join('');
-  for(const b of el('search-results').querySelectorAll('.candidate')){
+  el('search-results').innerHTML = exHtml + depHtml;
+  for(const b of el('search-results').querySelectorAll('.candidate[data-camara-id]')){
     b.addEventListener('click', () => analyzeCandidate(Number(b.dataset.camaraId), b.querySelector('b').textContent));
   }
+  for(const b of el('search-results').querySelectorAll('.candidate[data-exec-key]')){
+    b.addEventListener('click', () => showExecutiveProfile(execProfiles[b.dataset.execKey]));
+  }
+}
+
+// A non-legislator profile (no vote scorecard) rendered from the curated TSE data.
+function showExecutiveProfile(p){
+  if(!p) return;
+  el('search-results').innerHTML = '';
+  showSelected(executiveProfileHtml(p));
+  el('sources').textContent = `Perfil TSE DivulgaCand${p.source_url ? ` · ${p.source_url}` : ''} · renderizado em ${new Date().toLocaleString('pt-BR')}`;
 }
 
 /* ---------------- selection (Selecionado tab) ---------------- */
@@ -199,11 +221,15 @@ async function searchRemote(q){
   el('search-button').disabled = true;
   el('search-results').innerHTML = '<span class="muted">Buscando na Câmara…</span>';
   try{
-    const res = await fetch(`/api/candidates/search?q=${encodeURIComponent(q)}`);
-    const payload = await res.json();
-    if(!res.ok) throw new Error(payload.error || `HTTP ${res.status}`);
-    const candidates = payload.candidates || [];
-    if(candidates.length){ renderSearchResults(candidates); return; }
+    // Câmara (deputies) and Executivo (curated TSE) in parallel — the President isn't in the
+    // Câmara roster, so without the executive leg a search for "Lula" only finds deputies.
+    const [camPayload, exPayload] = await Promise.all([
+      fetch(`/api/candidates/search?q=${encodeURIComponent(q)}`).then(r => r.json()).catch(() => ({})),
+      fetch(`/api/executives/search?q=${encodeURIComponent(q)}`).then(r => r.json()).catch(() => ({})),
+    ]);
+    const candidates = camPayload.candidates || [];
+    const executives = exPayload.executives || [];
+    if(candidates.length || executives.length){ renderSearchResults(candidates, executives); return; }
     el('search-results').innerHTML = '<span class="muted">Nada na Câmara. Buscando no Senado e calculando…</span>';
     await searchSenator(q);
   }catch(err){
