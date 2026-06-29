@@ -21,8 +21,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import re
 import sys
 from typing import Any
 
@@ -229,7 +231,40 @@ def export_site(conn, site_data_dir: str = SITE_DATA_DIR) -> str:
     out_file = os.path.join(site_data_dir, "scorecards.json")
     _write(out_file, payload)
     copy_shared_assets()
+    stamp_cache_version()  # so returning visitors never get a stale snapshot/asset
     return out_file
+
+
+# Cached, content-addressed URLs in docs/index.html. GitHub Pages caches these aggressively,
+# so a deploy can otherwise leave a returning visitor running new HTML against old JS, or showing
+# an old snapshot. Stamping a content hash makes the ?v= token change iff the bytes change.
+CACHE_BUSTED_REFS = ("shared/theme.css", "shared/scorecard.js", "data/scorecards.json")
+
+
+def _site_version() -> str:
+    """Short hash of the three cached files — changes iff their content changes."""
+    h = hashlib.sha256()
+    for rel in CACHE_BUSTED_REFS:
+        with open(os.path.join(ROOT_DIR, "docs", rel), "rb") as f:
+            h.update(f.read())
+    return h.hexdigest()[:10]
+
+
+def stamp_cache_version(version: str | None = None) -> str:
+    """Rewrite docs/index.html so every cached asset/data URL carries ?v=<content-hash>.
+
+    Run after the data + assets are written. The token moves in lockstep with the content, so a
+    new deploy forces a fresh fetch automatically — no manual ?v= bumps, no stale-cache footgun.
+    """
+    version = version or _site_version()
+    index_path = os.path.join(ROOT_DIR, "docs", "index.html")
+    with open(index_path, encoding="utf-8") as f:
+        html = f.read()
+    for rel in CACHE_BUSTED_REFS:
+        html = re.sub(re.escape(rel) + r"(\?v=\w+)?", f"{rel}?v={version}", html)
+    with open(index_path, "w", encoding="utf-8") as f:
+        f.write(html)
+    return version
 
 
 def load_config(conn, data: dict[str, Any]) -> None:
@@ -352,6 +387,7 @@ def main(argv: list[str] | None = None) -> int:
             conn.close()
         print(f"Baked {len(payload['scorecards'])} scorecard(s) -> {out_file}")
         print(f"Copied shared assets ({', '.join(SHARED_ASSETS)}) -> {SITE_SHARED_DIR}")
+        print(f"Stamped docs/index.html cache version ?v={_site_version()}")
         return 0
 
     if args.command == "export":
