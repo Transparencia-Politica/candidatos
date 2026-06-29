@@ -128,7 +128,9 @@ function wireFilters(){
 /* ---------------- load ---------------- */
 async function run(){
   try{
-    const res = await fetch('./data/scorecards.json');
+    // Cache-bust the snapshot too: GitHub Pages caches it, so a returning visitor can otherwise
+    // get a stale roster (e.g. an old 3-candidate snapshot). Bump ?v= whenever the data is re-baked.
+    const res = await fetch('./data/scorecards.json?v=3');
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
     const cards = payload.scorecards || [];
