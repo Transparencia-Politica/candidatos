@@ -22,7 +22,7 @@
   <header>
     <div>
       <h1>Candidato · Scorecards</h1>
-      <div class="sub">Como deputados(as) votaram nas leis que mexem com o próprio patrimônio. Snapshot público, sem servidor.</div>
+      <div class="sub">Como deputados(as) e senadores(as) votaram nas leis que mexem com o próprio patrimônio. Snapshot público, sem servidor.</div>
     </div>
     <div class="header-actions">
       <div id="snapshot-badge" class="badge">snapshot</div>
@@ -30,50 +30,101 @@
     </div>
   </header>
 
-  <nav id="nav" class="nav" style="display:none"></nav>
+  <!-- Busca: filter panel + results grid -->
+  <section id="pane-busca">
+    <div class="panel"><div id="filters-host"></div></div>
+    <div id="grid-host"></div>
+  </section>
+
+  <!-- Detalhe: one full scorecard, read straight from the snapshot (no fetch) -->
+  <section id="pane-detalhe" hidden>
+    <button id="back" class="linkback" type="button">← Voltar à busca</button>
+    <div id="card-host"></div>
+  </section>
 
   <section id="state" class="panel">Carregando scorecards…</section>
-  <main id="cards"></main>
-
   <footer id="sources"></footer>
 </div>
 
 <script src="shared/scorecard.js"></script>
 <script>
-// Static GitHub Pages shell: load the baked snapshot, render every candidate, show one
-// at a time via the nav (hash). Shared helpers (cardBodyHtml, slugify, initThemeToggle,
-// …) come from scorecard.js.
-function renderCardBlock(card){
-  const p = card.politic;
-  const anchor = slugify(p.name, p.camara_id);
-  const block = document.createElement('article');
-  block.className = 'card-block';
-  block.id = anchor;
-  block.innerHTML = cardBodyHtml(card);
-  return { block, anchor };
+// Static GitHub Pages shell. Loads the baked snapshot once, then filters it entirely client-side
+// (filterRoster) and renders the full scorecard from the same data on click — no backend.
+// Filter logic + controls (filterControlsHtml, rosterEntry, rosterFacets, candidateGridHtml,
+// cardBodyHtml) live in shared/scorecard.js — this file is only state + wiring.
+
+let entries = [];                 // lightweight, filterable roster entries
+const cardByKey = new Map();      // key -> full scorecard (for the detail view)
+const filters = {
+  query: '', house: 'all', parties: [], ufs: [],
+  wealthMin: null, wealthMax: null, showUnknownWealth: true,
+  govMin: null, voteLaw: '', voteValue: '', sort: 'name',
+};
+
+/* ---------------- views ---------------- */
+function showBusca(){ el('pane-busca').hidden = false; el('pane-detalhe').hidden = true; }
+function showDetalhe(card){
+  el('card-host').innerHTML = cardBodyHtml(card);
+  el('pane-busca').hidden = true; el('pane-detalhe').hidden = false;
+  window.scrollTo(0, 0);
 }
 
-function renderNav(cards, anchors){
-  const links = cards.map((card, i) => {
-    const p = card.politic;
-    return `<a href="#${anchors[i]}">${p.name} <span class="muted">· ${p.party || '—'}/${p.uf || '—'}</span></a>`;
-  }).join('');
-  el('nav').innerHTML = `<span class="navlabel">Candidatos</span>${links}`;
-  el('nav').style.display = 'flex';
-}
-
-// Show only the card matching the current hash (default: first card).
-function showCard(){
-  const blocks = [...el('cards').querySelectorAll('.card-block')];
-  if(!blocks.length) return;
-  const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-  const active = blocks.find(b => b.id === hash) || blocks[0];
-  blocks.forEach(b => b.classList.toggle('active', b === active));
-  for(const a of el('nav').querySelectorAll('a')){
-    a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
+/* ---------------- grid ---------------- */
+function renderGrid(){
+  const list = filterRoster(entries, filters);
+  el('f-count').textContent = `${list.length} de ${entries.length}`;
+  el('grid-host').innerHTML = candidateGridHtml(list);
+  for(const tile of el('grid-host').querySelectorAll('.ccard')){
+    tile.addEventListener('click', () => {
+      const card = cardByKey.get(tile.dataset.key);
+      if(card) showDetalhe(card);
+    });
   }
 }
 
+/* ---------------- filter wiring ---------------- */
+const numOrNull = v => v.trim() === '' ? null : Number(v);
+function toggleInSet(arr, val){
+  const i = arr.indexOf(val);
+  if(i === -1) arr.push(val); else arr.splice(i, 1);
+}
+
+function wireFilters(){
+  el('f-query').addEventListener('input', e => { filters.query = normName(e.target.value); renderGrid(); });
+  el('f-sort').addEventListener('change', e => { filters.sort = e.target.value; renderGrid(); });
+  el('f-house').addEventListener('click', e => {
+    const b = e.target.closest('button[data-house]'); if(!b) return;
+    filters.house = b.dataset.house;
+    for(const x of el('f-house').children) x.classList.toggle('on', x === b);
+    renderGrid();
+  });
+  const wireChips = (hostId, key) => el(hostId).addEventListener('click', e => {
+    const c = e.target.closest('.fchip'); if(!c) return;
+    toggleInSet(filters[key], c.dataset[key === 'parties' ? 'party' : 'uf']);
+    c.classList.toggle('on');
+    renderGrid();
+  });
+  wireChips('f-parties', 'parties');
+  wireChips('f-ufs', 'ufs');
+  el('f-wmin').addEventListener('input', e => { filters.wealthMin = numOrNull(e.target.value); renderGrid(); });
+  el('f-wmax').addEventListener('input', e => { filters.wealthMax = numOrNull(e.target.value); renderGrid(); });
+  el('f-unknown').addEventListener('change', e => { filters.showUnknownWealth = e.target.checked; renderGrid(); });
+  el('f-gov').addEventListener('input', e => { filters.govMin = numOrNull(e.target.value); renderGrid(); });
+  el('f-law').addEventListener('change', e => { filters.voteLaw = e.target.value; renderGrid(); });
+  el('f-vote').addEventListener('change', e => { filters.voteValue = e.target.value; renderGrid(); });
+  el('f-clear').addEventListener('click', () => {
+    Object.assign(filters, { query:'', house:'all', parties:[], ufs:[], wealthMin:null, wealthMax:null,
+      showUnknownWealth:true, govMin:null, voteLaw:'', voteValue:'', sort:'name' });
+    // reset controls
+    el('f-query').value=''; el('f-sort').value='name'; el('f-wmin').value=''; el('f-wmax').value='';
+    el('f-gov').value=''; el('f-law').value=''; el('f-vote').value=''; el('f-unknown').checked=true;
+    for(const x of el('f-house').children) x.classList.toggle('on', x.dataset.house==='all');
+    for(const c of document.querySelectorAll('.fchip.on')) c.classList.remove('on');
+    renderGrid();
+  });
+}
+
+/* ---------------- load ---------------- */
 async function run(){
   try{
     const res = await fetch('./data/scorecards.json');
@@ -84,21 +135,15 @@ async function run(){
       el('state').innerHTML = '<span class="muted">Nenhum scorecard disponível neste snapshot.</span>';
       return;
     }
-    const container = el('cards');
-    container.innerHTML = '';
-    const anchors = [];
-    for(const card of cards){
-      const { block, anchor } = renderCardBlock(card);
-      container.appendChild(block);
-      anchors.push(anchor);
-    }
-    if(cards.length > 1) renderNav(cards, anchors);
-    showCard();
-    window.addEventListener('hashchange', showCard);
+    entries = cards.map(c => { const e = rosterEntry(c); cardByKey.set(e.key, c); return e; });
+    el('filters-host').innerHTML = filterControlsHtml(rosterFacets(entries));
+    wireFilters();
+    renderGrid();
+    el('back').addEventListener('click', showBusca);
     el('state').style.display = 'none';
     const when = payload.generated_at ? new Date(payload.generated_at).toLocaleString('pt-BR') : '—';
-    el('snapshot-badge').textContent = `${cards.length} candidato${cards.length === 1 ? '' : 's'}`;
-    el('sources').textContent = `Snapshot estático · ${cards.length} candidato(s) · gerado em ${when}`;
+    el('snapshot-badge').textContent = `${cards.length} no banco`;
+    el('sources').textContent = `Snapshot estático · ${cards.length} parlamentares · gerado em ${when}`;
   }catch(err){
     el('state').innerHTML = `<span class="error">Erro ao carregar os dados: ${err}</span>`;
   }

@@ -4,3 +4,7 @@ __pycache__/
 
 # Claude Code worktrees & session files
 .claude/
+
+# Test artifacts
+.playwright-mcp/
+pages-filters.png

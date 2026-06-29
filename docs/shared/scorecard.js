@@ -128,6 +128,41 @@ function cardBodyHtml(card){
     + metricsHtml(card) + wealthHtml(card) + votesHtml(card) + METHOD_HTML;
 }
 
+// Profile body for a non-legislator (President/governor) from a curated TSE profile. These have
+// NO vote scorecard — they don't vote in Congress — so we show identity + declared wealth + an
+// explicit note instead of metrics/votes. Shape: research/perfis-precandidatos-2026.data.json.
+function executiveProfileHtml(p){
+  const src = p.source_election || {};
+  const rows = Object.entries(p.wealth_buckets || {})
+    .filter(([,v]) => Number(v) > 0)
+    .sort((a,b) => b[1] - a[1])
+    .map(([label,value], i) => {
+      const share = p.wealth_total ? (100 * value / p.wealth_total) : 0;
+      return `<div class="row">
+        <div>${label}<div class="bar"><i style="width:${share.toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></i></div></div>
+        <div style="text-align:right;white-space:nowrap">${BRL(value)}<br><span class="muted">${share.toFixed(1)}%</span></div>
+      </div>`;
+    }).join('');
+  return `<section class="panel"><div class="identity">
+      <div class="avatar">${(p.display || '?').slice(0,1)}</div>
+      <div>
+        <div class="name">${p.display}</div>
+        <div class="muted">${p.party_2026 || '—'} · ${p.office_2026 || '—'}</div>
+        <div class="muted">${p.ocupacao || 'ocupação não informada'} · nascido(a) em ${p.municipio_nascimento || '—'}/${p.uf_nascimento || '—'}</div>
+      </div>
+    </div>
+    <div class="note warn">Cargo do Executivo — <b>não vota no Congresso</b>, portanto não tem
+    scorecard de votos nominais. Este é um <b>perfil</b> a partir do TSE.</div></section>
+  <section class="panel"><h2>Patrimônio declarado</h2>
+    <div class="note">Fonte: TSE DivulgaCand — <b>${src.cargo_label || 'candidatura'} ${src.year || ''}</b>.
+    É um retrato de eleição passada, <b>não é o patrimônio atual</b> e não é comparável entre
+    cargos/anos diferentes.</div>
+    <div class="wealth-grid">
+      <div><div class="big">${BRL(p.wealth_total)}</div><div class="muted">${p.n_bens || 0} bens declarados</div></div>
+      <div>${rows || '<span class="muted">Sem bens declarados.</span>'}</div>
+    </div></section>`;
+}
+
 /* ---- Cached-candidate grid (reusable components for a roster view) ----
    A roster entry is {name, party, uf, house, camara_id, senado_id, wealth_total}. */
 
@@ -156,6 +191,125 @@ function candidateGridHtml(list){
     return `<div class="sub" style="margin-top:14px">Nenhum candidato no banco corresponde — use <b>Buscar</b> para procurar um nome novo (Câmara → Senado).</div>`;
   }
   return `<div class="cgrid">${list.map((c, i) => candidateCardHtml(c, i)).join('')}</div>`;
+}
+
+/* ---- Filterable roster (GitHub Pages: filter the baked snapshot client-side) ----
+   The snapshot carries the FULL scorecard per person, so we can filter on name, house, party,
+   UF, declared wealth, and actual votes/alignment without any backend. These helpers are pure
+   and shared so the live app can adopt them later. */
+
+// Accent/case-insensitive name normalizer (matches the live app's `norm`).
+const normName = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+// Collapse a stored vote_status into one of SIM | NAO | AUSENTE | OUTRO for filtering.
+function voteBucket(status){
+  const v = status || '';
+  if(v.includes('sim')) return 'SIM';
+  if(v.includes('nao') || v.includes('não')) return 'NAO';
+  if(v === 'ausente') return 'AUSENTE';
+  return 'OUTRO';
+}
+
+// Flatten one full scorecard into a lightweight, filterable roster entry. Keeps the fields
+// candidateCardHtml needs, plus wealth-known, summary alignment, and a {lawLabel -> SIM/NAO/…} map.
+function rosterEntry(card){
+  const p = card.politic, s = card.summary || {};
+  const votes = {};
+  for(const t of (card.topics || [])) for(const law of (t.laws || [])){
+    if(law.score) votes[law.label] = voteBucket(law.score.vote_status);
+  }
+  return {
+    key: candidateKey(p),
+    name: p.name, party: p.party || '', uf: p.uf || '', house: p.house || 'camara',
+    camara_id: p.camara_id, senado_id: p.senado_id,
+    wealth_total: Number(p.wealth_total) || 0,
+    wealth_known: p.tse_sq != null && p.tse_sq !== '',
+    gov: s.gov_alignment_pct, opp: s.opp_alignment_pct,
+    votes, _name: normName(p.name),
+  };
+}
+
+// Distinct facet values for populating the controls, in display order.
+function rosterFacets(entries){
+  const parties = [...new Set(entries.map(e => e.party).filter(Boolean))].sort((a,b) => a.localeCompare(b,'pt'));
+  const ufs = [...new Set(entries.map(e => e.uf).filter(Boolean))].sort();
+  const laws = [...new Set(entries.flatMap(e => Object.keys(e.votes)))].sort((a,b) => a.localeCompare(b,'pt'));
+  return { parties, ufs, laws };
+}
+
+// Pure filter + sort. `f` = {query, house, parties[], ufs[], wealthMin, wealthMax, showUnknownWealth,
+// govMin, voteLaw, voteValue, sort}. Unknown-wealth people are kept only when showUnknownWealth is
+// on, and always sink to the bottom of a wealth sort (never faked as R$ 0 in the ordering).
+function filterRoster(entries, f){
+  const out = entries.filter(e => {
+    if(f.query && !e._name.includes(f.query)) return false;
+    if(f.house && f.house !== 'all' && e.house !== f.house) return false;
+    if(f.parties && f.parties.length && !f.parties.includes(e.party)) return false;
+    if(f.ufs && f.ufs.length && !f.ufs.includes(e.uf)) return false;
+    if(!e.wealth_known){
+      if(!f.showUnknownWealth) return false;
+    }else{
+      if(f.wealthMin != null && e.wealth_total < f.wealthMin) return false;
+      if(f.wealthMax != null && e.wealth_total > f.wealthMax) return false;
+    }
+    if(f.govMin != null && (e.gov == null || e.gov < f.govMin)) return false;
+    if(f.voteLaw && f.voteValue && (e.votes[f.voteLaw] || '') !== f.voteValue) return false;
+    return true;
+  });
+  const w = e => e.wealth_known ? e.wealth_total : null;
+  if(f.sort === 'wealth-desc') out.sort((a,b) => (w(b) ?? -1) - (w(a) ?? -1));
+  else if(f.sort === 'wealth-asc') out.sort((a,b) => (w(a) ?? Infinity) - (w(b) ?? Infinity));
+  else out.sort((a,b) => a.name.localeCompare(b.name,'pt'));
+  return out;
+}
+
+// Render the filter panel. State lives in the page shell; this only emits markup with stable ids.
+function filterControlsHtml(facets){
+  const chip = (cls, attr, val, label) => `<button type="button" class="fchip" data-${attr}="${val}">${label}</button>`;
+  const opts = (arr, ph) => `<option value="">${ph}</option>` + arr.map(x => `<option value="${x}">${x}</option>`).join('');
+  return `<div class="filters">
+    <div class="frow">
+      <input id="f-query" class="search-input" placeholder="Buscar por nome…" autocomplete="off">
+      <span id="f-count" class="fcount"></span>
+    </div>
+    <div class="frow">
+      <span class="flabel">Casa</span>
+      <span class="fseg" id="f-house">
+        <button type="button" data-house="all" class="on">Todas</button>
+        <button type="button" data-house="camara">Câmara</button>
+        <button type="button" data-house="senado">Senado</button>
+      </span>
+      <span class="flabel">Ordenar</span>
+      <select id="f-sort" class="fsel">
+        <option value="name">Nome (A→Z)</option>
+        <option value="wealth-desc">Patrimônio (maior→menor)</option>
+        <option value="wealth-asc">Patrimônio (menor→maior)</option>
+      </select>
+    </div>
+    <div class="frow"><span class="flabel">Partido</span><span class="fchips" id="f-parties">${
+      facets.parties.map(p => chip('party','party',p,p)).join('')}</span></div>
+    <div class="frow"><span class="flabel">UF</span><span class="fchips" id="f-ufs">${
+      facets.ufs.map(u => chip('uf','uf',u,u)).join('')}</span></div>
+    <div class="frow">
+      <span class="flabel">Patrimônio</span>
+      <input id="f-wmin" class="fnum" type="number" inputmode="numeric" placeholder="mín R$">
+      <input id="f-wmax" class="fnum" type="number" inputmode="numeric" placeholder="máx R$">
+      <label class="fcheck"><input id="f-unknown" type="checkbox" checked> incluir desconhecido</label>
+    </div>
+    <div class="frow">
+      <span class="flabel">Voto</span>
+      <select id="f-law" class="fsel">${opts(facets.laws, 'qualquer lei')}</select>
+      <select id="f-vote" class="fsel">
+        <option value="">qualquer voto</option>
+        <option value="SIM">votou SIM</option>
+        <option value="NAO">votou NÃO</option>
+        <option value="AUSENTE">AUSENTE</option>
+      </select>
+      <span class="flabel">Gov. mín %</span>
+      <input id="f-gov" class="fnum" type="number" inputmode="numeric" placeholder="0–100">
+      <button id="f-clear" type="button" class="secondary">Limpar filtros</button>
+    </div>
+  </div>`;
 }
 
 // Wire the sun/moon toggle. The button (#theme-toggle) starts empty; we inject the icons
