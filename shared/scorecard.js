@@ -132,11 +132,15 @@ const WEALTH_HIGH = 1000000;  // R$ — "high personal wealth" threshold for the
 function opinionScore(card){
   let sum = 0, n = 0;
   for(const t of (card.topics || [])) for(const law of (t.laws || [])){
+    // Only wealth-distribution laws with a real direction count (skips PEC 45 / direction 0).
+    if(!(law.keywords || []).some(k => Number(k.direction) !== 0)) continue;
     const s = law.score;
-    if(!s || s.score_value == null) continue;   // absent, unscored, or non-directional (PEC 45 = 0)
-    sum += s.score_value; n++;
+    if(!s) continue;
+    if(s.score_value != null){ sum += s.score_value; n++; }   // present: +1 (people) / -1 (wealth) / 0 (abstenção)
+    else if(s.vote_status === 'ausente'){ sum -= 1; n++; }    // ABSENT on a vote that happened → counts as -1
+    // 'sem-votacao-nominal' (no roll-call to attend) and 'misto' stay out — no clear signal.
   }
-  if(!n) return null;                            // not enough decisive votes to read
+  if(!n) return null;                            // no relevant roll-calls in their term — can't read
   const alignment = sum / n;                     // [-1, +1]
   const pct = Math.round((alignment + 1) / 2 * 100);  // 0 = protege patrimônio, 100 = apoia população
   const p = card.politic || {};
@@ -151,13 +155,14 @@ function opinionScore(card){
 // The ⓘ explainer — pure <details> so it works in both shells with no JS wiring.
 function opinionInfo(){
   return `<details class="opinfo"><summary title="Como medimos">ⓘ</summary>
-    <div class="opinfo-body"><b>Como medimos.</b> Para cada lei sobre distribuição de patrimônio em
-    que o(a) parlamentar <b>esteve presente</b>, um voto a favor da tributação progressiva conta
-    <b>+1</b> (apoia a população) e um voto contra conta <b>−1</b> (protege o patrimônio). A % é a
-    média desses votos — <b>só os votos movem o número</b>. O <b>patrimônio pessoal</b> muda apenas
-    o rótulo: quem vota para proteger o patrimônio <b>e</b> tem alta renda aparece como “protege o
-    próprio patrimônio”. É <b>uma lente</b>, não um veredito — a matemática está aberta. Em breve
-    você poderá configurar a sua própria.</div></details>`;
+    <div class="opinfo-body"><b>Como medimos.</b> Em cada lei sobre distribuição de patrimônio, um
+    voto a favor da tributação progressiva conta <b>+1</b> (apoia a população) e um voto contra
+    conta <b>−1</b> (protege o patrimônio). Uma <b>ausência</b> numa votação que aconteceu também
+    conta <b>−1</b> — não compareceu para apoiar. (Leis sem votação nominal e a reforma do consumo,
+    sem direção de patrimônio, ficam de fora.) A % é a média disso — <b>só os votos e ausências
+    movem o número</b>. O <b>patrimônio pessoal</b> muda apenas o rótulo: quem protege o patrimônio
+    <b>e</b> tem alta renda aparece como “protege o próprio patrimônio”. É <b>uma lente</b>, não um
+    veredito — a matemática está aberta. Em breve você poderá configurar a sua própria.</div></details>`;
 }
 
 // Slim opinion row for the profile: label + % + meter + ⓘ.
@@ -172,7 +177,7 @@ function opinionHtml(card){
     <div class="opinion-head">
       <span class="opinion-pct op-${o.tone}">${o.pct}%</span>
       <div><div class="opinion-label">${o.label}</div>
-        <div class="muted">apoio à população · ${o.n} voto(s) decisivo(s)</div></div>
+        <div class="muted">apoio à população · ${o.n} lei(s) considerada(s)</div></div>
       ${opinionInfo()}
     </div>
     <div class="opmeter"><i class="op-${o.tone}" style="width:${o.pct}%"></i></div>
