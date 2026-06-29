@@ -139,14 +139,22 @@ def resolve_senator(name: str) -> dict[str, Any]:
 
 
 def score_senator(
-    *, senado_id: int, name: str, party: str, uf: str, database_url: str | None = None, log=None
+    *, senado_id: int, name: str, party: str, uf: str, database_url: str | None = None,
+    build_package: bool = True, init: bool = True, log=None
 ) -> dict[str, Any]:
-    """Build the Senado package (once) and score this senator from the cache."""
-    conn = db.init_db(database_url)
+    """Build the Senado package (once) and score this senator from the cache.
+
+    `build_package=False` skips the (heavy) Senado roll-call ingest — the caller has already
+    built it. A bulk roster scan builds the package once, then scores every senator with
+    `build_package=False`, instead of re-ingesting all laws' Senado votações 81 times. The
+    default keeps single-senator callers (server.py) behaving exactly as before. See research/15.
+    """
+    conn = db.init_db(database_url) if init else db.connect(database_url)
     try:
-        if log:
-            log(f"Building Senado package for the seeded laws...")
-        build_senado_package(conn, log=log)
+        if build_package:
+            if log:
+                log(f"Building Senado package for the seeded laws...")
+            build_senado_package(conn, log=log)
 
         # Pull the senator's TSE declared wealth (bens), same machinery as deputies. Best-effort:
         # zeros if TSE can't resolve them, so a missing match never blocks the vote score.

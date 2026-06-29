@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import re
 import sys
 import time
@@ -11,7 +12,8 @@ import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any
+from functools import lru_cache
+from typing import Any, Callable
 
 try:
     import db
@@ -29,7 +31,23 @@ DEFAULT_ELECTION = {
 DEFAULT_CANDIDATE = {"camara_id": 74478}
 
 
-def fetch_json(url: str, attempts: int = 3, pause: float = 1.0) -> dict[str, Any]:
+# Telemetry hook: if set, called once per HTTP attempt with an event dict
+# {host, status, ms, attempt, retry_after, error}. It's how a bulk run *learns* the APIs'
+# throttling: every request (and every 429) is observable without coupling fetch_json to any
+# particular logger. Default None = zero overhead and unchanged behavior for the UI/server.
+REQUEST_HOOK: Callable[[dict[str, Any]], None] | None = None
+
+
+def _emit(event: dict[str, Any]) -> None:
+    hook = REQUEST_HOOK
+    if hook is not None:
+        try:
+            hook(event)
+        except Exception:
+            pass  # telemetry must never break a fetch
+
+
+def fetch_json(url: str, attempts: int = 5, pause: float = 1.0) -> dict[str, Any]:
     req = urllib.request.Request(
         url,
         headers={
@@ -41,20 +59,36 @@ def fetch_json(url: str, attempts: int = 3, pause: float = 1.0) -> dict[str, Any
             "Referer": "https://divulgacandcontas.tse.jus.br/",
         },
     )
+    host = urllib.parse.urlparse(url).hostname or ""
     last_error: Exception | None = None
     for attempt in range(1, attempts + 1):
+        started = time.monotonic()
         try:
             with urllib.request.urlopen(req, timeout=45) as response:
-                return json.loads(response.read().decode("utf-8"))
+                body = response.read().decode("utf-8")
+            _emit({"host": host, "status": getattr(response, "status", 200),
+                   "ms": round((time.monotonic() - started) * 1000), "attempt": attempt})
+            return json.loads(body)
         except urllib.error.HTTPError as exc:
             last_error = exc
+            retry_after = exc.headers.get("Retry-After") if exc.headers else None
+            _emit({"host": host, "status": exc.code,
+                   "ms": round((time.monotonic() - started) * 1000), "attempt": attempt,
+                   "retry_after": retry_after, "error": f"HTTP {exc.code}"})
             if exc.code not in (429, 500, 502, 503, 504) or attempt == attempts:
                 raise
+            # Honor Retry-After on 429 when the server tells us; else exponential backoff + jitter.
+            delay = float(retry_after) if (exc.code == 429 and retry_after and retry_after.isdigit()) \
+                else pause * (2 ** (attempt - 1))
         except urllib.error.URLError as exc:
             last_error = exc
+            _emit({"host": host, "status": None,
+                   "ms": round((time.monotonic() - started) * 1000), "attempt": attempt,
+                   "error": str(exc)})
             if attempt == attempts:
                 raise
-        time.sleep(pause * attempt)
+            delay = pause * (2 ** (attempt - 1))
+        time.sleep(delay + random.uniform(0, 0.4))  # jitter avoids a synchronized retry stampede
     raise RuntimeError(f"failed to fetch {url}: {last_error}")
 
 
@@ -85,6 +119,20 @@ def tse_candidates_from_response(payload: dict[str, Any] | list[Any]) -> list[di
     return payload.get("candidatos") or payload.get("dados") or []
 
 
+@lru_cache(maxsize=None)
+def _tse_listar(tse_year: int, tse_uf: str, tse_election_id: str, tse_cargo: int) -> tuple[dict[str, Any], ...]:
+    """The full TSE candidate list for one (year, UF, election, cargo), memoized.
+
+    A 2022 candidacy roster is immutable, so this never goes stale; memoizing it turns a
+    bulk roster scan's per-candidate `listar` fetch (≈150 rows each, see research/15) into one
+    call per UF. Both the deputy match (cargo 6) and the senator-wealth match (cargo 5) route
+    through here, so the cache helps both houses. Exceptions are never cached (lru_cache skips
+    them), so a transient TSE failure is retried on the next call.
+    """
+    url = f"{TSE}/candidatura/listar/{tse_year}/{tse_uf}/{tse_election_id}/{tse_cargo}/candidatos"
+    return tuple(tse_candidates_from_response(fetch_json(url)))
+
+
 def resolve_tse_candidate(
     profile: dict[str, Any],
     *,
@@ -100,8 +148,7 @@ def resolve_tse_candidate(
         normalize_name(profile.get("nome")),
     ]
     names = [name for name in names if name]
-    list_url = f"{TSE}/candidatura/listar/{tse_year}/{tse_uf}/{tse_election_id}/{tse_cargo}/candidatos"
-    candidates = tse_candidates_from_response(fetch_json(list_url))
+    candidates = _tse_listar(tse_year, tse_uf, tse_election_id, tse_cargo)
 
     def candidate_names(candidate: dict[str, Any]) -> list[str]:
         return [
@@ -154,9 +201,7 @@ def resolve_tse_senator(
     target = normalize_name(name)
     for year, eid in elections:
         try:
-            cands = tse_candidates_from_response(
-                fetch_json(f"{TSE}/candidatura/listar/{year}/{uf}/{eid}/5/candidatos")
-            )
+            cands = _tse_listar(year, uf, eid, 5)
         except Exception:
             continue
         for c in cands:
@@ -399,9 +444,14 @@ def score_camara_candidate(
     tse_sq: str | None = None,
     limit_votes: int = 25,
     pause: float = 0.35,
+    init: bool = True,
     log=None,
 ) -> dict[str, Any]:
-    conn = db.init_db(database_url)
+    # `init=False` skips schema-create + reference seed (use a plain connection). A parallel
+    # roster scan seeds ONCE up front, then runs workers with init=False — otherwise N threads
+    # each re-run the seed's `ON DUPLICATE KEY UPDATE` on the same topic/law rows and deadlock in
+    # InnoDB. Default True keeps single-shot callers (server.py, CLI) behaving exactly as before.
+    conn = db.init_db(database_url) if init else db.connect(database_url)
     try:
         profile = fetch_json(f"{CAMARA}/deputados/{camara_id}").get("dados", {})
         status = profile.get("ultimoStatus") or {}
@@ -409,17 +459,27 @@ def score_camara_candidate(
         if not tse_uf:
             raise ValueError(f"Cannot infer TSE UF for Câmara id {camara_id}")
         time.sleep(pause)
-        if tse_sq:
-            candidate = fetch_tse_detail(tse_year, tse_uf, tse_election_id, tse_sq)
-        else:
-            candidate, tse_sq = resolve_tse_candidate(
-                profile,
-                tse_year=tse_year,
-                tse_uf=tse_uf,
-                tse_election_id=tse_election_id,
-                tse_cargo=tse_cargo,
-            )
-        tse_url = f"{TSE}/candidatura/buscar/{tse_year}/{tse_uf}/{tse_election_id}/candidato/{tse_sq}"
+        candidate: dict[str, Any] = {}
+        try:
+            if tse_sq:
+                candidate = fetch_tse_detail(tse_year, tse_uf, tse_election_id, tse_sq)
+            else:
+                candidate, tse_sq = resolve_tse_candidate(
+                    profile,
+                    tse_year=tse_year,
+                    tse_uf=tse_uf,
+                    tse_election_id=tse_election_id,
+                    tse_cargo=tse_cargo,
+                )
+        except Exception as exc:
+            # TSE candidacy not matchable (name mismatch, suplente sworn in mid-term, off-year
+            # election). Don't discard the deputy + their vote scores over a *wealth* lookup —
+            # keep them with tse_sq=None so the UI shows wealth as '—' (never a fabricated R$ 0).
+            tse_sq = None
+            if log:
+                log(f"  TSE wealth unresolved for Câmara {camara_id} ({tse_uf}): {exc}")
+        tse_url = (f"{TSE}/candidatura/buscar/{tse_year}/{tse_uf}/{tse_election_id}/candidato/{tse_sq}"
+                   if tse_sq else None)
         assets = candidate.get("bens") or []
         buckets = bucketize_assets(assets)
         wealth_total = br_float(candidate.get("totalDeBens")) or sum(buckets.values())

@@ -142,6 +142,7 @@ deputies stays a local-only feature (it needs the backend proxy + DB).
 |---|---|
 | [`app/db.py`](app/db.py) | Local MySQL schema and read model for `topics -> laws -> keywords -> scores <- politics`. |
 | [`app/score_candidate.py`](app/score_candidate.py) | One-candidate scoring script/API helper that fetches official APIs, resolves TSE candidates, and stores calculated scores. |
+| [`app/scan_all.py`](app/scan_all.py) | Batch roster scan: paginate every deputy + list every senator and score them from the cached laws ([`research/15`](research/15-bulk-roster-scan.md)). |
 | [`app/server.py`](app/server.py) | Local HTTP server with candidate search, on-demand scoring, `/api/scorecards`, `/api/politics`, and `/api/topics`. |
 | [`app/index.html`](app/index.html) | Static frontend for candidate search and MySQL-backed scorecards. |
 | [`docs/DATABASE.md`](docs/DATABASE.md) | Implementation note for the database model and runtime flow. |
