@@ -46,6 +46,7 @@ frontend.
 | [`13-codtema-themes.md`](research/13-codtema-themes.md) | The 32 official Câmara `codTema` policy themes with a plain-language explanation of what each covers; how to pick a topic's `cod_temas`. | Curating a new topic's themes (see README "How to add a new topic"). |
 | [`14-senado-vote-crossing.md`](research/14-senado-vote-crossing.md) | Crossing the seeded laws with **Senado** nominal roll-calls so senators score on the same law package: verified Senado API contract (senators, matéria lookup, `/votacao`), the `house` pollution guard, symbolic-vote coverage limits, and the substitutive-misattribution caveat. API verified live. | Adding senators; before touching the shared `roll_calls`/`votes` tables or `senado.py`. |
 | [`15-bulk-roster-scan.md`](research/15-bulk-roster-scan.md) | The **batch** scan: enumerate the whole sitting Congress (paginated `/deputados` + the 81-senator list) and score everyone from the cached laws. The per-house join key (Câmara `id` / Senado `CodigoParlamentar`), Câmara pagination + stop condition, and the two budget fixes (TSE `listar` memoization, build-Senado-package-once). Verified live. | Running/extending `app/scan_all.py`; before any full-Congress run. |
+| [`16-scoring-improvements-tracker.md`](research/16-scoring-improvements-tracker.md) | Durable tracker for improving the current wealth-tax scoring model with the repo's existing primitives: `weight`, law-level aggregation, coverage/confidence, and asset-specific self-interest scoring. | Planning the next scoring iteration without changing the data-source surface. |
 
 ### `docs/`
 
@@ -74,6 +75,7 @@ frontend.
 - **Write the thesis bank** → `05` → `06` → `wahl-o-mat-methodology.md`.
 - **Scale the scoring POC** → `07` → `01` / `02`.
 - **Scan the whole Congress (batch)** → `15-bulk-roster-scan.md` → `12` (vote cache) → `14` (senators).
+- **Improve the current wealth-tax score** → `16-scoring-improvements-tracker.md` → `07` → `docs/DATABASE.md`.
 - **Work on the local scorecard DB/API** → `docs/DATABASE.md` → `app/db.py` →
   `app/score_candidate.py` → `app/server.py`.
 
