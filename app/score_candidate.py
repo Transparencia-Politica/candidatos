@@ -426,7 +426,9 @@ def score_keyword(keyword: dict[str, Any], law_vote: dict[str, Any], wealth_capi
     if sign is None:
         return None, None
     direction = int(keyword["direction"])
-    score_value = 0.0 if direction == 0 else float(sign * direction)
+    raw_weight = keyword.get("weight", 1.0)
+    weight = 1.0 if raw_weight is None else float(raw_weight)
+    score_value = 0.0 if direction == 0 else float(sign * direction * weight)
     self_interest_value = None
     if keyword["wealth_relevant"] and wealth_capital > 0 and direction != 0:
         self_interest_value = -score_value

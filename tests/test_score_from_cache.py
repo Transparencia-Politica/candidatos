@@ -53,3 +53,23 @@ def test_infer_from_cache_makes_no_network_calls(conn, monkeypatch):
 
     r = sc.infer_law_vote_from_cache(conn, 74478, law)
     assert r["present"] == 1
+
+
+def test_score_keyword_applies_weight_to_score_and_self_interest():
+    keyword = {"direction": 1, "weight": 0.4, "wealth_relevant": True}
+    law_vote = {"stance": "Sim"}
+
+    score_value, self_interest_value = sc.score_keyword(keyword, law_vote, wealth_capital=1000)
+
+    assert score_value == 0.4
+    assert self_interest_value == -0.4
+
+
+def test_score_keyword_uses_default_weight_when_missing():
+    keyword = {"direction": -1, "wealth_relevant": False}
+    law_vote = {"stance": "Não"}
+
+    score_value, self_interest_value = sc.score_keyword(keyword, law_vote, wealth_capital=0)
+
+    assert score_value == 1.0
+    assert self_interest_value is None

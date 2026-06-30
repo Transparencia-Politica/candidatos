@@ -89,11 +89,11 @@ Main limitations of the current implementation:
 ### 1. Apply keyword weight in scoring
 
 - **Why:** the schema already stores `keywords.weight`, but `score_keyword()` currently ignores it.
-- **Current state:** `score_value = sign * direction` (or `0` / `None`).
+- **Current state:** completed; `score_keyword()` now applies `weight` to directional score values.
 - **Target:** `score_value = sign * direction * weight`.
 - **Files:** `app/score_candidate.py`
-- **Status:** pending
-- **Notes:** this is the lowest-risk improvement and should land before adding more laws.
+- **Status:** completed
+- **Notes:** missing weights default to `1.0`; `self_interest_value` uses the weighted score because it is derived from `score_value`.
 
 ### 2. Separate core, supporting, and context laws
 
