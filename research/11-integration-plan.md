@@ -49,7 +49,7 @@ REST over the DB: `GET /api/candidates/search`, `GET /api/topics`, `POST /api/sc
 
 **Two design facts I initially under-weighted:**
 1. **It's multi-topic** — a general VAA skeleton, not wealth-tax-only (our prelim was single-topic, flat).
-2. **He already ported our self-interest metric** into `_summary` (`self_interest_alignment_pct`) — so it is **not** a delta.
+2. **He already ported our asset-exposure metric** into `_summary` (`self_interest_alignment_pct`) — so it is **not** a delta.
 
 ---
 
@@ -57,7 +57,7 @@ REST over the DB: `GET /api/candidates/search`, `GET /api/topics`, `POST /api/sc
 - Wealth `bucketize_assets` (= our `bucketize`); `wealth_capital` = ações + exterior
 - TSE resolution by name match → `bens`
 - Câmara `/votos`, `present/nominal/stance` (`vote_class`)
-- **self-interest = −score** for wealth-relevant keywords (now `self_interest_alignment_pct`)
+- **asset-exposure context = −score** for wealth-relevant keywords (now `self_interest_alignment_pct`)
 - Server-side fetch with **retry** (429/5xx); **DB caching** of scorecards
 - Deputy search
 

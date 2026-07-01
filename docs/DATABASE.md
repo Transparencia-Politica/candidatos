@@ -40,7 +40,7 @@ then serves the persisted scorecards and reference tree to the frontend.
 | `laws` | Câmara propositions connected to one topic. Stores the Câmara proposition id, label, source URL, and whether the law is a key wealth signal. |
 | `keywords` | Search/scoring concepts under a law, such as offshore, fundos exclusivos, or dividendos. The `direction` field says what a `Sim` vote means for that keyword: `+1`, `-1`, or `0` for context-only. |
 | `politics` | Politicians/candidates keyed by `camara_id`, with TSE election identifiers and declared-asset buckets. |
-| `scores` | The join table between one `politic` and one `keyword`. It stores the calculated score, self-interest alignment value, vote label, presence counts, and evidence JSON. |
+| `scores` | The join table between one `politic` and one `keyword`. It stores the calculated score, the asset-exposure context value, vote label, presence counts, and evidence JSON. |
 
 ## Runtime flow
 

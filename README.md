@@ -136,7 +136,8 @@ deputies stays a local-only feature (it needs the backend proxy + DB).
 | [`07-poc-candidate-scoring-bivar.md`](research/07-poc-candidate-scoring-bivar.md) | Live POC: joined TSE wealth ⨯ Câmara tax votes for one deputy. Verdict + reproducible calls. |
 | [`08-api-field-notes.md`](research/08-api-field-notes.md) | Hard-won API gotchas (DivulgaCand route shape, Câmara `/votos`, zsh, rate limits). Read before coding ingestion. |
 | [`09-topic-to-law-discovery.md`](research/09-topic-to-law-discovery.md) | Topic → bills: the `codTema` theme list + TECAD thesaurus + query-expansion pipeline (and the "0/0" discovery-bug fix). |
-| [`16-scoring-improvements-tracker.md`](research/16-scoring-improvements-tracker.md) | Tracker for the next iteration of the current wealth-tax score: use `weight`, separate core/context laws, add confidence, and make self-interest scoring asset-specific. |
+| [`16-scoring-improvements-tracker.md`](research/16-scoring-improvements-tracker.md) | Tracker for the next iteration of the current wealth-tax score: use `weight`, separate core/context laws, add confidence, and show asset exposure as context. |
+| [`17-wealth-tax-signature-vote-package.md`](research/17-wealth-tax-signature-vote-package.md) | Curated wealth-tax signature-vote package: which laws count, why they count, which ones are context, and how to maintain the package. |
 
 ### `app/` and `docs/`
 | File | What it is |

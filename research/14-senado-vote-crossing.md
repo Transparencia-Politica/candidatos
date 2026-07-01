@@ -84,7 +84,7 @@ GET .../candidatura/buscar/{year}/{uf}/{2040602022}/candidato/{sq} # -> .bens, .
 - The fetch is **best-effort**: a TSE outage or unmatched name yields zeros + `tse_sq = NULL`, and
   the card renders "Patrimônio não localizado no TSE" (driven by `tse_sq`), never a misleading
   R$ 0,00. Resolved senators feed `wealth_capital` into `score_keyword`, so the
-  self-interest ("protege o próprio patrimônio") metric becomes real for them.
+  asset-exposure context becomes available for them.
 
 ## 5. Where it lives
 
