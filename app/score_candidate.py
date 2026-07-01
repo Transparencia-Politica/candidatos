@@ -421,7 +421,58 @@ def infer_law_vote_from_cache(
     }
 
 
-def score_keyword(keyword: dict[str, Any], law_vote: dict[str, Any], wealth_capital: float) -> tuple[float | None, float | None]:
+def _bucket(wealth_buckets: dict[str, float] | None, label: str) -> float:
+    return float((wealth_buckets or {}).get(label) or 0.0)
+
+
+def self_interest_exposure(
+    keyword: dict[str, Any],
+    *,
+    wealth_total: float,
+    wealth_capital: float,
+    wealth_buckets: dict[str, float] | None,
+) -> float:
+    """How much the keyword's taxed base overlaps the politician's declared assets.
+
+    The return value is 0..1. It is intentionally conservative: if the TSE asset buckets do not
+    show the affected asset class, the asset-exposure context is weak or absent.
+    """
+    if not keyword.get("wealth_relevant"):
+        return 0.0
+
+    slug = keyword.get("slug")
+    shares = _bucket(wealth_buckets, "Ações / participações")
+    offshore = _bucket(wealth_buckets, "Depósito no exterior")
+    cash = _bucket(wealth_buckets, "Dinheiro em espécie")
+    fixed_income = _bucket(wealth_buckets, "Poupança / renda fixa / contas")
+    total = wealth_total if wealth_total > 0 else sum(float(v or 0.0) for v in (wealth_buckets or {}).values())
+
+    if slug == "offshore":
+        exposed = offshore
+    elif slug == "fundos-exclusivos":
+        exposed = shares + fixed_income
+    elif slug == "dividendos":
+        exposed = shares
+    elif slug == "igf-patrimonio":
+        return 1.0 if total >= 10_000_000 else 0.0
+    elif slug == "imposto-minimo-super-ricos":
+        exposed = shares + offshore + fixed_income + cash
+    else:
+        exposed = wealth_capital
+
+    if total <= 0 or exposed <= 0:
+        return 0.0
+    return min(1.0, exposed / total)
+
+
+def score_keyword(
+    keyword: dict[str, Any],
+    law_vote: dict[str, Any],
+    wealth_capital: float,
+    *,
+    wealth_total: float | None = None,
+    wealth_buckets: dict[str, float] | None = None,
+) -> tuple[float | None, float | None]:
     sign = vote_sign(law_vote["stance"])
     if sign is None:
         return None, None
@@ -430,8 +481,14 @@ def score_keyword(keyword: dict[str, Any], law_vote: dict[str, Any], wealth_capi
     weight = 1.0 if raw_weight is None else float(raw_weight)
     score_value = 0.0 if direction == 0 else float(sign * direction * weight)
     self_interest_value = None
-    if keyword["wealth_relevant"] and wealth_capital > 0 and direction != 0:
-        self_interest_value = -score_value
+    exposure = self_interest_exposure(
+        keyword,
+        wealth_total=float(wealth_total if wealth_total is not None else wealth_capital),
+        wealth_capital=wealth_capital,
+        wealth_buckets=wealth_buckets,
+    )
+    if exposure > 0 and direction != 0:
+        self_interest_value = -score_value * exposure
     return score_value, self_interest_value
 
 
@@ -512,7 +569,13 @@ def score_camara_candidate(
                 log(f"Scoring {name}: {law['label']}...")
             law_vote = infer_law_vote_from_cache(conn, camara_id, law, since_date=since_date)
             for keyword in law["keywords"]:
-                score_value, self_interest_value = score_keyword(keyword, law_vote, wealth_capital)
+                score_value, self_interest_value = score_keyword(
+                    keyword,
+                    law_vote,
+                    wealth_capital,
+                    wealth_total=wealth_total,
+                    wealth_buckets=buckets,
+                )
                 evidence = {
                     "camara_votes_url": law_vote["source_url"],
                     "camara_law_url": law["source_url"],

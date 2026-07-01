@@ -293,6 +293,13 @@ TOPICS = [
 ]
 
 
+# Weight tiers for the current wealth-tax rubric. These use the existing keyword
+# `weight` field until a later law-level aggregation pass lands.
+WEIGHT_VERY_HIGH = 1.5
+WEIGHT_HIGH = 1.25
+WEIGHT_CONTEXT = 0.2
+
+
 LAWS = [
     {
         "topic_slug": "tributacao-da-riqueza",
@@ -374,7 +381,7 @@ KEYWORDS = [
         "label": "Offshore",
         "description": "Renda auferida por pessoas físicas em entidades controladas no exterior.",
         "direction": 1,
-        "weight": 1.0,
+        "weight": WEIGHT_VERY_HIGH,
         "wealth_relevant": 1,
         "sort_order": 10,
     },
@@ -384,7 +391,7 @@ KEYWORDS = [
         "label": "Fundos exclusivos",
         "description": "Tributação periódica de fundos exclusivos.",
         "direction": 1,
-        "weight": 1.0,
+        "weight": WEIGHT_VERY_HIGH,
         "wealth_relevant": 1,
         "sort_order": 20,
     },
@@ -394,7 +401,7 @@ KEYWORDS = [
         "label": "Dividendos",
         "description": "Tributação de lucros e dividendos distribuídos.",
         "direction": 1,
-        "weight": 1.0,
+        "weight": WEIGHT_HIGH,
         "wealth_relevant": 1,
         "sort_order": 30,
     },
@@ -404,7 +411,7 @@ KEYWORDS = [
         "label": "Imposto sobre Grandes Fortunas",
         "description": "Tributação anual do patrimônio acima de R$ 10 milhões (alíquotas de 0,5% a 1,5%). Votar 'Sim' = a favor de tributar a riqueza.",
         "direction": 1,
-        "weight": 1.0,
+        "weight": WEIGHT_VERY_HIGH,
         "wealth_relevant": 1,
         "sort_order": 5,
     },
@@ -414,7 +421,7 @@ KEYWORDS = [
         "label": "Imposto mínimo dos super-ricos",
         "description": "Alíquota efetiva mínima de IRPF sobre altas rendas (IRPFM) e 10% na fonte sobre lucros e dividendos acima de R$ 50 mil/mês.",
         "direction": 1,
-        "weight": 1.0,
+        "weight": WEIGHT_VERY_HIGH,
         "wealth_relevant": 1,
         "sort_order": 15,
     },
@@ -424,7 +431,7 @@ KEYWORDS = [
         "label": "Tributação do consumo",
         "description": "Reorganização de impostos sobre consumo, sem medir diretamente patrimônio pessoal.",
         "direction": 0,
-        "weight": 0.4,
+        "weight": WEIGHT_CONTEXT,
         "wealth_relevant": 0,
         "sort_order": 40,
     },
@@ -1011,7 +1018,8 @@ def get_scorecard_for_politic(conn: MySQLConnection, politic_row: dict[str, Any]
     rows = conn.execute(
         """
         SELECT
-          s.*, k.wealth_relevant AS keyword_wealth_relevant, l.id AS law_id,
+          s.*, k.direction AS keyword_direction, k.weight AS keyword_weight,
+          k.wealth_relevant AS keyword_wealth_relevant, l.id AS law_id,
           l.is_key, l.wealth_relevant AS law_wealth_relevant
         FROM scores s
         JOIN keywords k ON k.id = s.keyword_id
@@ -1071,6 +1079,65 @@ def _score_payload(row: dict[str, Any] | None) -> dict[str, Any] | None:
     }
 
 
+def _signed(value: Any) -> int:
+    value = float(value or 0)
+    if value > 0:
+        return 1
+    if value < 0:
+        return -1
+    return 0
+
+
+def _row_signal_weight(row: dict[str, Any]) -> float:
+    direction = int(row.get("keyword_direction") or row.get("direction") or 0)
+    if direction == 0:
+        return 0.0
+    weight = row.get("keyword_weight", row.get("weight", 1.0))
+    return abs(float(weight or 0.0))
+
+
+def _law_rollup_row(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    if not rows:
+        return None
+
+    out = dict(next((row for row in rows if row.get("score_id") is not None), rows[0]))
+    law_weight = 0.0
+    score_sum = score_weight = 0.0
+    self_interest_sum = self_interest_weight = 0.0
+
+    for row in rows:
+        weight = _row_signal_weight(row)
+        law_weight = max(law_weight, weight)
+        if not weight:
+            continue
+        score_value = row.get("score_value")
+        if score_value is not None:
+            score_sum += _signed(score_value) * weight
+            score_weight += weight
+        self_interest_value = row.get("self_interest_value")
+        if self_interest_value is not None:
+            self_interest_sum += float(self_interest_value)
+            self_interest_weight += weight
+
+    if law_weight and score_weight:
+        out["score_value"] = (score_sum / score_weight) * law_weight
+    if law_weight:
+        out["self_interest_value"] = (
+            (self_interest_sum / self_interest_weight) * law_weight
+            if self_interest_weight
+            else None
+        )
+    out["_law_weight"] = law_weight
+    return out
+
+
+def _law_rollup_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[int, list[dict[str, Any]]] = {}
+    for row in rows:
+        grouped.setdefault(row["law_id"], []).append(row)
+    return [rollup for group in grouped.values() if (rollup := _law_rollup_row(group)) is not None]
+
+
 def _topics_for_politic(conn: MySQLConnection, politic_id: int) -> list[dict[str, Any]]:
     rows = conn.execute(
         """
@@ -1098,6 +1165,7 @@ def _topics_for_politic(conn: MySQLConnection, politic_id: int) -> list[dict[str
 
     topics: dict[int, dict[str, Any]] = {}
     laws_by_topic: dict[tuple[int, int], dict[str, Any]] = {}
+    rows_by_law: dict[tuple[int, int], list[dict[str, Any]]] = {}
     for row in rows:
         topic = topics.setdefault(
             row["topic_id"],
@@ -1131,8 +1199,7 @@ def _topics_for_politic(conn: MySQLConnection, politic_id: int) -> list[dict[str
             topic["laws"].append(law)
 
         keyword_score = _score_payload(row)
-        if law["score"] is None and keyword_score is not None:
-            law["score"] = keyword_score
+        rows_by_law.setdefault(law_key, []).append(row)
         law["keywords"].append(
             {
                 "id": row["keyword_id"],
@@ -1145,18 +1212,42 @@ def _topics_for_politic(conn: MySQLConnection, politic_id: int) -> list[dict[str
                 "score": keyword_score,
             }
         )
+    for law_key, law in laws_by_topic.items():
+        law["score"] = _score_payload(_law_rollup_row(rows_by_law.get(law_key, [])))
     return list(topics.values())
 
 
 def _summary(politic_row: dict[str, Any], rows: list[dict[str, Any]]) -> dict[str, Any]:
     wealth_total = float(politic_row["wealth_total"] or 0)
     wealth_capital = float(politic_row["wealth_capital"] or 0)
-    by_law: dict[int, dict[str, Any]] = {}
-    for row in rows:
-        by_law.setdefault(row["law_id"], row)
+    by_law = {row["law_id"]: row for row in _law_rollup_rows(rows)}
+    law_weights = {
+        row["law_id"]: float(row.get("_law_weight") or 0.0)
+        for row in by_law.values()
+        if row["law_wealth_relevant"]
+    }
 
     relevant_laws = [row for row in by_law.values() if row["law_wealth_relevant"]]
     recorded_laws = [row for row in relevant_laws if row["present_count"] > 0]
+    total_confidence_weight = sum(law_weights.values())
+    covered_confidence_weight = sum(
+        law_weights.get(row["law_id"], 0.0)
+        for row in recorded_laws
+    )
+    redistribution_sum = redistribution_weight = 0.0
+    self_interest_sum = self_interest_weight = 0.0
+    for row in recorded_laws:
+        weight = law_weights.get(row["law_id"], 0.0)
+        if not weight:
+            continue
+        score_value = row.get("score_value")
+        if score_value is not None:
+            redistribution_sum += float(score_value)
+            redistribution_weight += weight
+        self_interest_value = row.get("self_interest_value")
+        if self_interest_value is not None:
+            self_interest_sum += float(self_interest_value)
+            self_interest_weight += weight
     key_law = next((row for row in by_law.values() if row["is_key"]), None)
     self_interest_rows = [
         row for row in relevant_laws
@@ -1175,13 +1266,37 @@ def _summary(politic_row: dict[str, Any], rows: list[dict[str, Any]]) -> dict[st
         opp_comparable += int(ev.get("opp_comparable") or 0)
 
     return {
+        "vote_policy": {
+            "directional_votes": "Sim/Não affect progressive-taxation and wealth-concentration scores",
+            "neutral_votes": "Abstenção/Obstrução/Artigo 17 count as recorded neutral evidence",
+            "missing_votes": "AUSENTE/sem votação nominal reduce confidence or coverage only",
+        },
         "wealth_capital_pct": round(100 * wealth_capital / wealth_total) if wealth_total else 0,
         "coverage_pct": round(100 * len(recorded_laws) / len(relevant_laws)) if relevant_laws else 0,
+        "confidence_pct": (
+            round(100 * covered_confidence_weight / total_confidence_weight)
+            if total_confidence_weight
+            else 0
+        ),
+        "confidence_weight_covered": round(covered_confidence_weight, 3),
+        "confidence_weight_total": round(total_confidence_weight, 3),
+        "pro_redistribution_score": (
+            round(100 * ((redistribution_sum / redistribution_weight) + 1) / 2)
+            if redistribution_weight
+            else None
+        ),
+        "pro_redistribution_weight": round(redistribution_weight, 3),
         "key_attendance_pct": (
             round(100 * key_law["present_count"] / key_law["nominal_count"])
             if key_law is not None and key_law["nominal_count"]
             else 0
         ),
+        "self_interest_alignment_score": (
+            round(100 * ((self_interest_sum / self_interest_weight) + 1) / 2)
+            if self_interest_weight
+            else None
+        ),
+        "self_interest_weight": round(self_interest_weight, 3),
         "self_interest_alignment_pct": (
             round(100 * protect_count / len(self_interest_rows))
             if self_interest_rows

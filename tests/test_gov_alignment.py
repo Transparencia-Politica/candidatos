@@ -53,3 +53,80 @@ def test_summary_aggregates_gov_alignment_across_laws():
     s = db._summary(politic, rows)
     assert s["gov_comparable_n"] == 4
     assert s["gov_alignment_pct"] == 75  # (2+1)/(3+1)
+
+
+def test_summary_reports_weighted_confidence():
+    politic = {"wealth_total": 100, "wealth_capital": 50}
+    rows = [
+        {"law_id": 1, "law_wealth_relevant": 1, "is_key": 1, "present_count": 1,
+         "nominal_count": 1, "self_interest_value": None, "keyword_direction": 1,
+         "keyword_weight": 1.5, "evidence_json": "{}"},
+        {"law_id": 1, "law_wealth_relevant": 1, "is_key": 1, "present_count": 1,
+         "nominal_count": 1, "self_interest_value": None, "keyword_direction": 1,
+         "keyword_weight": 1.25, "evidence_json": "{}"},
+        {"law_id": 2, "law_wealth_relevant": 1, "is_key": 0, "present_count": 0,
+         "nominal_count": 1, "self_interest_value": None, "keyword_direction": 1,
+         "keyword_weight": 1.5, "evidence_json": "{}"},
+        {"law_id": 3, "law_wealth_relevant": 0, "is_key": 0, "present_count": 1,
+         "nominal_count": 1, "self_interest_value": None, "keyword_direction": 0,
+         "keyword_weight": 0.2, "evidence_json": "{}"},
+    ]
+
+    s = db._summary(politic, rows)
+
+    assert s["coverage_pct"] == 50
+    assert s["confidence_pct"] == 50
+    assert s["confidence_weight_covered"] == 1.5
+    assert s["confidence_weight_total"] == 3.0
+
+
+def test_summary_splits_redistribution_from_self_interest():
+    politic = {"wealth_total": 100, "wealth_capital": 50}
+    rows = [
+        {"law_id": 1, "law_wealth_relevant": 1, "is_key": 1, "present_count": 1,
+         "nominal_count": 1, "score_value": 1.5, "self_interest_value": -1.5,
+         "keyword_direction": 1, "keyword_weight": 1.5, "evidence_json": "{}"},
+        {"law_id": 2, "law_wealth_relevant": 1, "is_key": 0, "present_count": 1,
+         "nominal_count": 1, "score_value": -1.25, "self_interest_value": 1.25,
+         "keyword_direction": 1, "keyword_weight": 1.25, "evidence_json": "{}"},
+        {"law_id": 3, "law_wealth_relevant": 1, "is_key": 0, "present_count": 0,
+         "nominal_count": 1, "score_value": -1.5, "self_interest_value": 1.5,
+         "keyword_direction": 1, "keyword_weight": 1.5, "evidence_json": "{}"},
+    ]
+
+    s = db._summary(politic, rows)
+
+    assert s["pro_redistribution_score"] == 55
+    assert s["pro_redistribution_weight"] == 2.75
+    assert s["self_interest_alignment_score"] == 45
+    assert s["self_interest_weight"] == 2.75
+
+
+def test_summary_aggregates_keywords_to_one_law_contribution():
+    politic = {"wealth_total": 100, "wealth_capital": 50}
+    rows = [
+        {"law_id": 1, "law_wealth_relevant": 1, "is_key": 1, "present_count": 1,
+         "nominal_count": 1, "score_id": 10, "score_value": 1.5,
+         "self_interest_value": -1.5, "keyword_direction": 1, "keyword_weight": 1.5,
+         "evidence_json": "{}"},
+        {"law_id": 1, "law_wealth_relevant": 1, "is_key": 1, "present_count": 1,
+         "nominal_count": 1, "score_id": 11, "score_value": -1.25,
+         "self_interest_value": 1.25, "keyword_direction": 1, "keyword_weight": 1.25,
+         "evidence_json": "{}"},
+    ]
+
+    rollup = db._law_rollup_row(rows)
+    summary = db._summary(politic, rows)
+
+    assert round(rollup["score_value"], 3) == 0.136
+    assert rollup["_law_weight"] == 1.5
+    assert summary["pro_redistribution_score"] == 55
+    assert summary["pro_redistribution_weight"] == 1.5
+
+
+def test_summary_exposes_vote_policy_contract():
+    s = db._summary({"wealth_total": 0, "wealth_capital": 0}, [])
+
+    assert "Sim/Não" in s["vote_policy"]["directional_votes"]
+    assert "Abstenção" in s["vote_policy"]["neutral_votes"]
+    assert "AUSENTE" in s["vote_policy"]["missing_votes"]

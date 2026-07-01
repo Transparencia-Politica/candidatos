@@ -73,3 +73,91 @@ def test_score_keyword_uses_default_weight_when_missing():
 
     assert score_value == 1.0
     assert self_interest_value is None
+
+
+def test_score_keyword_treats_abstention_and_obstruction_as_neutral_recorded_votes():
+    keyword = {"slug": "dividendos", "direction": 1, "weight": 1.25, "wealth_relevant": True}
+    buckets = {"Ações / participações": 1000}
+
+    for stance in ("Abstenção", "Obstrução", "Artigo 17"):
+        score_value, self_interest_value = sc.score_keyword(
+            keyword,
+            {"stance": stance},
+            wealth_capital=1000,
+            wealth_total=1000,
+            wealth_buckets=buckets,
+        )
+        assert score_value == 0.0
+        assert self_interest_value == -0.0
+
+
+def test_score_keyword_keeps_missing_vote_out_of_scores():
+    keyword = {"slug": "dividendos", "direction": 1, "weight": 1.25, "wealth_relevant": True}
+
+    score_value, self_interest_value = sc.score_keyword(
+        keyword,
+        {"stance": None},
+        wealth_capital=1000,
+        wealth_total=1000,
+        wealth_buckets={"Ações / participações": 1000},
+    )
+
+    assert score_value is None
+    assert self_interest_value is None
+
+
+def test_score_keyword_requires_matching_asset_bucket_for_offshore():
+    keyword = {"slug": "offshore", "direction": 1, "weight": 1.5, "wealth_relevant": True}
+    law_vote = {"stance": "Sim"}
+    buckets = {"Ações / participações": 1000, "Depósito no exterior": 0}
+
+    score_value, self_interest_value = sc.score_keyword(
+        keyword,
+        law_vote,
+        wealth_capital=1000,
+        wealth_total=1000,
+        wealth_buckets=buckets,
+    )
+
+    assert score_value == 1.5
+    assert self_interest_value is None
+
+
+def test_score_keyword_scales_self_interest_by_asset_exposure():
+    keyword = {"slug": "dividendos", "direction": 1, "weight": 1.25, "wealth_relevant": True}
+    law_vote = {"stance": "Não"}
+    buckets = {"Ações / participações": 400, "Depósito no exterior": 0, "Outros": 600}
+
+    score_value, self_interest_value = sc.score_keyword(
+        keyword,
+        law_vote,
+        wealth_capital=400,
+        wealth_total=1000,
+        wealth_buckets=buckets,
+    )
+
+    assert score_value == -1.25
+    assert self_interest_value == 0.5
+
+
+def test_score_keyword_igf_exposure_uses_large_fortune_threshold():
+    keyword = {"slug": "igf-patrimonio", "direction": 1, "weight": 1.5, "wealth_relevant": True}
+    law_vote = {"stance": "Sim"}
+
+    _, under_threshold = sc.score_keyword(
+        keyword,
+        law_vote,
+        wealth_capital=5_000_000,
+        wealth_total=9_999_999,
+        wealth_buckets={"Ações / participações": 5_000_000},
+    )
+    _, over_threshold = sc.score_keyword(
+        keyword,
+        law_vote,
+        wealth_capital=5_000_000,
+        wealth_total=10_000_000,
+        wealth_buckets={"Ações / participações": 5_000_000},
+    )
+
+    assert under_threshold is None
+    assert over_threshold == -1.5

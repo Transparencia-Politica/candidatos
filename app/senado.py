@@ -171,7 +171,13 @@ def score_senator(
         for law in db.list_laws_with_keywords(conn):
             law_vote = sc.infer_law_vote_from_cache(conn, senado_id, law, house="senado")
             for keyword in law["keywords"]:
-                score_value, self_interest_value = sc.score_keyword(keyword, law_vote, wealth["wealth_capital"])
+                score_value, self_interest_value = sc.score_keyword(
+                    keyword,
+                    law_vote,
+                    wealth["wealth_capital"],
+                    wealth_total=wealth["wealth_total"],
+                    wealth_buckets=wealth["buckets"],
+                )
                 evidence = {
                     "house": "senado",
                     "senado_votacao_ids": law_vote["nominal_vote_ids"],
