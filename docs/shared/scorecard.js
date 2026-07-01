@@ -14,6 +14,14 @@ const pct = value => value === null || value === undefined ? '—' : `${value}%`
 const slugify = (name, id) => 'c-' + id + '-' + String(name || '').toLowerCase()
   .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
+const ZUCMAN_ARGUMENTS = {
+  'igf-grandes-fortunas': 'Taxa diretamente o estoque de grandes fortunas. É o sinal mais próximo da tese de tributar riqueza concentrada.',
+  'pl-4173-2023': 'Ataca estruturas usadas por alta renda e grande patrimônio: offshore e fundos exclusivos.',
+  'pl-1087-2025': 'Cria imposto mínimo sobre altas rendas e alcança grandes fluxos de lucros e dividendos.',
+  'pl-2337-2021': 'Tributa dividendos, uma forma central de renda de capital que favorece quem vive de propriedade e empresa.',
+  'pec-45-2019': 'Entra só como contexto fiscal. Reforma consumo, mas não mede diretamente tributação de riqueza.'
+};
+
 function chipClass(score){
   const status = score?.vote_status || '';
   if(status.includes('sim')) return 'c-sim';
@@ -51,8 +59,13 @@ function metricsHtml(card){
   const metrics = [
     [known ? pct(s.wealth_capital_pct) : '—', 'patrimônio em capital'],
     [pct(s.coverage_pct), 'cobertura de leis relevantes'],
+    [pct(s.confidence_pct), 'confiança da leitura',
+      'Percentual ponderado das leis relevantes em que há voto registrado. Leis centrais para tributação da riqueza pesam mais; ausência reduz confiança, não vira automaticamente posição política.'],
+    [pct(s.pro_redistribution_score), 'tributação progressiva',
+      'Pontuação ponderada dos votos registrados em leis de tributação da riqueza. 100% significa caminhar na direção de uma carga tributária mais progressiva; 0% significa proteger a concentração de riqueza.'],
     [pct(s.key_attendance_pct), 'presença no projeto-chave'],
-    [!known || s.self_interest_alignment_pct === null ? '—' : pct(s.self_interest_alignment_pct), 'protege o próprio patrimônio'],
+    [!known || s.self_interest_alignment_score === null ? '—' : pct(s.self_interest_alignment_score), 'exposição patrimonial ao tema',
+      'Leitura contextual: só aparece quando o patrimônio declarado tem bens parecidos com a base tributada pela lei. Não muda a pergunta principal, que é se o voto favorece tributação progressiva ou proteção da concentração de riqueza.'],
     [s.gov_alignment_pct === null || s.gov_alignment_pct === undefined ? '—' : pct(s.gov_alignment_pct), 'alinhado ao Governo',
       'Em cada votação, o líder do Governo orienta como a base deve votar — o "voto do Governo". Este é o % de votos em que o(a) parlamentar seguiu essa orientação.'],
     [s.opp_alignment_pct === null || s.opp_alignment_pct === undefined ? '—' : pct(s.opp_alignment_pct), 'alinhado à Oposição',
@@ -115,75 +128,190 @@ function votesHtml(card){
     <tbody>${rows.join('')}</tbody></table></section>`;
 }
 
+function lawWeight(law){
+  return (law.keywords || []).reduce((max, k) => Math.max(max, Math.abs(Number(k.weight || 0))), 0);
+}
+
+function lawDirectionLabel(law){
+  const directional = (law.keywords || []).filter(k => Number(k.direction) !== 0);
+  if(!directional.length) return 'Contexto: não move o score';
+  if(directional.every(k => Number(k.direction) > 0)) return 'SIM = tributação progressiva';
+  if(directional.every(k => Number(k.direction) < 0)) return 'SIM = protege concentração';
+  return 'Direção mista por palavra-chave';
+}
+
+function lawRole(law){
+  if(!law.wealth_relevant || lawDirectionLabel(law).startsWith('Contexto')) return 'contexto';
+  if(law.is_key) return 'central';
+  return 'apoio';
+}
+
+function weightLabel(weight){
+  if(weight >= 1.5) return 'muito alto';
+  if(weight >= 1.25) return 'alto';
+  if(weight > 0) return 'contexto';
+  return '0';
+}
+
+function rubricRows(topics){
+  const seen = new Set(), rows = [];
+  for(const topic of (topics || [])) for(const law of (topic.laws || [])){
+    if(seen.has(law.slug)) continue;
+    seen.add(law.slug);
+    const keywords = (law.keywords || []).map(k => k.label).join(', ');
+    const weight = lawWeight(law);
+    rows.push({ topic, law, keywords, weight, role: lawRole(law) });
+  }
+  return rows.sort((a, b) => {
+    const roleOrder = {central: 0, apoio: 1, contexto: 2};
+    return (roleOrder[a.role] ?? 9) - (roleOrder[b.role] ?? 9) || b.weight - a.weight;
+  });
+}
+
+function scoringRubricHtml(topics, options = {}){
+  const rows = rubricRows(topics);
+  if(!rows.length) return '';
+  const overrides = options.weightOverrides || {};
+  const interactive = Boolean(options.interactive);
+  const hasDraftChanges = Boolean(options.hasDraftChanges);
+  const title = interactive ? 'Critérios e Pesos' : 'Critérios e pesos';
+  return `<details class="panel collapse-panel rubric-panel"${options.collapseKey ? ` data-collapse-key="${options.collapseKey}"` : ''}>
+    <summary><span>${title}</span><span class="muted">${interactive ? 'ajustar o argumento' : 'ver como pontuamos'}</span></summary>
+    <div class="note">A leitura segue a pergunta do post: este voto caminhou para uma
+      <b>tributação mais progressiva</b> ou para <b>proteger a concentração de riqueza</b>?
+      A inspiração em Zucman aparece na prioridade dada a grandes fortunas, offshore, fundos
+      exclusivos, dividendos e imposto mínimo sobre alta renda. O peso muda a força da evidência;
+      contexto fiscal aparece, mas não move o score.${interactive ? ' Use os botões para preparar uma simulação; o grid só muda depois de <b>Aplicar pesos</b>.' : ''}</div>
+    <table class="rubric-table"><thead><tr>
+      <th>Lei</th><th>Papel</th><th>Peso</th><th>Como pontua</th><th>Argumento</th>
+    </tr></thead><tbody>${rows.map(({law, keywords, weight, role}) => {
+      const current = Object.prototype.hasOwnProperty.call(overrides, law.slug)
+        ? Number(overrides[law.slug])
+        : weight;
+      const canScore = Boolean(lawSignalWeight(law));
+      const control = interactive && canScore
+        ? `<div class="weight-control" data-law-weight="${law.slug}" data-default-weight="${weight}">
+            <button type="button" data-weight-delta="-0.25" title="Diminuir peso">−</button>
+            <button type="button" data-weight-flip title="Inverter sinal">±</button>
+            <span>${current.toFixed(2)}</span>
+            <button type="button" data-weight-delta="0.25" title="Aumentar peso">+</button>
+            <button type="button" data-weight-reset title="Voltar ao padrão">reset</button>
+          </div>`
+        : `<b>${current.toFixed(2)}</b><br><span class="muted">${canScore ? (current === weight ? weightLabel(weight) : 'ajustado') : 'não pontua'}</span>`;
+      return `
+      <tr>
+        <td><b>${law.label}</b><br><span class="muted">${keywords || '—'}</span></td>
+        <td><span class="chip ${role === 'contexto' ? 'c-aus' : role === 'central' ? 'c-sim' : 'c-mix'}">${role}</span></td>
+        <td>${control}</td>
+        <td>${lawDirectionLabel(law)}</td>
+        <td>${ZUCMAN_ARGUMENTS[law.slug] || law.description || 'Lei escolhida para estes critérios temáticos.'}
+          ${law.source_url ? `<br><a href="${law.source_url}" target="_blank" rel="noopener">fonte oficial</a>` : ''}</td>
+      </tr>`;
+    }).join('')}</tbody></table>
+    ${interactive ? `<div class="weight-actions">
+      <span class="muted">${hasDraftChanges ? 'Pesos alterados. Clique em aplicar para atualizar o grid.' : 'Pesos padrão aplicados ao grid.'}</span>
+      <button class="secondary" type="button" data-weight-reset-all>Resetar pesos</button>
+      <button class="primary" type="button" data-weight-apply>Aplicar pesos</button>
+    </div>` : ''}
+  </details>`;
+}
+
 const METHOD_HTML = `<section class="panel">
   <h2>Como o score é calculado</h2>
   <p>Para cada palavra-chave associada a uma lei, a direção indica o que um voto <code>Sim</code>
   representa. <code>+1</code> significa avançar a tese, <code>-1</code> significa bloquear a tese,
-  e <code>0</code> é contexto sem direção de riqueza.</p>
+  e <code>0</code> é contexto sem direção de riqueza. <code>Abstenção</code>, <code>Obstrução</code>
+  e <code>Artigo 17</code> são evidência registrada neutra. <code>AUSENTE</code> e leis sem votação
+  nominal reduzem cobertura/confiança, mas não viram posição política.</p>
   <div class="note warn">Ausência continua sendo ausência: o banco guarda presença, cobertura e
   evidência separadamente para evitar transformar dado faltante em intenção.</div>
 </section>`;
 
-/* ---- "Opinion" score: protege o patrimônio ◄──► apoia a população ----
-   Our DEFAULT lens. For each wealth-distribution law the person was present on, the stored
-   score_value is already +1 (voted with the people / progressive taxation) or -1 (voted to
-   protect wealth). The % is the plain average of those votes — only votes move the number.
-   Personal wealth shapes only the descriptive label (a future settings panel can swap the lens). */
-const WEALTH_HIGH = 1000000;  // R$ — "high personal wealth" threshold for the self-interest label
+/* ---- Opinion score: protege concentração ◄──► tributação progressiva ----
+   Our default lens. For each wealth-distribution law, the sign of score_value says direction:
+   progressive taxation versus protection of wealth concentration. The current keyword weights
+   say how much that law should count. */
 
-function opinionScore(card){
-  let sum = 0, n = 0;
+function lawSignalWeight(law){
+  let weight = 0;
+  for(const k of (law.keywords || [])){
+    if(Number(k.direction) !== 0) weight = Math.max(weight, Math.abs(Number(k.weight || 1)));
+  }
+  return weight;
+}
+
+function effectiveLawWeight(law, weightOverrides){
+  const base = lawSignalWeight(law);
+  if(!base) return 0;
+  if(weightOverrides && Object.prototype.hasOwnProperty.call(weightOverrides, law.slug)){
+    const custom = Number(weightOverrides[law.slug]);
+    return Number.isFinite(custom) ? custom : base;
+  }
+  return base;
+}
+
+function clamp(value, min, max){
+  return Math.max(min, Math.min(max, value));
+}
+
+function lawAlignmentUnit(law){
+  const weight = lawSignalWeight(law);
+  const score = law.score;
+  if(!weight || !score || score.score_value == null) return null;
+  return clamp(Number(score.score_value), -weight, weight) / weight;
+}
+
+function opinionScore(card, weightOverrides){
+  let sum = 0, totalWeight = 0, n = 0;
   for(const t of (card.topics || [])) for(const law of (t.laws || [])){
     // Only wealth-distribution laws with a real direction count (skips PEC 45 / direction 0).
-    if(!(law.keywords || []).some(k => Number(k.direction) !== 0)) continue;
-    const s = law.score;
-    if(!s) continue;
-    if(s.score_value != null){ sum += s.score_value; n++; }   // present: +1 (people) / -1 (wealth) / 0 (abstenção)
-    else if(s.vote_status === 'ausente'){ sum -= 1; n++; }    // ABSENT on a vote that happened → counts as -1
-    // 'sem-votacao-nominal' (no roll-call to attend) and 'misto' stay out — no clear signal.
+    const weight = effectiveLawWeight(law, weightOverrides);
+    if(!weight) continue;
+    const unit = lawAlignmentUnit(law);
+    if(unit !== null){
+      sum += unit * weight; totalWeight += Math.abs(weight); n++;
+    }   // present: positive (progressive) / negative (concentration) / 0 (abstenção)
+    // Absences and 'sem-votacao-nominal' stay out of the score; confidence shows missing evidence.
   }
-  if(!n) return null;                            // no relevant roll-calls in their term — can't read
-  const alignment = sum / n;                     // [-1, +1]
-  const pct = Math.round((alignment + 1) / 2 * 100);  // 0 = protege patrimônio, 100 = apoia população
-  const p = card.politic || {};
-  const wealthy = wealthKnown(p) && Number(p.wealth_total) >= WEALTH_HIGH;
+  if(!totalWeight) return null;                  // no relevant roll-calls in their term — can't read
+  const alignment = sum / totalWeight;           // [-1, +1]
+  const pct = Math.round((alignment + 1) / 2 * 100);  // 0 = protege concentração, 100 = tributação progressiva
   let label, tone;
-  if(pct >= 60){ tone = 'sim'; label = 'Vota pela população'; }
-  else if(pct <= 40){ tone = 'nao'; label = wealthy ? 'Protege o próprio patrimônio' : 'Vota contra a redistribuição'; }
-  else { tone = 'mix'; label = 'Voto misto'; }
-  return { pct, alignment, n, label, tone, wealthy };
+  if(pct >= 60){ tone = 'sim'; label = 'Vota por tributação progressiva'; }
+  else if(pct <= 40){ tone = 'nao'; label = 'Protege concentração de riqueza'; }
+  else { tone = 'mix'; label = 'Voto dividido'; }
+  return { pct, alignment, n, label, tone };
 }
 
 // The ⓘ explainer — pure <details> so it works in both shells with no JS wiring.
 function opinionInfo(){
   return `<details class="opinfo"><summary title="Como medimos">ⓘ</summary>
-    <div class="opinfo-body"><b>Como medimos.</b> Em cada lei sobre distribuição de patrimônio, um
-    voto a favor da tributação progressiva conta <b>+1</b> (apoia a população) e um voto contra
-    conta <b>−1</b> (protege o patrimônio). Uma <b>ausência</b> numa votação que aconteceu também
-    conta <b>−1</b> — não compareceu para apoiar. (Leis sem votação nominal e a reforma do consumo,
-    sem direção de patrimônio, ficam de fora.) A % é a média disso — <b>só os votos e ausências
-    movem o número</b>. O <b>patrimônio pessoal</b> muda apenas o rótulo: quem protege o patrimônio
-    <b>e</b> tem alta renda aparece como “protege o próprio patrimônio”. É <b>uma lente</b>, não um
-    veredito — a matemática está aberta. Em breve você poderá configurar a sua própria.</div></details>`;
+    <div class="opinfo-body"><b>Como medimos.</b> Em cada lei sobre tributação da riqueza, um
+    voto a favor da tributação progressiva conta positivo: desloca a carga para grandes fortunas,
+    renda de capital, dividendos, offshore ou estruturas de alta renda. Um voto contra conta
+    negativo: preserva a concentração de riqueza e as formas de pagar menos imposto. Ausência
+    reduz a <b>confiança da leitura</b>, mas não vira posição política. Leis sem votação nominal e
+    a reforma do consumo, sem direção de riqueza, ficam de fora. A % é a média ponderada dos votos
+    registrados. É <b>uma lente</b>, não um veredito — a matemática está aberta.</div></details>`;
 }
 
 // Slim opinion row for the profile: label + % + meter + ⓘ.
-function opinionHtml(card){
-  const o = opinionScore(card);
+function opinionHtml(card, weightOverrides){
+  const o = opinionScore(card, weightOverrides);
   if(!o){
     return `<section class="panel opinion-panel"><div class="opinion-head">
-      <span class="muted">Apoio à população: sem votos suficientes para medir.</span>${opinionInfo()}
+      <span class="muted">Tributação progressiva: sem votos suficientes para medir.</span>${opinionInfo()}
       </div></section>`;
   }
   return `<section class="panel opinion-panel">
     <div class="opinion-head">
       <span class="opinion-pct op-${o.tone}">${o.pct}%</span>
       <div><div class="opinion-label">${o.label}</div>
-        <div class="muted">apoio à população · ${o.n} lei(s) considerada(s)</div></div>
+        <div class="muted">tributação progressiva · ${o.n} lei(s) considerada(s)</div></div>
       ${opinionInfo()}
     </div>
     <div class="opmeter"><i class="op-${o.tone}" style="width:${o.pct}%"></i></div>
-    <div class="opmeter-ends"><span>protege o patrimônio</span><span>apoia a população</span></div>
+    <div class="opmeter-ends"><span>protege concentração</span><span>tributação progressiva</span></div>
   </section>`;
 }
 
@@ -191,16 +319,19 @@ function opinionHtml(card){
 function opinionLegendHtml(){
   return `<div class="opinion-legend">
     <span class="oleg-bar" aria-hidden="true"></span>
-    <span class="oleg-text">A <b>%</b> mede o <b>apoio à população</b> nas leis de distribuição de
-      patrimônio — <b class="op-nao-ink">0% = protege o patrimônio</b> (votou contra a tributação
-      progressiva) · <b class="op-sim-ink">100% = apoia a população</b> (votou a favor).</span>
+    <span class="oleg-text">A <b>%</b> mede se o voto caminhou para <b>tributação progressiva</b>
+      ou para <b>proteção da concentração de riqueza</b> —
+      <b class="op-nao-ink">0% = protege concentração</b> ·
+      <b class="op-sim-ink">100% = tributação progressiva</b>.</span>
   </div>`;
 }
 
 // Full scorecard body for one candidate (identity + opinion + metrics + wealth + votes + method).
-function cardBodyHtml(card){
+function cardBodyHtml(card, options = {}){
+  const weightOverrides = options.weightOverrides || {};
   return `<section class="panel">${identityHtml(card)}</section>`
-    + opinionHtml(card) + metricsHtml(card) + wealthHtml(card) + votesHtml(card) + METHOD_HTML;
+    + opinionHtml(card, weightOverrides) + metricsHtml(card) + scoringRubricHtml(card.topics, { weightOverrides })
+    + wealthHtml(card) + votesHtml(card) + METHOD_HTML;
 }
 
 // Profile body for a non-legislator (President/governor) from a curated TSE profile. These have
@@ -254,7 +385,7 @@ function candidateCardHtml(c, i){
   const delay = i ? ` style="animation-delay:${Math.min(i, 14) * 28}ms"` : '';
   // Slim opinion badge — only when the entry carries it (Pages snapshot); the live app's
   // lightweight /api/politics roster has no scores, so its tiles stay unchanged.
-  const op = c.opinion ? `<span class="opinion-tag op-${c.opinion.tone}" title="${c.opinion.label} — ${c.opinion.pct}% de apoio à população (0% protege o patrimônio · 100% apoia a população)">${c.opinion.pct}%<span class="op-i">ⓘ</span></span>` : '';
+  const op = c.opinion ? `<span class="opinion-tag op-${c.opinion.tone}" title="${c.opinion.label} — ${c.opinion.pct}% em tributação progressiva (0% protege concentração · 100% tributa riqueza)">${c.opinion.pct}%<span class="op-i">ⓘ</span></span>` : '';
   return `<button class="ccard" type="button" data-key="${candidateKey(c)}"${delay}>
     <span class="ccard-top"><span class="avatar avatar-sm">${(c.name || '?').slice(0, 1)}</span>${house}${op}</span>
     <b class="ccard-name">${c.name}</b>
@@ -290,7 +421,7 @@ function voteBucket(status){
 
 // Flatten one full scorecard into a lightweight, filterable roster entry. Keeps the fields
 // candidateCardHtml needs, plus wealth-known, summary alignment, and a {lawLabel -> SIM/NAO/…} map.
-function rosterEntry(card){
+function rosterEntry(card, weightOverrides){
   const p = card.politic, s = card.summary || {};
   const votes = {};
   for(const t of (card.topics || [])) for(const law of (t.laws || [])){
@@ -303,7 +434,7 @@ function rosterEntry(card){
     wealth_total: Number(p.wealth_total) || 0,
     wealth_known: p.tse_sq != null && p.tse_sq !== '',
     gov: s.gov_alignment_pct, opp: s.opp_alignment_pct,
-    opinion: opinionScore(card),   // {pct, tone, label} | null — drives the slim tile badge
+    opinion: opinionScore(card, weightOverrides),   // {pct, tone, label} | null — drives the slim tile badge
     votes, _name: normName(p.name),
   };
 }
@@ -391,10 +522,10 @@ function filterControlsHtml(facets){
       <label class="fcheck"><input id="f-unknown" type="checkbox" checked> incluir desconhecido</label>
     </div>
     <div class="frow">
-      <span class="flabel">Apoio %</span>${fi('Faixa do score de apoio à população: 0 = protege o patrimônio, 100 = apoia a população. Quem não tem score fica de fora.')}
+      <span class="flabel">Progressiva %</span>${fi('Faixa do score de tributação progressiva: 0 = protege concentração de riqueza, 100 = tributa riqueza de forma mais progressiva. Quem não tem score fica de fora.')}
       <input id="f-opmin" class="fnum" type="number" inputmode="numeric" min="0" max="100" placeholder="mín %">
       <input id="f-opmax" class="fnum" type="number" inputmode="numeric" min="0" max="100" placeholder="máx %">
-      <span class="muted" style="font-size:12px">0 = protege patrimônio · 100 = apoia população</span>
+      <span class="muted" style="font-size:12px">0 = protege concentração · 100 = tributação progressiva</span>
     </div>
     <div class="frow">
       <span class="flabel">Voto</span>${fi('Filtra por como votou numa lei específica: SIM, NÃO ou AUSENTE naquela votação.')}

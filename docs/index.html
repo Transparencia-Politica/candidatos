@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Candidato — Scorecards</title>
-<link rel="stylesheet" href="shared/theme.css?v=c340c5006a">
+<link rel="stylesheet" href="shared/theme.css?v=3b740f6410">
 <script>
   // Set theme before first paint to avoid a flash of the wrong theme.
   (function(){
@@ -22,7 +22,7 @@
   <header>
     <div>
       <h1>Candidato · Scorecards</h1>
-      <div class="sub">Como deputados(as) e senadores(as) votaram nas leis que mexem com o próprio patrimônio. Snapshot público, sem servidor.</div>
+      <div class="sub">Como deputados(as) e senadores(as) votaram nas leis de tributação da riqueza: tributação progressiva ou proteção da concentração. Snapshot público, sem servidor.</div>
     </div>
     <div class="header-actions">
       <div id="snapshot-badge" class="badge">snapshot</div>
@@ -32,7 +32,11 @@
 
   <!-- Busca: filter panel + opinion legend + results grid -->
   <section id="pane-busca">
-    <div class="panel"><div id="filters-host"></div></div>
+    <div id="rubric-host"></div>
+    <details id="filters-panel" class="panel collapse-panel" open>
+      <summary><span>Filtros</span><span class="muted">buscar, ordenar e combinar critérios</span></summary>
+      <div id="filters-host"></div>
+    </details>
     <div id="legend-host"></div>
     <div id="grid-host"></div>
   </section>
@@ -47,15 +51,18 @@
   <footer id="sources"></footer>
 </div>
 
-<script src="shared/scorecard.js?v=c340c5006a"></script>
+<script src="shared/scorecard.js?v=3b740f6410"></script>
 <script>
 // Static GitHub Pages shell. Loads the baked snapshot once, then filters it entirely client-side
 // (filterRoster) and renders the full scorecard from the same data on click — no backend.
 // Filter logic + controls (filterControlsHtml, rosterEntry, rosterFacets, candidateGridHtml,
 // cardBodyHtml) live in the shared scorecard module — this file is only state + wiring.
 
+let scorecards = [];              // full baked scorecards from the snapshot
 let entries = [];                 // lightweight, filterable roster entries
 const cardByKey = new Map();      // key -> full scorecard (for the detail view)
+const weightOverrides = {};       // law slug -> custom weight used only in this browser session
+const draftWeightOverrides = {};  // edited weights, applied only when the user clicks the button
 const filters = {
   query: '', house: 'all', parties: [], ufs: [],
   wealthMin: null, wealthMax: null, showUnknownWealth: true,
@@ -65,7 +72,7 @@ const filters = {
 /* ---------------- views ---------------- */
 function showBusca(){ el('pane-busca').hidden = false; el('pane-detalhe').hidden = true; }
 function showDetalhe(card){
-  el('card-host').innerHTML = cardBodyHtml(card);
+  el('card-host').innerHTML = cardBodyHtml(card, { weightOverrides });
   el('pane-busca').hidden = true; el('pane-detalhe').hidden = false;
   window.scrollTo(0, 0);
 }
@@ -81,6 +88,88 @@ function renderGrid(){
       if(card) showDetalhe(card);
     });
   }
+}
+
+function rebuildEntries(){
+  cardByKey.clear();
+  entries = scorecards.map(c => {
+    const e = rosterEntry(c, weightOverrides);
+    cardByKey.set(e.key, c);
+    return e;
+  });
+}
+
+function renderRubric(){
+  el('rubric-host').innerHTML = scoringRubricHtml(scorecards[0]?.topics || [], {
+    interactive: true,
+    weightOverrides: draftWeightOverrides,
+    hasDraftChanges: weightsChanged(),
+    collapseKey: 'criteria-weights',
+  });
+  wireDetailsState(el('rubric-host').querySelector('[data-collapse-key]'), 'criteria-weights', false);
+}
+
+function applyWeightChange(control, action){
+  const slug = control.dataset.lawWeight;
+  const fallback = Number(control.dataset.defaultWeight);
+  const current = Object.prototype.hasOwnProperty.call(draftWeightOverrides, slug)
+    ? Number(draftWeightOverrides[slug])
+    : fallback;
+  if(action.reset) delete draftWeightOverrides[slug];
+  else if(action.flip) draftWeightOverrides[slug] = Number((-current).toFixed(2));
+  else draftWeightOverrides[slug] = Number((current + action.delta).toFixed(2));
+  renderRubric();
+}
+
+function wireRubricControls(){
+  el('rubric-host').addEventListener('click', e => {
+    const resetAll = e.target.closest('[data-weight-reset-all]');
+    if(resetAll){
+      for(const key of Object.keys(draftWeightOverrides)) delete draftWeightOverrides[key];
+      renderRubric();
+      return;
+    }
+    const apply = e.target.closest('[data-weight-apply]');
+    if(apply){
+      for(const key of Object.keys(weightOverrides)) delete weightOverrides[key];
+      for(const [key, value] of Object.entries(draftWeightOverrides)) weightOverrides[key] = value;
+      rebuildEntries();
+      renderGrid();
+      renderRubric();
+      return;
+    }
+    const control = e.target.closest('[data-law-weight]');
+    if(!control) return;
+    const deltaButton = e.target.closest('[data-weight-delta]');
+    if(deltaButton) return applyWeightChange(control, { delta: Number(deltaButton.dataset.weightDelta) });
+    if(e.target.closest('[data-weight-flip]')) return applyWeightChange(control, { flip: true });
+    if(e.target.closest('[data-weight-reset]')) return applyWeightChange(control, { reset: true });
+  });
+}
+
+function weightsChanged(){
+  const keys = new Set([...Object.keys(weightOverrides), ...Object.keys(draftWeightOverrides)]);
+  for(const key of keys){
+    if(Number(weightOverrides[key]) !== Number(draftWeightOverrides[key])) return true;
+  }
+  return false;
+}
+
+function storageGet(key){
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+
+function storageSet(key, value){
+  try{ localStorage.setItem(key, value); }catch(e){}
+}
+
+function wireDetailsState(details, key, defaultOpen){
+  if(!details) return;
+  const stored = storageGet(`collapse:${key}`);
+  details.open = stored === null ? defaultOpen : stored === 'open';
+  details.addEventListener('toggle', () => {
+    storageSet(`collapse:${key}`, details.open ? 'open' : 'closed');
+  }, { once: false });
 }
 
 /* ---------------- filter wiring ---------------- */
@@ -133,30 +222,33 @@ async function run(){
   try{
     // Cache-bust the snapshot too: GitHub Pages caches it, so a returning visitor can otherwise
     // get a stale roster (e.g. an old 3-candidate snapshot). Bump ?v= whenever the data is re-baked.
-    const res = await fetch('./data/scorecards.json?v=c340c5006a');
+    const res = await fetch('./data/scorecards.json?v=3b740f6410');
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
-    const cards = payload.scorecards || [];
-    if(!cards.length){
+    scorecards = payload.scorecards || [];
+    if(!scorecards.length){
       el('state').innerHTML = '<span class="muted">Nenhum scorecard disponível neste snapshot.</span>';
       return;
     }
-    entries = cards.map(c => { const e = rosterEntry(c); cardByKey.set(e.key, c); return e; });
+    rebuildEntries();
     el('filters-host').innerHTML = filterControlsHtml(rosterFacets(entries));
     el('legend-host').innerHTML = opinionLegendHtml();
+    renderRubric();
+    wireRubricControls();
     wireFilters();
     renderGrid();
     el('back').addEventListener('click', showBusca);
     el('state').style.display = 'none';
     const when = payload.generated_at ? new Date(payload.generated_at).toLocaleString('pt-BR') : '—';
-    el('snapshot-badge').textContent = `${cards.length} no banco`;
-    el('sources').textContent = `Snapshot estático · ${cards.length} parlamentares · gerado em ${when}`;
+    el('snapshot-badge').textContent = `${scorecards.length} no banco`;
+    el('sources').textContent = `Snapshot estático · ${scorecards.length} parlamentares · gerado em ${when}`;
   }catch(err){
     el('state').innerHTML = `<span class="error">Erro ao carregar os dados: ${err}</span>`;
   }
 }
 
 initThemeToggle();
+wireDetailsState(el('filters-panel'), 'filters', true);
 run();
 </script>
 </body>

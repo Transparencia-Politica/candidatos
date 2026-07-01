@@ -39,6 +39,14 @@ h3{font-size:1.05rem;margin:0 0 2px}
 .badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;
   padding:4px 10px;background:var(--surface);color:var(--muted);font-size:.78rem;font-weight:650;white-space:nowrap}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;margin:14px 0}
+.collapse-panel>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  cursor:pointer;list-style:none;font-weight:760;color:var(--ink);margin:-2px 0}
+.collapse-panel>summary::-webkit-details-marker{display:none}
+.collapse-panel>summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--muted);
+  border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .15s ease;margin-left:auto}
+.collapse-panel[open]>summary{margin-bottom:14px}
+.collapse-panel[open]>summary::after{transform:rotate(225deg)}
+.collapse-panel>summary:hover span:first-child{color:var(--blue)}
 .search-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .search-input{min-width:260px;flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);background:var(--input-bg)}
 .primary{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:9px 15px;font-weight:700;cursor:pointer}
@@ -88,6 +96,17 @@ h3{font-size:1.05rem;margin:0 0 2px}
 table{width:100%;border-collapse:collapse}
 th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--muted);font-size:.75rem;text-transform:uppercase}
+.rubric-panel .note{margin-bottom:12px}
+.rubric-panel .weight-reset-all{margin:0 0 12px}
+.rubric-table td:nth-child(2),.rubric-table td:nth-child(3){white-space:nowrap}
+.rubric-table a{color:var(--blue);font-weight:650;text-decoration:none}
+.rubric-table a:hover{text-decoration:underline}
+.weight-control{display:grid;grid-template-columns:auto auto auto auto;gap:4px;align-items:center}
+.weight-control button{border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink);
+  cursor:pointer;padding:3px 7px;font-weight:750;line-height:1}
+.weight-control button:hover{border-color:var(--blue);color:var(--blue)}
+.weight-control span{grid-column:1 / -1;text-align:center;font-variant-numeric:tabular-nums;font-weight:800}
+.weight-control button[data-weight-reset]{grid-column:1 / -1;color:var(--muted);font-size:11px;font-weight:650}
 .chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 9px;font-size:.77rem;font-weight:700;
   border:1px solid transparent;white-space:nowrap}
 .c-sim{background:var(--sim-bg);color:var(--teal);border-color:var(--sim-line)}
@@ -174,7 +193,7 @@ footer{color:var(--muted);font-size:.8rem;margin-top:16px}
   white-space:normal;background:var(--surface);color:var(--ink);border:1px solid var(--line);
   border-radius:8px;padding:8px 10px;font-size:12px;font-weight:400;line-height:1.45;
   box-shadow:0 6px 20px var(--shadow)}
-/* ---- Opinion score (protege o patrimônio ◄──► apoia a população) ---- */
+/* ---- Opinion score (protege concentração ◄──► tributação progressiva) ---- */
 .opinion-tag{margin-left:auto;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;
   border:1px solid var(--line);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}
 .opinion-tag .op-i{font-size:10px;opacity:.7;font-weight:400}
