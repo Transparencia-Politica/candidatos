@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Candidato — Scorecards</title>
-<link rel="stylesheet" href="shared/theme.css?v=17759d9397">
+<link rel="stylesheet" href="shared/theme.css?v=bfd9f9cdf7">
 <script>
   // Set theme before first paint to avoid a flash of the wrong theme.
   (function(){
@@ -21,11 +21,12 @@
 <div class="wrap">
   <header>
     <div>
-      <h1>Candidato · Scorecards</h1>
-      <div class="sub">Como deputados(as) e senadores(as) votaram nas leis de tributação da riqueza: tributação progressiva ou proteção da concentração. Snapshot público, sem servidor.</div>
+      <h1 data-i18n="pageTitleStatic">Candidato · Scorecards</h1>
+      <div class="sub" data-i18n="pageSubtitleStatic">Como deputados(as) e senadores(as) votaram nas leis de tributação da riqueza: tributação progressiva ou proteção da concentração. Snapshot público, sem servidor.</div>
     </div>
     <div class="header-actions">
-      <div id="snapshot-badge" class="badge">snapshot</div>
+      <div id="snapshot-badge" class="badge" data-i18n="snapshotBadge">snapshot</div>
+      <button id="lang-toggle" class="lang-toggle" type="button" aria-label="Switch language" title="Switch language"></button>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema"></button>
     </div>
   </header>
@@ -34,7 +35,7 @@
   <section id="pane-busca">
     <div id="rubric-host"></div>
     <details id="filters-panel" class="panel collapse-panel" open>
-      <summary><span>Filtros</span><span class="muted">buscar, ordenar e combinar critérios</span></summary>
+      <summary><span data-i18n="filtersTitle">Filtros</span><span class="muted" data-i18n="filtersSubtitle">buscar, ordenar e combinar critérios</span></summary>
       <div id="filters-host"></div>
     </details>
     <div id="legend-host"></div>
@@ -43,15 +44,15 @@
 
   <!-- Detalhe: one full scorecard, read straight from the snapshot (no fetch) -->
   <section id="pane-detalhe" hidden>
-    <button id="back" class="linkback" type="button">← Voltar à busca</button>
+    <button id="back" class="linkback" type="button" data-i18n="detailBack">← Voltar à busca</button>
     <div id="card-host"></div>
   </section>
 
-  <section id="state" class="panel">Carregando scorecards…</section>
+  <section id="state" class="panel" data-i18n="loadingScorecards">Carregando scorecards…</section>
   <footer id="sources"></footer>
 </div>
 
-<script src="shared/scorecard.js?v=17759d9397"></script>
+<script src="shared/scorecard.js?v=bfd9f9cdf7"></script>
 <script>
 // Static GitHub Pages shell. Loads the baked snapshot once, then filters it entirely client-side
 // (filterRoster) and renders the full scorecard from the same data on click — no backend.
@@ -222,12 +223,12 @@ async function run(){
   try{
     // Cache-bust the snapshot too: GitHub Pages caches it, so a returning visitor can otherwise
     // get a stale roster (e.g. an old 3-candidate snapshot). Bump ?v= whenever the data is re-baked.
-    const res = await fetch('./data/scorecards.json?v=17759d9397');
+    const res = await fetch('./data/scorecards.json?v=bfd9f9cdf7');
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
     scorecards = payload.scorecards || [];
     if(!scorecards.length){
-      el('state').innerHTML = '<span class="muted">Nenhum scorecard disponível neste snapshot.</span>';
+      el('state').innerHTML = `<span class="muted">${tr('loadingEmpty')}</span>`;
       return;
     }
     rebuildEntries();
@@ -241,13 +242,14 @@ async function run(){
     el('state').style.display = 'none';
     const when = payload.generated_at ? new Date(payload.generated_at).toLocaleString('pt-BR') : '—';
     el('snapshot-badge').textContent = `${scorecards.length} no banco`;
-    el('sources').textContent = `Snapshot estático · ${scorecards.length} parlamentares · gerado em ${when}`;
+    el('sources').textContent = tr('snapshotFooter', scorecards.length, when);
   }catch(err){
-    el('state').innerHTML = `<span class="error">Erro ao carregar os dados: ${err}</span>`;
+    el('state').innerHTML = `<span class="error">${tr('loadError', err)}</span>`;
   }
 }
 
 initThemeToggle();
+initLanguageToggle();
 wireDetailsState(el('filters-panel'), 'filters', true);
 run();
 </script>

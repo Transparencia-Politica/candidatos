@@ -21,18 +21,19 @@
 <div class="wrap">
   <header>
     <div>
-      <h1>Candidato · Scorecard</h1>
-      <div class="sub">Busque um(a) deputado(a) ou senador(a), calcule se os votos caminham para tributação progressiva ou proteção da concentração, e leia o resultado armazenado em MySQL.</div>
+      <h1 data-i18n="pageTitleLive">Candidato · Scorecard</h1>
+      <div class="sub" data-i18n="pageSubtitleLive">Busque um(a) deputado(a) ou senador(a), calcule se os votos caminham para tributação progressiva ou proteção da concentração, e leia o resultado armazenado em MySQL.</div>
     </div>
     <div class="header-actions">
-      <div class="badge">MySQL API</div>
+      <div class="badge" data-i18n="mysqlBadge">MySQL API</div>
+      <button id="lang-toggle" class="lang-toggle" type="button" aria-label="Switch language" title="Switch language"></button>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema"></button>
     </div>
   </header>
 
   <nav class="tabs" id="tabs">
-    <button class="tabbtn active" type="button" data-tab="busca">Busca <span class="count" id="roster-count"></span></button>
-    <button class="tabbtn" type="button" data-tab="selecionado" id="tab-selecionado" hidden>Selecionado</button>
+    <button class="tabbtn active" type="button" data-tab="busca"><span data-i18n="searchTab">Busca</span> <span class="count" id="roster-count"></span></button>
+    <button class="tabbtn" type="button" data-tab="selecionado" id="tab-selecionado" hidden data-i18n="selectedTab">Selecionado</button>
   </nav>
 
   <!-- TAB: Busca — search + grid of cached candidates -->
@@ -40,13 +41,13 @@
     <div class="panel">
       <form id="search-form" class="search-form">
         <div class="search-field">
-          <input id="candidate-query" class="search-input" placeholder="Filtre a grade ou digite um nome novo…" autocomplete="off">
+          <input id="candidate-query" class="search-input" placeholder="Filtre a grade ou digite um nome novo…" autocomplete="off" data-i18n-placeholder="liveSearchPlaceholder">
         </div>
-        <button id="search-button" class="primary" type="submit">Buscar</button>
-        <button id="random-cached" class="secondary" type="button" title="Abre um candidato já no banco">🎲 No banco</button>
-        <button id="random-new" class="secondary" type="button" title="Sorteia um deputado novo e calcula o score">🎲 Novo</button>
+        <button id="search-button" class="primary" type="submit" data-i18n="searchButton">Buscar</button>
+        <button id="random-cached" class="secondary" type="button" title="Abre um candidato já no banco" data-i18n="randomCached" data-i18n-title="randomCachedTitle">🎲 No banco</button>
+        <button id="random-new" class="secondary" type="button" title="Sorteia um deputado novo e calcula o score" data-i18n="randomNew" data-i18n-title="randomNewTitle">🎲 Novo</button>
       </form>
-      <div class="sub" style="margin-top:8px">A grade mostra quem já está no banco — digite para filtrar. Clique em <b>Buscar</b> para procurar um nome novo (Câmara → Senado).</div>
+      <div class="sub" style="margin-top:8px" data-i18n="liveGridHint">A grade mostra quem já está no banco — digite para filtrar. Clique em <b>Buscar</b> para procurar um nome novo (Câmara → Senado).</div>
       <div id="search-results" class="results"></div>
     </div>
     <div id="grid-host"></div>
@@ -54,7 +55,7 @@
 
   <!-- TAB: Selecionado — the full scorecard; tab hidden until something is selected -->
   <section id="pane-selecionado" class="tabpane" hidden>
-    <button id="back-to-busca" class="linkback" type="button">← Voltar à busca</button>
+    <button id="back-to-busca" class="linkback" type="button" data-i18n="detailBack">← Voltar à busca</button>
     <div id="card-host"></div>
     <footer id="sources"></footer>
   </section>
@@ -297,6 +298,7 @@ async function randomNew(){
 
 /* ---------------- wiring ---------------- */
 initThemeToggle();
+initLanguageToggle();
 el('search-form').addEventListener('submit', onSubmit);
 el('candidate-query').addEventListener('input', renderGrid);
 el('random-cached').addEventListener('click', randomCached);
