@@ -96,17 +96,73 @@ h3{font-size:1.05rem;margin:0 0 2px}
 table{width:100%;border-collapse:collapse}
 th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--muted);font-size:.75rem;text-transform:uppercase}
-.rubric-panel .note{margin-bottom:12px}
-.rubric-panel .weight-reset-all{margin:0 0 12px}
-.rubric-table td:nth-child(2),.rubric-table td:nth-child(3){white-space:nowrap}
-.rubric-table a{color:var(--blue);font-weight:650;text-decoration:none}
-.rubric-table a:hover{text-decoration:underline}
-.weight-control{display:grid;grid-template-columns:auto auto auto auto;gap:4px;align-items:center}
-.weight-control button{border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink);
-  cursor:pointer;padding:3px 7px;font-weight:750;line-height:1}
-.weight-control button:hover{border-color:var(--blue);color:var(--blue)}
-.weight-control span{grid-column:1 / -1;text-align:center;font-variant-numeric:tabular-nums;font-weight:800}
-.weight-control button[data-weight-reset]{grid-column:1 / -1;color:var(--muted);font-size:11px;font-weight:650}
+/* ---- Rubric panel: "Critérios e Pesos" (roles + direction explained once, slim rows) ---- */
+.rubric2{display:flex;flex-direction:column;gap:0}
+.rub-intro{color:var(--note-ink);font-size:.9rem;line-height:1.55;margin:2px 0 0;max-width:74ch}
+.rub-legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin:11px 0 4px;
+  padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--soft);font-size:12px;color:var(--muted)}
+.rub-legend .lg{display:inline-flex;align-items:center;gap:6px}
+.rub-legend .dot{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+.rub-legend .sep{width:1px;height:13px;background:var(--line)}
+.rub-legend .rule{color:var(--note-ink)}
+.dot.central{background:var(--teal)}
+.dot.apoio{background:var(--amber)}
+
+/* one law = one compact row: explanation (flex) + weight module (fixed) */
+.rlaw{display:grid;grid-template-columns:1fr 192px;gap:20px;align-items:center;
+  padding:11px 0;border-top:1px solid var(--line)}
+.rlaw:first-of-type{border-top:0}
+.rlaw-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.rdot{width:9px;height:9px;border-radius:3px;flex:0 0 auto;align-self:center;transform:translateY(1px)}
+.rdot.central{background:var(--teal)}
+.rdot.apoio{background:var(--amber)}
+.rlaw-name{font-weight:760;font-size:.96rem;letter-spacing:-.01em}
+.rlaw-sub{color:var(--muted);font-size:.83rem}
+.rlaw-dir{margin-left:auto;font-size:.74rem;font-weight:650;color:var(--muted);
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.rlaw-dir .arrow{color:var(--teal);font-weight:800}
+.rlaw-body{color:var(--note-ink);font-size:.87rem;line-height:1.45;margin:3px 0 0}
+.rlaw-body a,.rub-note a{color:var(--blue);font-weight:650;text-decoration:none;margin-left:2px}
+.rlaw-body a:hover,.rub-note a:hover{text-decoration:underline}
+.rlaw-src::before{content:"·";margin:0 6px;color:var(--muted)}
+
+/* weight module: stepper (with icon actions) + role-colored bar & qualifier */
+.wmod{align-self:center;display:flex;flex-direction:column;gap:6px}
+.wmod-static{align-items:flex-end}
+.wmod-staticval{font-size:1.15rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.wrow{display:flex;align-items:stretch;gap:6px}
+.stepper{flex:1;display:flex;align-items:stretch;border:1px solid var(--line);border-radius:8px;
+  overflow:hidden;background:var(--surface)}
+.stepper button{flex:1;border:0;background:var(--surface);color:var(--ink);cursor:pointer;
+  font-size:1rem;font-weight:700;line-height:1;padding:6px 0;transition:background .12s,color .12s}
+.stepper button:hover{background:var(--accent-soft);color:var(--blue)}
+.stepper button:active{background:var(--track)}
+.stepper .mid{flex:1.5;display:grid;place-items:center;border-left:1px solid var(--line);border-right:1px solid var(--line);
+  font-variant-numeric:tabular-nums;font-weight:800;font-size:.98rem;cursor:default}
+.wicon{flex:0 0 auto;width:30px;border:1px solid var(--line);border-radius:8px;background:var(--surface);
+  color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:color .12s,border-color .12s}
+.wicon:hover{color:var(--blue);border-color:var(--blue)}
+.wicon svg{width:14px;height:14px}
+.wmod-scale{display:flex;align-items:center;gap:8px;padding:0 1px;width:100%}
+.wmod-static .wmod-scale{max-width:120px}
+.wmod-bar{flex:1;height:5px;background:var(--track);border-radius:999px;overflow:hidden}
+.wmod-bar i{display:block;height:100%;border-radius:999px;transition:width .25s ease}
+.wmod-bar i.central{background:var(--teal)}
+.wmod-bar i.apoio{background:var(--amber)}
+.wmod-bar i.nao{background:var(--rose)}
+.wmod-q{font-size:.67rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.wmod-q.adj{color:var(--amber)}
+
+/* documented exclusion of context-only laws */
+.rub-note{margin:12px 0 0;padding:11px 13px;border-left:3px solid var(--muted);border-radius:6px;
+  background:var(--soft);font-size:.82rem;color:var(--note-ink);line-height:1.55}
+.rub-note b{font-weight:700}
+
+/* action bar */
+.rub-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:13px;border-top:1px solid var(--line)}
+.rub-foot .status{font-size:.82rem;color:var(--muted);margin-right:auto}
+.rub-foot .status.dirty{color:var(--amber);font-weight:600}
+.rub-foot .status .pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:7px;vertical-align:middle}
 .chip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 9px;font-size:.77rem;font-weight:700;
   border:1px solid transparent;white-space:nowrap}
 .c-sim{background:var(--sim-bg);color:var(--teal);border-color:var(--sim-line)}
@@ -235,4 +291,6 @@ details.opinfo>summary::-webkit-details-marker{display:none}
   th:nth-child(2),td:nth-child(2){display:none}
   .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
   .flabel{min-width:0}
+  .rlaw{grid-template-columns:1fr;gap:10px;align-items:start}
+  .wmod-static{align-items:flex-start}
 }

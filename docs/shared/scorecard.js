@@ -147,11 +147,22 @@ function lawRole(law){
 }
 
 function weightLabel(weight){
-  if(weight >= 1.5) return 'muito alto';
-  if(weight >= 1.25) return 'alto';
-  if(weight > 0) return 'contexto';
-  return '0';
+  const w = Math.abs(weight);
+  if(w >= 1.5) return 'muito alto';
+  if(w >= 1.25) return 'alto';
+  if(w >= 0.75) return 'moderado';
+  if(w > 0) return 'baixo';
+  return '—';
 }
+
+// Bar fill is proportional to |weight| against a fixed reference so laws are visually comparable
+// across rows and cards; clamp so a hand-raised weight can't overflow the track.
+const WEIGHT_BAR_REF = 2.0;
+const weightBarPct = weight => Math.min(100, Math.round(Math.abs(weight) / WEIGHT_BAR_REF * 100));
+
+// SVG glyphs for the two rare per-law actions (invert sign / reset to default).
+const ICON_FLIP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M7 10l-3 3 3 3M4 13h11M17 14l3-3-3-3M20 11H9"/></svg>';
+const ICON_RESET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>';
 
 function rubricRows(topics){
   const seen = new Set(), rows = [];
@@ -168,6 +179,37 @@ function rubricRows(topics){
   });
 }
 
+function rubricArgument(law){
+  return ZUCMAN_ARGUMENTS[law.slug] || law.description || 'Lei escolhida para estes critérios temáticos.';
+}
+
+// Weight module (right side of each scored row). Interactive mode keeps the DOM contract the
+// roster handlers depend on: [data-law-weight] wrapper + [data-default-weight] and the
+// data-weight-delta / -flip / -reset buttons. `applyWeightChange` reads the attributes, not the
+// rendered number, so the displayed value is presentation-only.
+function weightModuleHtml(law, weight, current, role, interactive){
+  const flipped = current < 0;                         // ± turned this into a "protege concentração" sim
+  const adjusted = Number(current.toFixed(2)) !== Number(weight.toFixed(2));
+  const tone = flipped ? 'nao' : role;                 // rose when the sign was inverted, else role color
+  const qualifier = adjusted ? 'ajustado' : weightLabel(current);
+  const scale = `<div class="wmod-scale"><div class="wmod-bar"><i class="${tone}" style="width:${weightBarPct(current)}%"></i></div>
+    <span class="wmod-q${adjusted ? ' adj' : ''}">${qualifier}</span></div>`;
+  if(!interactive){
+    return `<div class="wmod wmod-static">
+      <div class="wmod-staticval">${current.toFixed(2)}</div>${scale}</div>`;
+  }
+  return `<div class="wmod" data-law-weight="${law.slug}" data-default-weight="${weight}">
+    <div class="wrow">
+      <div class="stepper">
+        <button type="button" data-weight-delta="-0.25" title="Diminuir peso">−</button>
+        <span class="mid">${current.toFixed(2)}</span>
+        <button type="button" data-weight-delta="0.25" title="Aumentar peso">+</button>
+      </div>
+      <button type="button" class="wicon" data-weight-flip title="Inverter sinal">${ICON_FLIP}</button>
+      <button type="button" class="wicon" data-weight-reset title="Voltar ao padrão">${ICON_RESET}</button>
+    </div>${scale}</div>`;
+}
+
 function scoringRubricHtml(topics, options = {}){
   const rows = rubricRows(topics);
   if(!rows.length) return '';
@@ -175,44 +217,81 @@ function scoringRubricHtml(topics, options = {}){
   const interactive = Boolean(options.interactive);
   const hasDraftChanges = Boolean(options.hasDraftChanges);
   const title = interactive ? 'Critérios e Pesos' : 'Critérios e pesos';
-  return `<details class="panel collapse-panel rubric-panel"${options.collapseKey ? ` data-collapse-key="${options.collapseKey}"` : ''}>
-    <summary><span>${title}</span><span class="muted">${interactive ? 'ajustar o argumento' : 'ver como pontuamos'}</span></summary>
-    <div class="note">A leitura segue a pergunta do post: este voto caminhou para uma
-      <b>tributação mais progressiva</b> ou para <b>proteger a concentração de riqueza</b>?
-      A inspiração em Zucman aparece na prioridade dada a grandes fortunas, offshore, fundos
-      exclusivos, dividendos e imposto mínimo sobre alta renda. O peso muda a força da evidência;
-      contexto fiscal aparece, mas não move o score.${interactive ? ' Use os botões para preparar uma simulação; o grid só muda depois de <b>Aplicar pesos</b>.' : ''}</div>
-    <table class="rubric-table"><thead><tr>
-      <th>Lei</th><th>Papel</th><th>Peso</th><th>Como pontua</th><th>Argumento</th>
-    </tr></thead><tbody>${rows.map(({law, keywords, weight, role}) => {
-      const current = Object.prototype.hasOwnProperty.call(overrides, law.slug)
-        ? Number(overrides[law.slug])
-        : weight;
-      const canScore = Boolean(lawSignalWeight(law));
-      const control = interactive && canScore
-        ? `<div class="weight-control" data-law-weight="${law.slug}" data-default-weight="${weight}">
-            <button type="button" data-weight-delta="-0.25" title="Diminuir peso">−</button>
-            <button type="button" data-weight-flip title="Inverter sinal">±</button>
-            <span>${current.toFixed(2)}</span>
-            <button type="button" data-weight-delta="0.25" title="Aumentar peso">+</button>
-            <button type="button" data-weight-reset title="Voltar ao padrão">reset</button>
-          </div>`
-        : `<b>${current.toFixed(2)}</b><br><span class="muted">${canScore ? (current === weight ? weightLabel(weight) : 'ajustado') : 'não pontua'}</span>`;
-      return `
-      <tr>
-        <td><b>${law.label}</b><br><span class="muted">${keywords || '—'}</span></td>
-        <td><span class="chip ${role === 'contexto' ? 'c-aus' : role === 'central' ? 'c-sim' : 'c-mix'}">${role}</span></td>
-        <td>${control}</td>
-        <td>${lawDirectionLabel(law)}</td>
-        <td>${ZUCMAN_ARGUMENTS[law.slug] || law.description || 'Lei escolhida para estes critérios temáticos.'}
-          ${law.source_url ? `<br><a href="${law.source_url}" target="_blank" rel="noopener">fonte oficial</a>` : ''}</td>
-      </tr>`;
-    }).join('')}</tbody></table>
-    ${interactive ? `<div class="weight-actions">
-      <span class="muted">${hasDraftChanges ? 'Pesos alterados. Clique em aplicar para atualizar o grid.' : 'Pesos padrão aplicados ao grid.'}</span>
+  const currentWeight = law => Object.prototype.hasOwnProperty.call(overrides, law.slug)
+    ? Number(overrides[law.slug]) : lawWeight(law);
+
+  // A law scores iff it has a directional keyword (lawSignalWeight > 0). That is the same predicate
+  // used to decide whether a control renders — so we use it to both split rows and build the note,
+  // guaranteeing the note lists exactly the laws we dropped from the interactive list.
+  const scored = rows.filter(r => lawSignalWeight(r.law));
+  const contexto = rows.filter(r => !lawSignalWeight(r.law));
+
+  // Direction ("SIM = tributação progressiva" etc.) is stated once above the list only when every
+  // scored law agrees; otherwise it stays per-row so a non-progressiva/mixed law is never mislabeled.
+  const dirLabels = [...new Set(scored.map(r => lawDirectionLabel(r.law)))];
+  const uniformDir = dirLabels.length === 1 ? dirLabels[0] : null;
+
+  const scoredHtml = scored.map(({law, keywords, role}) => {
+    const safeRole = role === 'contexto' ? 'apoio' : role;   // a scoring law is never "contexto"
+    const current = currentWeight(law);
+    const dirNote = uniformDir ? '' :
+      `<span class="rlaw-dir"><span class="arrow">→</span> ${lawDirectionLabel(law)}</span>`;
+    return `<div class="rlaw">
+      <div>
+        <div class="rlaw-head">
+          <span class="rdot ${safeRole}"></span>
+          <span class="rlaw-name">${law.label}</span>
+          <span class="rlaw-sub">${keywords || law.description || ''}</span>${dirNote}
+        </div>
+        <p class="rlaw-body">${rubricArgument(law)}${law.source_url
+          ? `<a class="rlaw-src" href="${law.source_url}" target="_blank" rel="noopener">fonte oficial</a>` : ''}</p>
+      </div>
+      ${weightModuleHtml(law, lawWeight(law), current, safeRole, interactive)}
+    </div>`;
+  }).join('');
+
+  // Documented exclusion: instead of a dead, un-adjustable row, list context-only laws with the
+  // reason they don't move the score, linking each law's own official source.
+  const contextoSources = contexto.filter(c => c.law.source_url).map(({law}) =>
+    `<a class="rlaw-src" href="${law.source_url}" target="_blank" rel="noopener">${contexto.length > 1 ? law.label : 'fonte oficial'}</a>`);
+  const contextoHtml = contexto.length ? `<div class="rub-note">
+      <b>Por que ${contexto.length > 1 ? 'estas leis não entram' : `a ${contexto[0].law.label} não entra`} no score?</b>
+      Este recorte, inspirado em Zucman, mede tributação de <b>riqueza e renda de capital</b>.
+      ${contexto.map(({law, keywords}) => `${law.label}${keywords ? ` (${keywords})` : ''} — ${rubricArgument(law)}`).join(' ')}
+      Fica${contexto.length > 1 ? 'm' : ''} registrada${contexto.length > 1 ? 's' : ''} como contexto, sem mover o score.${contextoSources.length
+        ? ` <span class="rub-note-src">${contexto.length > 1 ? 'Fontes: ' : ''}${contextoSources.join(', ')}</span>` : ''}
+    </div>` : '';
+
+  const legend = `<div class="rub-legend">
+      <span class="lg"><span class="dot central"></span> <b>central</b> — sinal direto da tese</span>
+      <span class="sep"></span>
+      <span class="lg"><span class="dot apoio"></span> <b>apoio</b> — reforça a tese</span>
+      <span class="lg rule" style="margin-left:auto">${interactive
+        ? 'Ajuste os pesos e clique em <b>Aplicar</b> para atualizar o grid.'
+        : 'O peso define quanto cada lei conta no cálculo.'}</span>
+    </div>`;
+
+  const footer = interactive ? `<div class="rub-foot">
+      <span class="status${hasDraftChanges ? ' dirty' : ''}">${hasDraftChanges
+        ? '<span class="pulse"></span>Pesos alterados — clique em aplicar para atualizar o grid.'
+        : 'Pesos padrão aplicados ao grid.'}</span>
       <button class="secondary" type="button" data-weight-reset-all>Resetar pesos</button>
       <button class="primary" type="button" data-weight-apply>Aplicar pesos</button>
-    </div>` : ''}
+    </div>` : '';
+
+  return `<details class="panel collapse-panel rubric-panel"${options.collapseKey ? ` data-collapse-key="${options.collapseKey}"` : ''}>
+    <summary><span>${title}</span><span class="muted">${interactive ? 'ajustar o argumento' : 'ver como pontuamos'}</span></summary>
+    <div class="rubric2">
+      <p class="rub-intro">Este voto caminhou para <b>tributação mais progressiva</b> ou para
+        <b>proteger a concentração de riqueza</b>? A inspiração em Zucman prioriza grandes fortunas,
+        offshore, fundos exclusivos, dividendos e imposto mínimo sobre alta renda.${uniformDir
+          ? ` Nestes critérios, um voto <b>${uniformDir}</b>; o` : ' O'} <b>peso</b> ajusta quanto
+        cada lei conta.</p>
+      ${legend}
+      ${scoredHtml}
+      ${contextoHtml}
+      ${footer}
+    </div>
   </details>`;
 }
 
